@@ -1,93 +1,144 @@
 # Talix Product Vision
 
-## Status
-
-**Product:** Talix  
+## Status and authority
 **Stage:** Foundation / pre-implementation  
-**Purpose of this document:** Durable product intent, independent of implementation architecture.
+**Product discovery updated:** October 6, 2026  
+**First POC:** Not yet defined or approved
 
-## Product Purpose
+This document owns the confirmed overall product intent. These are requirements for the overall vision, not implemented functionality or authorization to implement the entire product. Technical architecture, schema, technology, detailed UI, pricing, and POC scope remain undecided.
 
-Talix is a web-based business platform intended to let business owners manage the information and operations needed to present and sell their products through a customer-facing digital experience.
+Discovery source: [Talix FigJam](https://www.figma.com/board/WtSucgcWZBc29V8SXToWKS/Talix?node-id=0-1), refined through explicit product-owner clarifications on October 6, 2026. The board is a visual companion; repository documentation is durable project truth.
 
-The initial product concept combines a business-owner back office with a generated customer-facing point-of-sale / commerce experience. Business data and settings entered in the back office should drive the customer-facing experience rather than requiring each business to build and maintain a separate website manually.
+## Purpose and strategy
+Talix connects business operations and managed product data to business-specific customer commerce and staff-operated sales. Restaurants are the first audience. The shared business foundation is intended to support other business types over time; the industry-specific module defines how that business uses Talix.
 
-## Intended Users
+Modularity and easy connection to an owner's preferred external tools are strategic differentiators. This is a product objective, not approval of a technical modular architecture or a promise that every third-party tool already has a supported integration.
 
-### Business owners and operators
+Begin with a focused, complete POC before expanding breadth. The full vision below does not define its scope.
 
-Talix should provide business owners with a central place to manage their business-facing configuration and product information.
+## Clients, subscriptions, locations, and users
+- A client can hold multiple subscriptions.
+- Each subscription selects one business type and its corresponding industry module.
+- One subscription can cover multiple locations of that business type.
+- Owners use one login, switch subscriptions, then select a location.
+- Employees use one login across subscriptions they have been granted access to.
+- Employee access is granted to a subscription; location access and defined roles are configured within it. Roles can differ between locations.
+- Talix supplies initial predefined roles; owners can create custom roles.
+- Employees switch between authorized locations. Permissions govern what they can view and do.
+- Business users include owners/operators, staff handling orders, kitchen/preparation staff, and drivers.
+- Business customers can use guest checkout or accounts.
+- Talix administrators manage client businesses through their own administrative CRM.
 
-### Customers of Talix businesses
+## Application areas
+### Shared business core
+Business-facing capabilities include product management, BOM and inventory, financial tracking and reporting, business CRM, settings, payment support, employee management, marketing, and communications.
 
-Customers should receive a business-specific customer-facing experience generated from the business's Talix-managed data and settings.
+Industry modules shape business-specific options and workflows. Restaurants are the first supported audience; other industry details are not yet defined.
 
-### Talix operations
+### Website and revenue engine
+A shared business website directs customers to Talix's customer-facing revenue engine. Customers select a location before ordering; that location determines the product offering, local inventory, and receiving order queue.
 
-Talix itself will eventually require capabilities to manage client businesses, customer service, billing/relationship information, and platform operations.
+Existing websites can be retained. Initially new website building is handled by Talix staff or outsourced. Longer term, a Talix-owned website-builder module or an external website-builder integration is planned.
 
-These are product intentions, not claims of implemented functionality.
+Managed products and subscription settings drive the commerce experience: products, cart, checkout, order status, and transactional notifications. The restaurant experience also supports staff-entered counter, phone, and table-service orders and in-person table QR ordering.
 
-## Core Product Intent
+### Talix administration
+Talix Admin has a separate CRM covering client relationships, subscription information, support history, tickets, billing, and administrative reports. It manages the client's overall relationship with subscription-level detail. It is distinct from the business CRM managing that business's customers.
 
-The product direction currently includes:
+## Subscription and location configuration
+- Branding and business configuration are subscription-level only, with no location-specific branding overrides.
+- Each location has its own address, contact details, and operating hours.
+- Location operational settings include fulfillment options, immediate/scheduled ordering, table QR payment behavior, preparation stations and routing, inventory, orders, and employee location roles.
+- Tool selection is subscription-wide, not per location.
+- Reports support subscription-wide and individual-location views, subject to permissions.
 
-- authenticated back-office access for business owners;
-- product/catalog management, including product images, pricing, and descriptions;
-- persistent business/product data;
-- generation of a customer-facing commerce/POS experience from managed data and settings;
-- business-level appearance and configuration so each business can present its own identity;
-- reporting capabilities, including accounting-oriented and consumer-trend information;
-- customer tracking and marketing capabilities for business owners;
-- extensibility so a generic business foundation can later support industry-specific modules;
-- integration capability through appropriately designed endpoints/APIs when demonstrated requirements justify them;
-- Talix-side operational/customer-management capability for managing client relationships, billing, and support.
+## Product management
+Owners manage product images, prices, descriptions, and broad product configuration. Available options depend on the subscription's business type.
 
-## Product Strategy
+For restaurants, options include sizes, add-ons, substitutions, and removals, affecting price and BOM material usage where applicable.
 
-Talix should begin with a focused proof of concept and establish a useful end-to-end product path before expanding breadth.
+Products can be:
+- **General:** identical configuration across every location in the subscription.
+- **Location specific:** configuration can differ in any way for the relevant location.
 
-The initial product should favor a generic business foundation. Industry-specific paid modules may be added later when validated demand demonstrates what those modules need to contain.
+General products still have separate inventory quantities at each location, visible by location subject to access. Preparation routing is local operational configuration, not a change to a general product's shared definition.
 
-The project should avoid implementing speculative platform breadth before the core value proposition is demonstrated.
+## BOM, production, and inventory
+BOM describes materials and quantities required for a product: recipe ingredients for food or materials for a 3D-printed toy, for example.
 
-## Product and Architecture Separation
+BOM calculates/reports only the materials portion of product cost. It is one input to final COGS reporting, not a complete COGS calculation. Other COGS components remain to be defined.
 
-This document describes intended product value and capabilities. It does not prescribe:
+Production behavior is configured per product, available to any business type:
+- **Made to order:** selling the product deducts BOM materials.
+- **Produced ahead of sale:** production deducts materials and increases finished-product inventory; sales decrease finished-product inventory.
 
-- database schema;
-- application/module boundaries;
-- service decomposition;
-- API shape;
-- authentication implementation;
-- billing provider;
-- CRM implementation;
-- deployment architecture;
-- detailed technology stack.
+This supersedes the earlier idea that production timing is determined solely by business type. Restaurants can use both workflows, such as meals and pre-produced bottled sauces.
 
-Those decisions belong in architecture/ADRs only after evidence and requirements justify them.
+Inventory covers materials and finished goods, receipts, transfers between locations in the same subscription, and adjustments. Every inventory adjustment requires a reason, including adjustments associated with cancellations/refunds. Detailed reversal, waste, costing, and transfer rules remain to be specified; a refund is not assumed to automatically restore materials.
 
-## Current Product Questions
+## Restaurant ordering and operations
+- Support online customer orders and staff-entered counter, phone, and table-service orders.
+- Online and staff-entered orders feed the same location-specific order queue.
+- Authorized staff manage preparation, fulfillment, and status.
+- Each location chooses pickup, delivery, and dine-in offerings.
+- Each location chooses immediate orders, scheduled orders, or both.
+- Product customization supports industry-relevant restaurant options.
+- Kitchen staff have a dedicated preparation view of the shared queue.
+- Order items route to preparation stations, such as bar and kitchen.
+- Authorized staff configure stations and product routing separately per location.
 
-The foundation phase still needs to turn the broad vision into an explicit first proof-of-concept boundary.
+### Dine-in
+Support table assignments and open tabs. Staff can add items over time, close the tab, and collect payment. Customers can order at their table with a Talix QR code associated with the location/table.
 
-Important unresolved questions include:
+Each location configures whether QR orders join an open tab for later payment or require checkout payment. Tabs support split bills and multiple payment methods.
 
-- Which business type or generic workflow should the first POC demonstrate?
-- What is the smallest complete business-owner-to-customer workflow that proves Talix's value?
-- Which capabilities are required for that POC versus intentionally deferred?
-- What customer-facing transaction behavior is required in the first POC?
-- What business customization is necessary to demonstrate that separate businesses can have distinct experiences?
-- Which reporting, customer-management, billing, marketing, and integration capabilities can wait until the core workflow is validated?
+### Delivery
+The built-in delivery module supports a restaurant's own drivers, driver assignment, delivery-status tracking, routes, and dispatch coordination. Drivers access assigned delivery details and update status in Talix under their applicable roles/access.
 
-These questions should be resolved through product decisions before their answers are encoded as architecture.
+An owner can replace this tool through an external delivery integration selected for the subscription. Specific providers and integration behavior are not yet defined.
 
-## Success Principle
+### Payments and corrections
+Support online payments and staff-collected payments, including cash; the business controls available methods. Authorized staff can cancel orders and issue full or partial refunds, with actions recorded for reporting. Providers, payment hardware, and detailed payment rules remain undecided.
 
-Talix should demonstrate value through a complete usable workflow before investing in broad platform capability.
+## Business CRM and customer contact
+Customer data is tracked at subscription level; customer activity is attributable to locations for reporting. A customer's activity across locations belongs to the subscription-level relationship.
 
-The development question is not "What could a complete SaaS platform eventually contain?"
+Customers can order as guests or account holders:
+- **Online orders:** email and phone required for notifications and potential future marketing.
+- **In-person QR checkout:** email and phone optional.
+- **Staff-entered orders:** both are not required.
 
-It is:
+The latest clarification limits mandatory contact collection to online orders; it supersedes the earlier broader self-checkout requirement.
 
-> **What is the smallest real Talix experience that demonstrates meaningful value to a business owner and their customer?**
+Account holders can manage marketing preferences. Guest checkout has no preference controls in the confirmed vision; emails generally provide unsubscribe links. Marketing opt-outs stop marketing while preserving transactional confirmations and active-order status updates.
+
+## Marketing and communications
+Marketing covers campaigns and promotions, with email/texting sending the associated communications. All marketing efforts are separate from legitimate business communications such as confirmations and status updates.
+
+Capturing contact details and providing unsubscribe links does not resolve channel-specific consent/eligibility requirements. Those remain an open communications requirement; no automatic marketing entitlement is established here.
+
+Transactional notifications and broader post-POC communications automation must be considered separately during POC definition.
+
+## Financial reporting and employee management
+Built-in Accounting covers financial tracking and reporting only. Full bookkeeping is outside Talix's product scope and requires an external accounting integration, such as QuickBooks.
+
+BOM contributes materials costs to broader COGS reporting. Reporting also includes business performance and customer/consumer trends, with subscription/location views controlled by permissions.
+
+Employee Management includes scheduling, time tracking, and permissions. Talix can provide payroll-related reports/exports to external payroll/accounting tools. Payroll processing is out of scope; no future Talix payroll module is planned at this time.
+
+## Integration and replacement model
+- Talix offers built-in capabilities.
+- Selecting an external tool replaces the corresponding built-in tool while selected; parallel use is not the selected model.
+- The selection applies to the entire subscription and its locations.
+- Owners can remove an external tool at any time, return to the built-in tool, or choose another external tool.
+- Existing business data/history and ongoing work should remain available in Talix and carry over where the selected tools support it.
+- Transfer limitations must be made clear. Detailed data responsibility, supported providers, mappings, switching procedures, and compatibility remain unresolved.
+
+Do not infer a built-in full bookkeeping or payroll tool from this general replacement principle: those capabilities are explicitly outside Talix scope.
+
+## Timing, open boundaries, and next step
+The initial FigJam marked Marketing, Reports, broader Email/Text Automation, Employee Management, and Integrations as post POC. Preserve these as initial sequencing intent, not an approved POC definition. Mandatory access controls and transactional notifications require separate consideration from broader deferred capabilities. Unmarked capabilities are not automatically POC requirements.
+
+The next step is to define and approve the first restaurant-focused POC workflow and explicit exclusions. Remaining detailed questions can be resolved when needed, including additional COGS components, provider compatibility/data portability, communications consent, order/payment edge cases, and commercial subscription terms.
+
+No architecture, schema, technology, detailed UI, or implementation decisions are authorized by this discovery record.

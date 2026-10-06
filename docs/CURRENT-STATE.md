@@ -47,9 +47,19 @@ No repository-controlled database schema, migration history, or application inte
 
 Other infrastructure should not be assumed until repository evidence records it.
 
+## Product Discovery Checkpoint — October 6, 2026
+
+The full FigJam was reviewed and the product owner clarified the overall vision. See `docs/PRODUCT-VISION.md` for the authoritative requirements and the linked FigJam for their visual companion.
+
+Restaurants are the first audience for a foundation intended to support other business types. Client/subscription/location relationships, employee roles, restaurant sales and preparation, delivery, product/BOM/inventory behavior, reporting, CRM, and reversible subscription-wide tool replacement are confirmed at product level.
+
+Discovery documentation and the board are being reconciled on `foundation/project-governance`, whose previous verified head was `6e89c4cb70e1fd185ba16495fe98b8474d6d62af`. The resulting commit is discoverable in branch history; this file does not embed its own commit hash. The default branch remains at the initial README checkpoint until an accepted merge.
+
+No application capability is implemented. No POC, detailed UI, schema, architecture, or technology has been approved. Confirmed vision is not full-product implementation scope. The external Supabase project remains documented but was not independently inspected in this discovery pass.
+
 ## Exact Next Decision Boundary
 
-Define and approve Talix's first proof-of-concept product boundary before selecting or implementing detailed application architecture.
+Define and approve Talix's first restaurant-focused proof-of-concept product boundary before selecting or implementing detailed application architecture.
 
 The next product decision should identify the smallest complete workflow that demonstrates Talix's value from business-owner configuration/data management through a customer-facing experience.
 

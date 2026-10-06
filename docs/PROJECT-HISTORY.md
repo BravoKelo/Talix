@@ -43,3 +43,13 @@ Talix therefore adopted a controlled direct-GitHub workflow:
 - complete diff review and product-owner acceptance remain required before merge.
 
 This governance model is intended to keep product-owner attention focused on decisions and acceptance rather than mechanical development transport.
+
+## 4. Overall Product Discovery and Vision Reconciliation — October 6, 2026
+
+The entire initial Talix FigJam was reviewed, then refined through explicit owner clarifications before first-POC definition. The owner authorized updating the board and repository documentation, without implementation or architecture/schema/technology decisions.
+
+Material outcomes include restaurant-first audience with a foundation for other industries; multiple subscriptions per client and multiple locations per single-business-type subscription; one login and location-specific predefined/custom roles; subscription-wide branding, CRM, and tool selection; shared/local products with local inventory; product-configured production timing; materials-only BOM contribution to COGS; restaurant ordering, tables/QR/tabs, preparation stations, own-driver delivery; and financial reporting without full bookkeeping or payroll processing.
+
+Later clarifications superseded initial interpretations: production timing is product-configured rather than industry-fixed; online orders alone require email and phone, while in-person QR contact details are optional; marketing is separate from transactional communications.
+
+Current product authority is `docs/PRODUCT-VISION.md`. Detailed UI, technical decisions, commercial terms, and first-POC scope remain open. This reconciliation does not authorize application implementation.

@@ -2,7 +2,7 @@
 
 ## Status
 
-**Design status:** Foundation / no approved customer-facing design yet.
+**Design status:** Confirmed product-level workflows; no approved detailed UI or visual design.
 
 ## Purpose
 
@@ -29,6 +29,14 @@ The product vision establishes that Talix is intended to include:
 - a business-specific customer-facing commerce/POS experience driven by managed data/settings.
 
 Those are product requirements, not approval of a particular layout, navigation system, visual style, responsive hierarchy, or interaction model.
+
+## Confirmed Product-Level Experience
+
+The October 6, 2026 discovery established user journeys and operating behaviors, owned by `docs/PRODUCT-VISION.md`. Preserve those requirements when proposing the POC and later design.
+
+The [Talix FigJam](https://www.figma.com/board/WtSucgcWZBc29V8SXToWKS/Talix?node-id=0-1) is a product-discovery map and visual companion. Its boxes, colors, connections, and supplemental detail cards do not approve screen layouts, navigation widgets, service decomposition, or database relationships.
+
+Product-level choices are confirmed; detailed interface design remains undecided. Nothing is implemented. POC inclusion remains undecided even for confirmed overall capabilities.
 
 ## Design Principles for the First POC
 
