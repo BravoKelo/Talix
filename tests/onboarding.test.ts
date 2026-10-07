@@ -11,10 +11,10 @@ let quote: Record<string, unknown>;
 const business = {
   business_name: "Independent shop",
   contact_name: "Alex Owner",
-  phone: "5551234567",
-  billing_address: "100 Billing Road",
+  phone: "+15551234567",
+  billing_address: "100 Billing Road, Seattle, WA, 98101, United States",
   location_name: "Main shop",
-  location_address: "200 Main Road",
+  location_address: "200 Main Road, Seattle, WA, 98101, United States",
   slug: "independent-shop",
 };
 async function as(id: string | null, role = "authenticated") {
@@ -110,6 +110,12 @@ describe.sequential("customer signup and Talix offerings", () => {
       rpc("create_workspace", ["Bypass", "bypass-shop", "Main"]),
     ).rejects.toThrow("permission denied");
   });
+  it("rejects noncanonical contact and address formats before creating a subscription", async () => {
+    await as(owner);
+    for (const invalid of [{phone: "555"}, {contact_name: "Alex123"}, {billing_address: "100 Main"}, {location_address: "200 Main"}]) {
+      await expect(rpc("start_subscription", [crypto.randomUUID(), {...business, ...invalid}, type, plan, [addon], quote])).rejects.toThrow(/phone number|contact name|billing address|location address/);
+    }
+  });
   it("requires confirmation and complete business details", async () => {
     await as(unconfirmed);
     await expect(
@@ -183,7 +189,7 @@ describe.sequential("customer signup and Talix offerings", () => {
     await expect(
       rpc("start_subscription", [
         id,
-        { ...business, phone: "5551111111" },
+        { ...business, phone: "+15551111111" },
         type,
         plan,
         [addon],

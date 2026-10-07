@@ -14,9 +14,7 @@ export default async function Page() {
     if (user)
       redirect(
         readDraft(user.user_metadata?.talix_onboarding)
-          ? emailConfirmationPending()
-            ? "/signup/confirmation"
-            : "/onboarding"
+          ? "/signup/confirmation"
           : "/workspace",
       );
   }

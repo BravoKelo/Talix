@@ -17,14 +17,25 @@ import {
   type Offering,
   type Quote,
 } from "@/lib/onboarding";
+import { AddressFields } from "@/components/address-fields";
+import {
+  businessErrors,
+  normalizeBusiness,
+  parseAddress,
+  formatAddress,
+  subscriptionProblem,
+  sameQuote,
+} from "@/lib/business-details";
 export function Onboarding({
   email = "",
   draft = null,
   confirmationPending = false,
+  edit = false,
 }: {
   email?: string;
   draft?: Draft | null;
   confirmationPending?: boolean;
+  edit?: boolean;
 }) {
   const router = useRouter();
   const [types, setTypes] = useState<BusinessType[]>([]),
@@ -41,6 +52,18 @@ export function Onboarding({
     [loading, setLoading] = useState(true),
     [message, setMessage] = useState(""),
     [sentEmail, setSentEmail] = useState("");
+  const [account, setAccount] = useState({
+    email: "",
+    password: "",
+    confirmation: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [billing, setBilling] = useState(
+    parseAddress(draft?.business.billing_address ?? ""),
+  );
+  const [location, setLocation] = useState(
+    parseAddress(draft?.business.location_address ?? ""),
+  );
   const request = useRef(draft?.request ?? "");
   async function loadCatalog() {
     const db = browserClient();
@@ -86,8 +109,8 @@ export function Onboarding({
             }
           } else if (alive) {
             setQuote(data);
-            setStep(3);
-            if (JSON.stringify(data) !== JSON.stringify(draft.quote))
+            setStep(edit ? 1 : 3);
+            if (!sameQuote(data, draft.quote))
               setMessage(
                 "Please review the current pricing before continuing.",
               );
@@ -103,7 +126,7 @@ export function Onboarding({
     return () => {
       alive = false;
     };
-  }, [draft]);
+  }, [draft, edit]);
   const selectedPlan = offerings.find((o) => o.id === plan);
   const plans = offerings.filter(
     (o) => o.kind === "plan" && o.business_type_id === type,
@@ -139,10 +162,15 @@ export function Onboarding({
   async function confirm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!quote) return;
-    const f = new FormData(e.currentTarget);
-    const accountEmail = email || String(f.get("email")).trim();
-    const password = String(f.get("password") ?? "");
-    if (!email && password !== String(f.get("confirm_password"))) {
+    const validation = businessErrors(business);
+    if (Object.keys(validation).length) {
+      setErrors(validation);
+      setStep(1);
+      return;
+    }
+    const accountEmail = email || account.email.trim();
+    const password = account.password;
+    if (!email && password !== account.confirmation) {
       setMessage("Your passwords do not match.");
       return;
     }
@@ -210,9 +238,7 @@ export function Onboarding({
             return;
           }
         }
-        router.replace(
-          confirmationPending ? "/signup/confirmation" : "/onboarding",
-        );
+        router.replace("/signup/confirmation");
         router.refresh();
         return;
       }
@@ -237,9 +263,18 @@ export function Onboarding({
             ? error.message
             : "We couldn’t start your subscription. Please try again.",
         );
-        setStep(2);
-        setQuote(null);
-        await loadCatalog().catch(() => {});
+        const problem = subscriptionProblem(
+          error.code === "P0001" ? error.message : undefined,
+        );
+        setMessage(problem.message);
+        if (problem.area === "business") {
+          setStep(1);
+          setErrors({ [problem.field]: problem.message });
+        }
+        if (problem.area === "plan") {
+          setStep(2);
+          await loadCatalog().catch(() => {});
+        }
         return;
       }
       await db.auth
@@ -338,6 +373,20 @@ export function Onboarding({
               className="panel stack"
               onSubmit={(e) => {
                 e.preventDefault();
+                const next = normalizeBusiness({
+                  ...business,
+                  billing_address: formatAddress(billing),
+                  location_address: formatAddress(location),
+                });
+                const issues = businessErrors(next);
+                setErrors(issues);
+                setBusiness(next);
+                if (Object.keys(issues).length) {
+                  setMessage("Please check the highlighted details.");
+                  return;
+                }
+                setBilling(parseAddress(next.billing_address));
+                setLocation(parseAddress(next.location_address));
                 setMessage("");
                 setStep(2);
               }}
@@ -349,14 +398,7 @@ export function Onboarding({
                     ["business_name", "Business name", "organization", 100],
                     ["contact_name", "Your full name", "name", 100],
                     ["phone", "Business phone", "tel", 40],
-                    [
-                      "billing_address",
-                      "Billing address",
-                      "street-address",
-                      500,
-                    ],
                     ["location_name", "First location name", "off", 100],
-                    ["location_address", "Location address", "off", 500],
                     ["slug", "Your online store address", "off", 63],
                   ] as const
                 ).map(([key, label, auto, max]) => (
@@ -373,14 +415,15 @@ export function Onboarding({
                       autoComplete={auto}
                       maxLength={max}
                       type={key === "phone" ? "tel" : "text"}
-                      pattern={
-                        key === "slug" ? "[a-z0-9][a-z0-9-]{2,62}" : undefined
-                      }
+                      aria-invalid={!!errors[key]}
                       value={business[key]}
                       onChange={(e) =>
                         setBusiness({ ...business, [key]: e.target.value })
                       }
                     />
+                    {errors[key] && (
+                      <small className="field-error">{errors[key]}</small>
+                    )}
                     {key === "slug" && (
                       <small>
                         Choose 3–63 lowercase letters, numbers or dashes, such
@@ -389,6 +432,20 @@ export function Onboarding({
                     )}
                   </label>
                 ))}
+                <AddressFields
+                  name="billing_address"
+                  title="Billing address"
+                  value={billing}
+                  onChange={setBilling}
+                  errors={errors}
+                />
+                <AddressFields
+                  name="location_address"
+                  title="Location address"
+                  value={location}
+                  onChange={setLocation}
+                  errors={errors}
+                />
               </div>
               <button disabled={!types.length}>Choose your plan →</button>
               {!types.length && (
@@ -532,7 +589,7 @@ export function Onboarding({
                   </div>
                   <div>
                     <dt>Online store address</dt>
-                    <dd>{business.slug}</dd>
+                    <dd>/shop/{business.slug}</dd>
                   </div>
                 </dl>
                 <button
@@ -553,6 +610,10 @@ export function Onboarding({
                       <input
                         type="email"
                         name="email"
+                        value={account.email}
+                        onChange={(e) =>
+                          setAccount({ ...account, email: e.target.value })
+                        }
                         autoComplete="email"
                         required
                         maxLength={254}
@@ -563,6 +624,10 @@ export function Onboarding({
                       <input
                         type="password"
                         name="password"
+                        value={account.password}
+                        onChange={(e) =>
+                          setAccount({ ...account, password: e.target.value })
+                        }
                         aria-describedby="password-help"
                         autoComplete="new-password"
                         required
@@ -578,6 +643,13 @@ export function Onboarding({
                       <input
                         type="password"
                         name="confirm_password"
+                        value={account.confirmation}
+                        onChange={(e) =>
+                          setAccount({
+                            ...account,
+                            confirmation: e.target.value,
+                          })
+                        }
                         autoComplete="new-password"
                         required
                         minLength={12}

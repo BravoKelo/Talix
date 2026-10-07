@@ -13,14 +13,14 @@ export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token_hash");
   if (code) {
     const { error } = await db.auth.exchangeCodeForSession(code);
-    if (!error) return destination("/onboarding");
+    if (!error) return destination("/signup/confirmation");
   }
   if (token && request.nextUrl.searchParams.get("type") === "email") {
     const { error } = await db.auth.verifyOtp({
       token_hash: token,
       type: "email",
     });
-    if (!error) return destination("/onboarding");
+    if (!error) return destination("/signup/confirmation");
   }
   return destination("/login?confirmation=failed&next=onboarding");
 }

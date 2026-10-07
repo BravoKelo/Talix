@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ new?: string }>;
+  searchParams: Promise<{ new?: string; edit?: string; review?: string }>;
 }) {
   if (!configured())
     return (
@@ -22,11 +22,15 @@ export default async function Page({
     error,
   } = await db.auth.getUser();
   if (error || !user) redirect("/login?next=onboarding");
-  const fresh = (await searchParams).new === "1";
+  const params = await searchParams;
+  const fresh = params.new === "1";
+  const draft = fresh ? null : readDraft(user.user_metadata?.talix_onboarding);
+  if (draft && !params.edit && !params.review) redirect("/signup/confirmation");
   return (
     <Onboarding
       email={user.email ?? ""}
-      draft={fresh ? null : readDraft(user.user_metadata?.talix_onboarding)}
+      draft={draft}
+      edit={params.edit === "1"}
     />
   );
 }
