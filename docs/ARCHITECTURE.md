@@ -1,73 +1,33 @@
 # Talix Architecture
 
-## Status
+## Accepted foundation
 
-**Architecture status:** Not yet established  
-**Project stage:** Foundation / pre-implementation
+The owner approved a bounded business-neutral commerce and fulfillment core, followed by explicitly selecting Next.js, Supabase and Vercel on October 7, 2026. Restaurants remain the first audience, not the core domain model. [Issue #1](https://github.com/BravoKelo/Talix/issues/1) owns implementation scope.
 
-## Purpose
+## Implemented boundaries
 
-This document records Talix's implemented architectural boundaries and accepted high-level architecture.
+- Next.js App Router and TypeScript provide the owner/employee workspace, shared business storefront, and private order tracking. Supabase SSR clients maintain Auth sessions; workspace entry checks verified claims. PostgreSQL remains the authorization boundary even if a browser bypasses UI controls.
+- Supabase PostgreSQL holds client/subscription/location relationships, membership and location roles, general/local products with generic optional extras, order snapshots, and payment/fulfillment histories. No business-type behavior or plugin framework is encoded now.
+- Supabase Auth supplies owner/employee identity. In this slice each owner is a client with multiple subscriptions; shared ownership/client administration is not implemented. A signed-in owner can create subscriptions. Employee accounts are explicitly provisioned in Auth, then granted location access by an owner.
+- Supabase Storage holds public product images. Uploads require subscription owner access and a subscription-ID folder; only JPEG/PNG/WebP up to 5 MB are allowed.
+- Vercel is the approved deployment target. Configuration and actual deployment state are recorded in `CURRENT-STATE.md`.
 
-It must not be used to turn product ideas or possible future capabilities into architecture prematurely.
+## Data and trust
 
-## Current Implemented Architecture
+RLS covers every application table. Owners manage their subscriptions/locations/products and refunds. Employees require subscription membership plus the assigned location role: viewer reads; fulfillment also advances orders. Custom roles are a later requirement. Direct browser writes cannot mutate memberships, orders, totals, payment state or histories.
 
-There is currently no implemented Talix application architecture in the repository.
+Narrow security-definer RPCs, fixed empty search paths, explicit execution grants, and checked ownership handle privileged transactions. Anonymous access is limited to the published catalog, validated simulated checkout, private order tracking, and private-token simulated payment retry. No service-role key exists in the application.
 
-A Supabase project named Talix exists externally, but that fact alone does not establish:
+Checkout calculates prices/options from stored products, validates location/product availability and contact details, and atomically snapshots purchased names/prices/options. Integer cents avoid rounding ambiguity. Request IDs and transaction locks make payment retries idempotent; changing the payload for an existing key fails. Refunds lock the order, require owner access and a reason, and cannot exceed the remaining payment.
 
-- the application framework;
-- database schema;
-- authentication model;
-- module boundaries;
-- API architecture;
-- deployment model;
-- billing architecture;
-- CRM architecture;
-- integration architecture.
+Private random UUID order tokens are bearer secrets and are not granted as readable order columns to business users. Public tracking excludes contact information and uses no-referrer/no-index behavior. Historical order snapshots survive product edits. Fulfillment and payment are separate states; declined payments cannot progress, full refunds cancel only uncompleted orders.
 
-## Previously Discussed Technology
+## Payment boundary
 
-Earlier Talix planning considered a modern web architecture, including Next.js and Supabase/PostgreSQL.
+Only simulated approved/declined payments and full/partial refunds exist. There are no card fields, processor SDKs, API keys, payment webhooks or money movements. Processor selection is deferred; the current simulator is not a production payment integration.
 
-Those discussions remain useful inputs, but they are not accepted architecture merely because they were previously considered.
+## Verification and unresolved infrastructure
 
-Technology decisions should be re-evaluated against the approved first proof-of-concept requirements before implementation.
+Versioned migration: `supabase/migrations/20261007002309_core_commerce.sql`. Embedded PostgreSQL tests verify real SQL/RLS using small Auth/Storage fixtures; browser tests adapt RPC requests to that database. They do not verify Supabase service configuration. Migration application and live Auth/PostgREST/Storage checks require access to the existing Talix development project.
 
-## Architecture Principles
-
-Until concrete architecture is approved, use these governing principles:
-
-1. **Requirements before structure.** Demonstrated product requirements drive architecture.
-2. **Minimum necessary architecture.** Implement the smallest structure that cleanly supports the accepted requirement.
-3. **Avoid speculative decomposition.** Do not create services, modules, schemas, APIs, or abstractions solely for anticipated future needs.
-4. **Preserve clear ownership.** Once boundaries are established, responsibilities should have clear owners and should not be duplicated across layers.
-5. **Keep external providers behind deliberate boundaries.** Provider-specific behavior should not silently become the core domain model.
-6. **Preserve durable data deliberately.** Persistence decisions must be based on demonstrated product/history/reporting/integration needs.
-7. **Architecture changes require evidence.** Accepted architecture changes follow the process in `AGENTS.md`.
-
-## Decision Process
-
-When the first POC boundary is approved:
-
-1. identify the required end-to-end behavior;
-2. identify the minimum data that must persist;
-3. identify required trust/authentication boundaries;
-4. identify required external services;
-5. select the simplest architecture that supports those demonstrated needs;
-6. record durable architectural decisions in this document and ADRs where appropriate;
-7. implement a small complete vertical slice.
-
-## ADR Policy
-
-Use an ADR when a decision is:
-
-- architecturally significant;
-- durable enough that future developers need its rationale;
-- costly or confusing to reverse without context;
-- a choice among meaningful alternatives.
-
-Do not create ADRs for trivial implementation details.
-
-Accepted ADRs supplement this document. If architecture changes, supersede or update the appropriate durable record rather than silently contradicting it.
+Preserve the evidence-driven governance in `AGENTS.md`: build only demonstrated requirements; avoid speculative module frameworks; protected changes require owner approval; acceptance precedes merge.

@@ -53,3 +53,8 @@ Material outcomes include restaurant-first audience with a foundation for other 
 Later clarifications superseded initial interpretations: production timing is product-configured rather than industry-fixed; online orders alone require email and phone, while in-person QR contact details are optional; marketing is separate from transactional communications.
 
 Current product authority is `docs/PRODUCT-VISION.md`. Detailed UI, technical decisions, commercial terms, and first-POC scope remain open. This reconciliation does not authorize application implementation.
+
+
+## 5. Shared core implementation — October 7, 2026
+
+The owner clarified that Talix primarily serves online ordering/fulfillment and approved building the business-neutral core before industry modules, without extended theoretical POC work. A bounded core slice was approved, with simulated payments instead of a real processor. The owner selected Next.js, Supabase and Vercel. Issue #1 and branch `feature/core-commerce` record the implementation. Existing foundation governance is preserved. The Supabase connector exposed only unrelated AMZ-PSE Development; that project was not changed, and the Talix migration remains unapplied pending access.

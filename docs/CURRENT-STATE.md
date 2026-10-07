@@ -1,66 +1,45 @@
 # Talix Current State
 
-## Status
+## Verified checkpoint — October 7, 2026
 
-**Project status:** Foundation / pre-implementation  
-**Repository:** BravoKelo/Talix  
-**Default branch:** `main`  
-**Foundation branch:** `foundation/project-governance`
+Repository: `BravoKelo/Talix`. Implementation branch: `feature/core-commerce`, based on `foundation/project-governance` at `4d547496998c50a30ee20afec5ef423b7145381d`. `main` remains the initial README commit until accepted merge. [Issue #1](https://github.com/BravoKelo/Talix/issues/1) owns the approved implementation scope. Governance remains in `AGENTS.md`.
 
-## Verified Starting Checkpoint
+## Approved direction
 
-Before foundation work began:
+Talix primarily provides online ordering and fulfillment. Build the business-neutral core first; restaurants are the first audience and industry modules come later. The owner approved Next.js, Supabase and Vercel. Payments/refunds must be simulated; processor selection is deferred. No real card data or money movement.
 
-- the repository contained only `README.md`;
-- `README.md` contained the Talix name and "AIO SAAS";
-- Git history contained one commit: `133cb2450a422ed550a8d646d3a7626d36c68519` (`Initial commit`);
-- no application architecture or application code was established in the repository;
-- no GitHub issues or pull requests existed.
+## Implemented on this branch
 
-A Supabase project named Talix has been created separately. Its existence does not by itself establish the Talix database schema or application architecture.
+- Next.js App Router/TypeScript with Supabase SSR Auth clients and guarded workspace.
+- Owner onboarding; multiple subscriptions per client; authorized subscription/location switching; predefined viewer/fulfillment location access for explicitly provisioned employee accounts.
+- Subscription branding and location details/publication.
+- General/location-specific products with images, descriptions, integer-cent prices, availability and generic optional extras.
+- Location-first storefront, cart and guest online checkout requiring name/email/phone.
+- Database-priced order snapshots, approved/declined simulated payments, duplicate-safe checkout/retry, private customer order status.
+- Location order queue and sequential received/in-progress/ready/completed fulfillment; owner partial/full simulated refunds, reasons and histories.
+- Versioned migration, RLS/least-privilege grants, public catalog and narrow checked RPCs; read-only GitHub Actions checks.
 
-## Current Foundation Decision
+This is implementation for review, not full-product completion or production launch. Detailed final layout/design remains subject to product-owner acceptance.
 
-Talix is continuing the previously established product concept, while deliberately establishing a new engineering foundation before application implementation.
+## Validation evidence
 
-The project is adopting a controlled direct-GitHub development workflow so the product owner does not need to act as a routine file-transfer, command-execution, and log-relay intermediary.
+Local lint and TypeScript checks pass. Production build passes. Eleven embedded PostgreSQL tests pass for schema/RLS, tenant/location restrictions, server pricing, snapshots, retry/idempotency, fulfillment/refunds and image-upload permissions. Desktop and mobile Playwright customer flows pass against the actual migration through a test-only RPC adapter.
 
-The product owner retains approval authority over protected product, architecture, schema, security, infrastructure, integration, and material scope boundaries.
+Tests mock Supabase Auth/Storage scaffolding and the RPC transport. They do not claim live Supabase Auth/PostgREST/Storage, deployed checkout, concurrency load, or workspace UI verification. The standard browser download failed in this runtime; an npm-distributed Chromium executable was used locally through `PLAYWRIGHT_CHROMIUM_EXECUTABLE`. CI uses normal Playwright browser installation. Production dependency audit found zero reported vulnerabilities.
 
-## Implemented Product Capabilities
+## External infrastructure and blockers
 
-None yet.
+The earlier foundation records an existing Talix Supabase project. The connected account currently exposes only `AMZ-PSE Development` (`ukihcsdiqfhtszcdgale`, inactive). It was not changed. No Talix migration has been applied, no production credentials set, and no replacement project created.
 
-Product vision must not be mistaken for implemented functionality.
+The Talix Vercel project/preview is being prepared from this branch. Until the existing Talix development project is accessible and its URL/publishable key configured, sign-in/ordering cannot operate against live persistence.
 
-## Accepted Architecture
+## Exact restart
 
-No application architecture has yet been accepted.
+1. Inspect this branch, Issue #1, PR and latest checks/deployment status; preserve foundation governance/history.
+2. Expose the existing Talix development project through the authorized Supabase connection. Verify its identity/schema/migration history before applying the reviewed migration. Follow `docs/SETUP.md`.
+3. Configure preview public environment values, provision owner/employee accounts, and verify the full owner → customer → employee → refund flow against live Supabase, including image upload and tenant isolation.
+4. Review the complete diff and provisional experience with the owner. Acceptance is required before merge under `AGENTS.md`.
 
-Prior Talix technology discussions are inputs to future decisions, not automatically accepted architecture.
+## Deferred
 
-## External Infrastructure
-
-A Supabase project named Talix exists.
-
-No repository-controlled database schema, migration history, or application integration is established yet.
-
-Other infrastructure should not be assumed until repository evidence records it.
-
-## Product Discovery Checkpoint — October 6, 2026
-
-The full FigJam was reviewed and the product owner clarified the overall vision. See `docs/PRODUCT-VISION.md` for the authoritative requirements and the linked FigJam for their visual companion.
-
-Restaurants are the first audience for a foundation intended to support other business types. Client/subscription/location relationships, employee roles, restaurant sales and preparation, delivery, product/BOM/inventory behavior, reporting, CRM, and reversible subscription-wide tool replacement are confirmed at product level.
-
-Discovery documentation and the board are being reconciled on `foundation/project-governance`, whose previous verified head was `6e89c4cb70e1fd185ba16495fe98b8474d6d62af`. The resulting commit is discoverable in branch history; this file does not embed its own commit hash. The default branch remains at the initial README checkpoint until an accepted merge.
-
-No application capability is implemented. No POC, detailed UI, schema, architecture, or technology has been approved. Confirmed vision is not full-product implementation scope. The external Supabase project remains documented but was not independently inspected in this discovery pass.
-
-## Exact Next Decision Boundary
-
-Define and approve Talix's first restaurant-focused proof-of-concept product boundary before selecting or implementing detailed application architecture.
-
-The next product decision should identify the smallest complete workflow that demonstrates Talix's value from business-owner configuration/data management through a customer-facing experience.
-
-Only after that boundary is approved should the project select the minimum architecture and implementation needed to support it.
+Business-type modules, restaurant specifics, inventory/BOM/COGS, custom roles, CRM/reporting, customer accounts, tax/shipping/scheduling, notifications/marketing, billing, external integrations and real payment processors. These remain overall vision, not this implementation slice.

@@ -36,13 +36,13 @@ The October 6, 2026 discovery established user journeys and operating behaviors,
 
 The [Talix FigJam](https://www.figma.com/board/WtSucgcWZBc29V8SXToWKS/Talix?node-id=0-1) is a product-discovery map and visual companion. Its boxes, colors, connections, and supplemental detail cards do not approve screen layouts, navigation widgets, service decomposition, or database relationships.
 
-Product-level choices are confirmed; detailed interface design remains undecided. Nothing is implemented. POC inclusion remains undecided even for confirmed overall capabilities.
+Product-level choices are confirmed; detailed interface design remains undecided. The subsequent approved core slice is implemented for review; full vision capabilities remain deferred unless included in Issue #1.
 
-## Design Principles for the First POC
+## Design Principles for the Core
 
 When design work begins:
 
-1. start from the approved POC workflow;
+1. start from the approved core workflow;
 2. design the minimum complete experience required to demonstrate that workflow;
 3. distinguish business-owner tasks from customer tasks;
 4. make loading, empty, error, and incomplete states explicit where relevant;
@@ -60,4 +60,11 @@ Diagnostic, administrative, or engineering interfaces do not become customer-exp
 
 ## Next Design Boundary
 
-No detailed product design should be established until the first POC product boundary is approved.
+The approved bounded core is now implemented. Screen layouts and visual styling are provisional for product-owner acceptance; implementation does not establish final design authority.
+
+
+## Implemented for review — October 7, 2026
+
+Owner/employee sign-in leads to subscription/location selectors and orders, products, settings and access areas. Only owners see management controls. Customers enter `/shop/<slug>`, choose a location before seeing products, select generic optional extras, and check out as guests with name/email/phone. A clearly labeled simulated outcome selector replaces card collection. The resulting private order link shows fulfillment/payment/refund state and allows declined-payment retry. No transactional messages are sent yet.
+
+The workspace polls the latest 100 location orders, shows contact and item snapshots, advances the sequential generic statuses, and records owner refunds with reasons and history. Subscription-level branding applies across locations. Product image upload and general/local scope are included. Predefined viewer and fulfillment roles are the initial options; custom roles remain later scope.
