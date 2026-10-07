@@ -114,6 +114,14 @@ test("location → catalog → decline → retry → fulfillment → refund", as
       order,
       crypto.randomUUID(),
     ]);
+    expect(
+      (
+        await db.query(
+          "select id from public.order_events where order_id=$1 and status='cancelled'",
+          [order],
+        )
+      ).rows,
+    ).toHaveLength(1);
     await page.reload();
     await expect(
       page.getByText("This order has been cancelled."),

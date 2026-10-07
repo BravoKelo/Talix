@@ -23,7 +23,7 @@ This is implementation for review, not full-product completion or production lau
 
 ## Validation evidence
 
-Local lint and TypeScript checks pass. Production build passes. Eleven embedded PostgreSQL tests pass for schema/RLS, tenant/location restrictions, server pricing, snapshots, retry/idempotency, fulfillment/refunds and image-upload permissions. Desktop and mobile Playwright customer flows pass against the actual migration through a test-only RPC adapter.
+Local lint and TypeScript checks pass. Production build passes. GitHub Actions run `37552938983` passed the complete suite for application commit `9b0e35ea24223e4dc7b145e89524250ca650f175`. Final review narrowed private-function revocations to this migration's helpers and recorded refund cancellations in the fulfillment audit. Local database/browser checks also pass after those corrections; latest remote checks remain visible in PR #2. Eleven embedded PostgreSQL tests pass for schema/RLS, tenant/location restrictions, server pricing, snapshots, retry/idempotency, fulfillment/refunds and image-upload permissions. Desktop and mobile Playwright customer flows pass against the actual migration through a test-only RPC adapter.
 
 Tests mock Supabase Auth/Storage scaffolding and the RPC transport. They do not claim live Supabase Auth/PostgREST/Storage, deployed checkout, concurrency load, or workspace UI verification. The standard browser download failed in this runtime; an npm-distributed Chromium executable was used locally through `PLAYWRIGHT_CHROMIUM_EXECUTABLE`. CI uses normal Playwright browser installation. Production dependency audit found zero reported vulnerabilities.
 
@@ -31,7 +31,7 @@ Tests mock Supabase Auth/Storage scaffolding and the RPC transport. They do not 
 
 The earlier foundation records an existing Talix Supabase project. The connected account currently exposes only `AMZ-PSE Development` (`ukihcsdiqfhtszcdgale`, inactive). It was not changed. No Talix migration has been applied, no production credentials set, and no replacement project created.
 
-The Talix Vercel project/preview is being prepared from this branch. Until the existing Talix development project is accessible and its URL/publishable key configured, sign-in/ordering cannot operate against live persistence.
+Vercel project `talix` (`prj_Xmg24E6djhGtCFIJsmP9EblkLDym`) exists in the `bravokelo` team using Node.js 24. Preview deployment `dpl_3sewxmjWPm1UJCoQzTTgPfVoqpJu` is READY for application commit `9b0e35ea24223e4dc7b145e89524250ca650f175`: https://talix-h2s0dc0j7-bravokelo.vercel.app . Home/login/workspace returned HTTP 200 through authenticated protected-preview access; the latter show the expected missing-connection state. Default deployment protection remains enabled. No production deployment was created. [Draft PR #2](https://github.com/BravoKelo/Talix/pull/2) targets the foundation branch, preserving its governance. The complete changed-file set was inspected; `AGENTS.md` and the ADR template are unchanged. The local source was reconstructed through GitHub APIs; ordinary git clone was unavailable in this runtime. Until the existing Talix development project is accessible and its URL/publishable key configured, sign-in/ordering cannot operate against live persistence.
 
 ## Exact restart
 

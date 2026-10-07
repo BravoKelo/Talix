@@ -275,11 +275,14 @@ if o.payment_status not in ('paid','partially_refunded') or p_amount>o.total_cen
 end if;
 insert into public.payment_events(order_id,request_id,kind,amount_cents,reason) values(o.id,p_request,'refund',p_amount,trim(p_reason));
 update public.orders set refunded_cents=refunded_cents+p_amount,payment_status=case when refunded_cents+p_amount=total_cents then 'refunded' else 'partially_refunded' end,status=case when refunded_cents+p_amount=total_cents and status<>'completed' then 'cancelled' else status end where id=o.id;
+if o.refunded_cents+p_amount=o.total_cents and o.status<>'completed' then
+  insert into public.order_events(order_id,status,actor) values(o.id,'cancelled',auth.uid());
+end if;
 end$$;
 
 revoke all on function public.create_workspace(text,text,text),public.grant_location_access(uuid,text,text),public.public_catalog(text),public.checkout_simulated(uuid,uuid,jsonb,jsonb,text),public.track_order(uuid),public.retry_simulated_payment(uuid,uuid,text),public.advance_order(uuid,text),public.refund_simulated(uuid,uuid,integer,text) from public,anon,authenticated;
 
-revoke all on all functions in schema private from public,anon,authenticated;
+revoke all on function private.is_owner(uuid),private.can_access(uuid,boolean),private.valid_options(jsonb) from public,anon,authenticated;
 
 grant execute on function private.is_owner(uuid),private.can_access(uuid,boolean),private.valid_options(jsonb) to authenticated;
 
