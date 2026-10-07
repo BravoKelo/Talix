@@ -22,6 +22,8 @@ The customer-onboarding migration and policy performance correction are applied 
 
 The new preview branch has URL/publishable-key environment values configured in Vercel project `talix` (`prj_Xmg24E6djhGtCFIJsmP9EblkLDym`, team `bravokelo`). Production variables remain unset; deployment protection is unchanged. Initial repository linking created a disconnected production-labelled deployment automatically; no manual production promotion occurred. Repository writes use GitHub APIs; local git history is not an ordinary remote clone. No service-role key is introduced.
 
+Implementation commit `00f0e8d46e5cc2cb08882e12bf03606b8e68049b` is saved in [draft PR #4](https://github.com/BravoKelo/Talix/pull/4), stacked on the core branch. Vercel deployment `dpl_Fih9DXE1uJhvxkh1AeeC3tR7UrFQ` is READY. The stable protected preview is https://talix-git-feature-customer-onboarding-bravokelo.vercel.app/signup . Its signup page returns HTTP 200 with the expected sample-pricing and business-language copy. This does not establish mailbox delivery or deployed completion of signup.
+
 Advisors flag intentional narrowly checked security-definer endpoints. Private staff allowlist RLS has no client policies/grants by design. Redundant catalog/client SELECT policies were consolidated after the performance advisor identified them, preserving semantics. Fresh-database unused-index notices are not grounds to remove required indexes. Previously reported leaked-password protection remains a production-hardening item, not authorization to upgrade plans. Two synthetic 1×1 core-test PNG assets remain in Storage folders `a76900bf-1d6c-45c9-ade8-ad5a71a832d7` and `081c7e39-61b7-428c-a313-f8b234f2c1b3`; dashboard cleanup is pending.
 
 ## Operational boundary: confirmation mail
@@ -29,6 +31,8 @@ Advisors flag intentional narrowly checked security-definer endpoints. Private s
 Live public Auth settings show password/email signup enabled, signup allowed, and automatic confirmation disabled. Mail delivery, sender and allowed confirmation destinations cannot be inspected/edited with the available Supabase connector tools. No real test email was sent. The application supports PKCE and email token-hash callbacks; its configured destination must be allowed and its confirmation template/delivery verified before public signup is claimed ready. Default Supabase mail only sends to organization team addresses; arbitrary prospective customers require suitable SMTP configuration. No new mail provider was selected and verification was not bypassed.
 
 The browser tool requires user approval before falling back from an insufficient plugin. The concrete remaining work is to inspect the existing Auth mail/URL/template settings in the Supabase dashboard, scope the callback to the reviewed preview, and determine whether the existing sender can deliver the signup confirmation. A new provider/cost decision, if needed, belongs to the owner. This is service provisioning, not manual customer business creation. See SETUP and ADR 0002.
+
+GitHub Actions completed successfully for implementation commit `00f0e8d46e5cc2cb08882e12bf03606b8e68049b` on both push (run 37560008900) and draft PR (run 37560013049). The complete checks include lint, TypeScript, 20 database tests, four desktop/mobile browser scenarios and production build. This handoff-only documentation update does not change the tested implementation.
 
 ## Exact restart
 
