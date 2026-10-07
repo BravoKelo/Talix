@@ -1,20 +1,20 @@
 # Talix Product Vision
 
 ## Status and authority
-**Stage:** Foundation / pre-implementation  
-**Product discovery updated:** October 6, 2026  
-**First POC:** Not yet defined or approved
+**Stage:** Shared core implementation
+**Product discovery updated:** October 6, 2026
+**Current approved slice:** Business-neutral core commerce and fulfillment (Issue #1)
 
-This document owns the confirmed overall product intent. These are requirements for the overall vision, not implemented functionality or authorization to implement the entire product. Technical architecture, schema, technology, detailed UI, pricing, and POC scope remain undecided.
+This document owns the confirmed overall product intent. These are requirements for the overall vision, not implemented functionality or authorization to implement the entire product. The bounded core slice and Next.js/Supabase/Vercel foundation are approved. Full-product scope, commercial pricing, provider selection and detailed final UI remain separate decisions.
 
 Discovery source: [Talix FigJam](https://www.figma.com/board/WtSucgcWZBc29V8SXToWKS/Talix?node-id=0-1), refined through explicit product-owner clarifications on October 6, 2026. The board is a visual companion; repository documentation is durable project truth.
 
 ## Purpose and strategy
-Talix connects business operations and managed product data to business-specific customer commerce and staff-operated sales. Restaurants are the first audience. The shared business foundation is intended to support other business types over time; the industry-specific module defines how that business uses Talix.
+Talix is primarily an online ordering and fulfillment service, connecting managed product data to customer commerce and business operations. Restaurants are the first audience. The shared business foundation is intended to support other business types over time; the industry-specific module defines how that business uses Talix.
 
 Modularity and easy connection to an owner's preferred external tools are strategic differentiators. This is a product objective, not approval of a technical modular architecture or a promise that every third-party tool already has a supported integration.
 
-Begin with a focused, complete POC before expanding breadth. The full vision below does not define its scope.
+Build a working shared core before industry-specific modules. Any business type must be able to use the core; industry modules later define how that business type interacts with it. The full vision below does not authorize implementing its entire breadth.
 
 ## Clients, subscriptions, locations, and users
 - A client can hold multiple subscriptions.
@@ -139,6 +139,6 @@ Do not infer a built-in full bookkeeping or payroll tool from this general repla
 ## Timing, open boundaries, and next step
 The initial FigJam marked Marketing, Reports, broader Email/Text Automation, Employee Management, and Integrations as post POC. Preserve these as initial sequencing intent, not an approved POC definition. Mandatory access controls and transactional notifications require separate consideration from broader deferred capabilities. Unmarked capabilities are not automatically POC requirements.
 
-The next step is to define and approve the first restaurant-focused POC workflow and explicit exclusions. Remaining detailed questions can be resolved when needed, including additional COGS components, provider compatibility/data portability, communications consent, order/payment edge cases, and commercial subscription terms.
+The owner approved the initial business-neutral core slice: subscription/location access and configuration, general/local products, generic options, guest online checkout, order fulfillment/status, and payment/refund simulation. See Issue #1. Restaurants, BOM/inventory, QR/table/station/driver workflows, marketing, customer accounts, reporting, custom roles and external integrations are deferred from this slice. Remaining detailed questions can be resolved when needed, including additional COGS components, provider compatibility/data portability, communications consent, order/payment edge cases, and commercial subscription terms.
 
-No architecture, schema, technology, detailed UI, or implementation decisions are authorized by this discovery record.
+The discovery record alone did not authorize implementation. Subsequent owner approval authorized the bounded core and Next.js, Supabase and Vercel. Real payment processing is explicitly deferred: simulate card approvals/declines/refunds without collecting card data or moving money.
