@@ -19,6 +19,36 @@ async function asUser(id: string | null, role = "authenticated") {
   await db.exec(`set role ${role}`);
 }
 async function rpc<T = unknown>(name: string, args: unknown[]) {
+  if (name === "create_workspace" && args[0] !== "Bad") {
+    const type = (
+      await db.query<{ id: string }>(
+        "select id from public.business_types where name='Retail'",
+      )
+    ).rows[0].id;
+    const plan = (
+      await db.query<{ id: string }>(
+        "select id from public.talix_offerings where kind='plan' and name='Starter' and business_type_id=$1",
+        [type],
+      )
+    ).rows[0].id;
+    const quote = await rpc("subscription_quote", [type, plan, []]);
+    return await rpc("start_subscription", [
+      crypto.randomUUID(),
+      {
+        business_name: args[0],
+        slug: args[1],
+        location_name: args[2],
+        contact_name: "Owner",
+        phone: "5551234567",
+        billing_address: "123 Main",
+        location_address: "123 Main",
+      },
+      type,
+      plan,
+      [],
+      quote,
+    ]);
+  }
   const result = await db.query<{ value: T }>(
     `select public.${name}(${args.map((_, i) => `$${i + 1}`).join(",")}) as value`,
     args,
@@ -33,14 +63,17 @@ const customer = {
 const req = () => crypto.randomUUID();
 beforeAll(async () => {
   await initializeDatabase(db);
-  await db.query("insert into auth.users values ($1,$2),($3,$4),($5,$6)", [
-    owner,
-    "owner@example.com",
-    employee,
-    "worker@example.com",
-    outsider,
-    "other@example.com",
-  ]);
+  await db.query(
+    "insert into auth.users(id,email) values ($1,$2),($3,$4),($5,$6)",
+    [
+      owner,
+      "owner@example.com",
+      employee,
+      "worker@example.com",
+      outsider,
+      "other@example.com",
+    ],
+  );
   await asUser(owner);
   sid = await rpc<string>("create_workspace", [
     "Acme",
@@ -310,7 +343,7 @@ describe.sequential("schema and business boundaries", () => {
     const tables = await db.query<{ relrowsecurity: boolean }>(
       "select relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r'",
     );
-    expect(tables.rows).toHaveLength(9);
+    expect(tables.rows).toHaveLength(12);
     expect(tables.rows.every((t) => t.relrowsecurity)).toBe(true);
   });
   it("supports multiple subscriptions for a single client without tenant leakage", async () => {

@@ -29,4 +29,12 @@ export async function proxy(request: NextRequest) {
   await db.auth.getClaims();
   return response;
 }
-export const config = { matcher: ["/workspace/:path*", "/login"] };
+export const config = {
+  matcher: [
+    "/workspace/:path*",
+    "/login",
+    "/onboarding",
+    "/admin/:path*",
+    "/auth/confirm",
+  ],
+};

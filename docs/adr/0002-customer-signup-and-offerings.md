@@ -1,0 +1,22 @@
+# ADR 0002: Customer signup and editable Talix offerings
+
+Status: Owner-approved bounded scope; implementation subject to acceptance.
+Date: October 6, 2026 (Pacific).
+
+## Evidence
+
+The owner rejected manual business onboarding in the Supabase dashboard and approved the real landing-page signup experience: business/contact information, one business type per subscription, tier, optional Talix products, and a visible billing total/frequency. Sample offerings are approved until commercial terms are defined. Offerings must be addable/editable in Talix admin at any time. Customer screens must avoid technical terminology. Issue #3 owns this scope.
+
+## Decision within the approved scope
+
+Keep the existing Next.js/Supabase/Vercel foundation. Add business types and Talix offerings as an editable sales catalog, client contact fields, a subscription business type, and an immutable purchase snapshot. These additions are required by the accepted signup/catalog behaviors; they do not create industry-specific workflows or a module framework.
+
+Public visitors can read available catalog entries and obtain a database-priced quote. Confirmed signed-in owners create subscriptions through one checked transaction, persisting client details, membership, an unpublished first location, and agreed terms. The server compares the reviewed quote under locks; catalog edits require a new price review. Repeating the same confirmation is safe. Retire the older account-creation shortcut. Existing subscriptions retain their terms after catalog changes. Existing draft subscriptions without a purchase are preserved.
+
+Email/password signup uses existing Supabase Auth with verification retained. Non-authoritative form input lives in user metadata only to resume onboarding; it never grants permissions or determines prices. Both PKCE callbacks and email token-hash confirmation are supported. No service-role key or custom email-provider integration is introduced.
+
+Talix staff access is an explicit, private administrator allowlist. Business ownership never grants Talix staff privileges. Only authorized staff can add/edit/withdraw business types, plans, and extras. The admin customer view displays the contact details and purchased terms required by this slice; it is not the full support/tickets/reporting CRM. Initial real staff assignment requires identifying the owner's verified account; no public administrator bootstrap exists.
+
+## Operational boundaries
+
+Everything is sample pricing and simulated subscription billing. There is no recurring charge engine, processor, card collection, upgrade/proration/cancellation system, addon entitlement enforcement or industry-specific behavior. Potential public signup requires verified email delivery, correct allowed confirmation destinations and suitable mail capacity. Default Supabase mail is restricted; configuring a new mail provider or bypassing verification is not authorized by this decision. Existing deployment protection remains in place.

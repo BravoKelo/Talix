@@ -8,7 +8,7 @@ test("location → catalog → decline → retry → fulfillment → refund", as
   const db = new PGlite();
   await initializeDatabase(db);
   const owner = crypto.randomUUID();
-  await db.query("insert into auth.users values($1,$2)", [
+  await db.query("insert into auth.users(id,email) values($1,$2)", [
     owner,
     "owner@example.com",
   ]);
@@ -30,50 +30,47 @@ test("location → catalog → decline → retry → fulfillment → refund", as
   );
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.route(
-    "https://local-test.supabase.co/rest/v1/rpc/**",
-    async (route) => {
-      const name = route.request().url().split("/").pop()!;
-      const body = route.request().postDataJSON();
-      const keys: Record<string, string[]> = {
-        public_catalog: ["p_slug"],
-        checkout_simulated: [
-          "p_location",
-          "p_request",
-          "p_customer",
-          "p_lines",
-          "p_outcome",
-        ],
-        track_order: ["p_token"],
-        retry_simulated_payment: ["p_token", "p_request", "p_outcome"],
-      };
-      try {
-        if (!keys[name]) throw new Error("Unexpected RPC");
-        const args = keys[name].map((k) => body[k]);
-        const value = await db.transaction(async (tx) => {
-          await tx.exec("set local role anon");
-          const result = await tx.query<{ value: unknown }>(
-            `select public.${name}(${args.map((_, i) => `$${i + 1}`).join(",")}) as value`,
-            args,
-          );
-          return result.rows[0].value;
-        });
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify(value),
-        });
-      } catch (e) {
-        await route.fulfill({
-          status: 400,
-          contentType: "application/json",
-          body: JSON.stringify({
-            message: e instanceof Error ? e.message : "Database error",
-          }),
-        });
-      }
-    },
-  );
+  await page.route("http://127.0.0.1:3290/rest/v1/rpc/**", async (route) => {
+    const name = route.request().url().split("/").pop()!;
+    const body = route.request().postDataJSON();
+    const keys: Record<string, string[]> = {
+      public_catalog: ["p_slug"],
+      checkout_simulated: [
+        "p_location",
+        "p_request",
+        "p_customer",
+        "p_lines",
+        "p_outcome",
+      ],
+      track_order: ["p_token"],
+      retry_simulated_payment: ["p_token", "p_request", "p_outcome"],
+    };
+    try {
+      if (!keys[name]) throw new Error("Unexpected RPC");
+      const args = keys[name].map((k) => body[k]);
+      const value = await db.transaction(async (tx) => {
+        await tx.exec("set local role anon");
+        const result = await tx.query<{ value: unknown }>(
+          `select public.${name}(${args.map((_, i) => `$${i + 1}`).join(",")}) as value`,
+          args,
+        );
+        return result.rows[0].value;
+      });
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(value),
+      });
+    } catch (e) {
+      await route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({
+          message: e instanceof Error ? e.message : "Database error",
+        }),
+      });
+    }
+  });
   try {
     await page.goto("/shop/acme-shop");
     await expect(page.getByRole("heading", { name: "Acme" })).toBeVisible();

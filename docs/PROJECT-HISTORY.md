@@ -61,3 +61,7 @@ The owner clarified that Talix primarily serves online ordering/fulfillment and 
 ## 6. Supabase development connection — October 7, 2026
 
 The owner reconnected the Supabase plugin, exposing the existing healthy Talix project. Its empty application schema was inspected before applying the approved core migration. Preview/development public environment values were configured; production remains disconnected. Two corrective migrations address observed platform helper grants and access-query advisor findings. No processor or industry-specific behavior was introduced.
+
+## 7. Self-service customer experience — October 6, 2026 (Pacific)
+
+The owner corrected manual account provisioning and approved the next bounded scope: public signup, business information, subscription type/tier/optional-product selection, price review, simulated billing, and editable sample offerings in Talix admin. Signup data is intended to grow into the administrative CRM. Customer copy must use plain language. Issue #3 and feature/customer-onboarding build on the unmerged core draft, preserving foundation governance. No industry-specific behavior or real processor is added.

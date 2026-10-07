@@ -62,9 +62,16 @@ Diagnostic, administrative, or engineering interfaces do not become customer-exp
 
 The approved bounded core is now implemented. Screen layouts and visual styling are provisional for product-owner acceptance; implementation does not establish final design authority.
 
-
 ## Implemented for review — October 7, 2026
 
 Owner/employee sign-in leads to subscription/location selectors and orders, products, settings and access areas. Only owners see management controls. Customers enter `/shop/<slug>`, choose a location before seeing products, select generic optional extras, and check out as guests with name/email/phone. A clearly labeled simulated outcome selector replaces card collection. The resulting private order link shows fulfillment/payment/refund state and allows declined-payment retry. No transactional messages are sent yet.
 
 The workspace polls the latest 100 location orders, shows contact and item snapshots, advances the sequential generic statuses, and records owner refunds with reasons and history. Subscription-level branding applies across locations. Product image upload and general/local scope are included. Predefined viewer and fulfillment roles are the initial options; custom roles remain later scope.
+
+## Customer signup and Talix admin — Issue #3
+
+Approved journey: landing-page Sign up → business/contact and first-location details → business type, tier and optional extras → price and billing-frequency review → account creation/email confirmation → final review → business workspace. Additional subscriptions use the selection/review flow. No manual database-dashboard business creation is part of the customer journey. All customer copy uses plain business language. Sample pricing and no charges must remain clear.
+
+The three-step responsive layout is implemented for review, not final visual approval. Loading/empty/withdrawn-selection states, confirmation resend, duplicate-account-safe messaging, failed confirmation, changed-price review, duplicate-safe subscription confirmation and signed-in resume are included. Owners see their saved subscription selection in Settings. Their first location starts unpublished until they configure products and enable ordering.
+
+Talix staff separately manage business types, plans and optional extras, including availability, name, description, price and monthly/yearly billing frequency. A customer-account view displays contacts and subscription snapshots. Staff authorization is explicit; business-owner signup never creates a Talix administrator. Full CRM tickets/support/reporting, real billing and industry-specific benefits are not part of this slice. Email delivery/redirect configuration must be verified before public signup is described as live.

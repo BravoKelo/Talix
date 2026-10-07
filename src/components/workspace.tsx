@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { SubscriptionSummary } from "./subscription-summary";
 import { LocationForm, ProductEditor } from "./product-editor";
 import { browserClient } from "@/lib/supabase/client";
 import {
@@ -26,6 +28,12 @@ export function Workspace({
   userId: string;
   email: string;
 }) {
+  const [adminAccess, setAdminAccess] = useState(false);
+  useEffect(() => {
+    void browserClient()
+      .rpc("talix_admin_access")
+      .then(({ data }) => setAdminAccess(data === true));
+  }, []);
   const [subs, setSubs] = useState<Subscription[]>([]),
     [members, setMembers] = useState<Membership[]>([]),
     [sid, setSid] = useState(""),
@@ -194,41 +202,11 @@ export function Workspace({
   );
   const createForm = (
     <section className="panel">
-      <h2>Create a subscription</h2>
-      <form
-        className="stack"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const f = new FormData(e.currentTarget);
-          void run(async () => {
-            await rpc("create_workspace", {
-              p_name: f.get("name"),
-              p_slug: f.get("slug"),
-              p_location: f.get("location"),
-            });
-            await loadSubscriptions();
-          });
-        }}
-      >
-        <label>
-          Business name
-          <input name="name" required maxLength={100} />
-        </label>
-        <label>
-          Website address
-          <input
-            name="slug"
-            required
-            pattern="[a-z0-9][a-z0-9-]{2,62}"
-            placeholder="your-business"
-          />
-        </label>
-        <label>
-          First location
-          <input name="location" required maxLength={100} />
-        </label>
-        <button disabled={busy}>Create workspace</button>
-      </form>
+      <h2>Add a subscription</h2>
+      <p>Choose a business type, plan and extras for your next business.</p>
+      <Link className="button" href="/onboarding?new=1">
+        Choose a plan →
+      </Link>
     </section>
   );
   return (
@@ -238,6 +216,7 @@ export function Workspace({
           <p className="eyebrow">BUSINESS WORKSPACE</p>
           <h1>{sub?.name || "Your businesses"}</h1>
           <p className="muted">{email}</p>
+          {adminAccess && <Link href="/admin">Talix admin</Link>}
         </div>
         <button
           className="secondary"
@@ -588,125 +567,128 @@ export function Workspace({
             </section>
           )}
           {tab === "settings" && owner && sub && (
-            <div className="workspace-grid">
-              <section className="panel">
-                <details>
-                  <summary>Add another subscription</summary>
-                  {createForm}
-                </details>
-                <h2>Branding</h2>
-                <form
-                  className="stack"
-                  key={sub.id}
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const f = new FormData(e.currentTarget);
-                    void run(async () => {
-                      const v = {
-                        name: String(f.get("name")),
-                        description: String(f.get("description")),
-                        accent: String(f.get("accent")),
-                      };
-                      const { error } = await browserClient()
-                        .from("subscriptions")
-                        .update(v)
-                        .eq("id", sid);
-                      if (error) throw error;
-                      setSubs(
-                        subs.map((s) => (s.id === sid ? { ...s, ...v } : s)),
-                      );
-                    });
-                  }}
-                >
-                  <label>
-                    Business name
-                    <input
-                      name="name"
-                      defaultValue={sub.name}
-                      required
-                      maxLength={100}
-                    />
-                  </label>
-                  <label>
-                    Introduction
-                    <textarea
-                      name="description"
-                      defaultValue={sub.description}
-                      maxLength={1000}
-                    />
-                  </label>
-                  <label>
-                    Brand color
-                    <input
-                      type="color"
-                      name="accent"
-                      defaultValue={sub.accent}
-                    />
-                  </label>
-                  <button disabled={busy}>Save branding</button>
-                </form>
-              </section>
-              <section className="panel">
-                <h2>{location ? "Location settings" : "Create location"}</h2>
-                {location && (
-                  <LocationForm
-                    key={location.id}
-                    location={location}
-                    busy={busy}
-                    save={(v) =>
-                      run(async () => {
-                        const { error } = await browserClient()
-                          .from("locations")
-                          .update(v)
-                          .eq("id", lid);
-                        if (error) throw error;
-                        setLocations(
-                          locations.map((l) =>
-                            l.id === lid ? { ...l, ...v } : l,
-                          ),
-                        );
-                      })
-                    }
-                  />
-                )}
-                <h3>Add a location</h3>
-                <form
-                  className="stack"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const f = new FormData(e.currentTarget);
-                    void run(async () => {
-                      const { data, error } = await browserClient()
-                        .from("locations")
-                        .insert({
-                          subscription_id: sid,
+            <div>
+              <SubscriptionSummary key={sid} id={sid} />
+              <div className="workspace-grid">
+                <section className="panel">
+                  <details>
+                    <summary>Add another subscription</summary>
+                    {createForm}
+                  </details>
+                  <h2>Branding</h2>
+                  <form
+                    className="stack"
+                    key={sub.id}
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const f = new FormData(e.currentTarget);
+                      void run(async () => {
+                        const v = {
                           name: String(f.get("name")),
+                          description: String(f.get("description")),
+                          accent: String(f.get("accent")),
+                        };
+                        const { error } = await browserClient()
+                          .from("subscriptions")
+                          .update(v)
+                          .eq("id", sid);
+                        if (error) throw error;
+                        setSubs(
+                          subs.map((s) => (s.id === sid ? { ...s, ...v } : s)),
+                        );
+                      });
+                    }}
+                  >
+                    <label>
+                      Business name
+                      <input
+                        name="name"
+                        defaultValue={sub.name}
+                        required
+                        maxLength={100}
+                      />
+                    </label>
+                    <label>
+                      Introduction
+                      <textarea
+                        name="description"
+                        defaultValue={sub.description}
+                        maxLength={1000}
+                      />
+                    </label>
+                    <label>
+                      Brand color
+                      <input
+                        type="color"
+                        name="accent"
+                        defaultValue={sub.accent}
+                      />
+                    </label>
+                    <button disabled={busy}>Save branding</button>
+                  </form>
+                </section>
+                <section className="panel">
+                  <h2>{location ? "Location settings" : "Create location"}</h2>
+                  {location && (
+                    <LocationForm
+                      key={location.id}
+                      location={location}
+                      busy={busy}
+                      save={(v) =>
+                        run(async () => {
+                          const { error } = await browserClient()
+                            .from("locations")
+                            .update(v)
+                            .eq("id", lid);
+                          if (error) throw error;
+                          setLocations(
+                            locations.map((l) =>
+                              l.id === lid ? { ...l, ...v } : l,
+                            ),
+                          );
                         })
-                        .select()
-                        .single();
-                      if (error) throw error;
-                      setLocations([...locations, data]);
-                      setLid(data.id);
-                    });
-                  }}
-                >
-                  <label>
-                    Name
-                    <input name="name" required maxLength={100} />
-                  </label>
-                  <button disabled={busy}>Add location</button>
-                </form>
-              </section>
+                      }
+                    />
+                  )}
+                  <h3>Add a location</h3>
+                  <form
+                    className="stack"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const f = new FormData(e.currentTarget);
+                      void run(async () => {
+                        const { data, error } = await browserClient()
+                          .from("locations")
+                          .insert({
+                            subscription_id: sid,
+                            name: String(f.get("name")),
+                          })
+                          .select()
+                          .single();
+                        if (error) throw error;
+                        setLocations([...locations, data]);
+                        setLid(data.id);
+                      });
+                    }}
+                  >
+                    <label>
+                      Name
+                      <input name="name" required maxLength={100} />
+                    </label>
+                    <button disabled={busy}>Add location</button>
+                  </form>
+                </section>
+              </div>
             </div>
           )}
           {tab === "access" && owner && (
             <section className="panel">
               <h2>Employee location access</h2>
               <p>
-                Create the employee account in Supabase Auth first. Grant access
-                separately for each location. Viewer reads orders and products;
-                fulfillment also advances orders. Owners manage settings,
-                products, access and refunds.
+                Team members need a Talix account before you grant access.
+                Choose access separately for each location. Viewer reads orders
+                and products; fulfillment also advances orders. Owners manage
+                settings, products, access and refunds.
               </p>
               <form
                 className="stack"

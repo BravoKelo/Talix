@@ -16,13 +16,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Link>
           <nav>
             <Link href="/workspace">Business workspace</Link>
-            <span className="badge">Simulated payments</span>
+            <Link href="/login">Sign in</Link>
+            <Link href="/signup">Sign up</Link>
           </nav>
         </header>
         {children}
-        <footer>
-          Talix Core · Business-neutral commerce · No real payments
-        </footer>
+        <footer>Talix · Your business, connected.</footer>
       </body>
     </html>
   );
