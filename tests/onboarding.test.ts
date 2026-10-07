@@ -112,8 +112,24 @@ describe.sequential("customer signup and Talix offerings", () => {
   });
   it("rejects noncanonical contact and address formats before creating a subscription", async () => {
     await as(owner);
-    for (const invalid of [{phone: "555"}, {contact_name: "Alex123"}, {billing_address: "100 Main"}, {location_address: "200 Main"}]) {
-      await expect(rpc("start_subscription", [crypto.randomUUID(), {...business, ...invalid}, type, plan, [addon], quote])).rejects.toThrow(/phone number|contact name|billing address|location address/);
+    for (const invalid of [
+      { phone: "555" },
+      { contact_name: "Alex123" },
+      { billing_address: "100 Main" },
+      { location_address: "200 Main" },
+    ]) {
+      await expect(
+        rpc("start_subscription", [
+          crypto.randomUUID(),
+          { ...business, ...invalid },
+          type,
+          plan,
+          [addon],
+          quote,
+        ]),
+      ).rejects.toThrow(
+        /phone number|contact name|billing address|location address/,
+      );
     }
   });
   it("requires confirmation and complete business details", async () => {
@@ -244,6 +260,10 @@ describe.sequential("customer signup and Talix offerings", () => {
       [addon],
       current,
     ]);
+    expect(
+      (await db.query("select slug from public.subscriptions order by slug"))
+        .rows,
+    ).toEqual([{ slug: "independent-shop" }, { slug: "independent-shop-2" }]);
     expect((await db.query("select * from public.clients")).rows).toHaveLength(
       1,
     );

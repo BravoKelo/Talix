@@ -79,3 +79,9 @@ Talix staff separately manage business types, plans and optional extras, includi
 ## Approved confirmation amendment — October 6, 2026 (Pacific)
 
 The owner explicitly deferred email delivery and verification for current development. After signup display a separate confirmation page: `Email confirmation sent to: <account email>` with `(Feature coming soon)` underneath. Do not label this journey as a demonstration. Continue completes the saved purchase and opens the business workspace. Only a changed price or unavailable selection requires another review. Reload/sign-in resume the saved input; neither passwords nor the email address are stored in URL parameters. No email is sent in this mode. The existing real-confirmation path remains for live launch, which requires verification and delivery configuration. This supersedes required email confirmation in the earlier development journey; other signup/catalog decisions remain.
+
+## Automatic ordering address — October 7, 2026
+
+The owner confirmed that prospective customers should not choose an internal ordering address at signup. The address field and review row are removed. The purchase transaction derives an address from the business name, uses `store` for names without a usable ASCII form, and adds a numeric suffix when needed. A shared transaction lock serializes competing allocations; prior purchase retries retain their original address. Saved draft address input is ignored for new allocation. No new table, role, or external domain configuration is involved. Existing ordering links remain unchanged. Owner customization in Settings is a later follow-up, not part of this correction.
+
+Development migration `20261007043143_generate_ordering_address` is applied. Database checks verify duplicate-name allocation and repeat-safe completion. The live check used a rolled-back transaction and left no records. Customer signup no longer exposes this internal requirement.

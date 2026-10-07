@@ -76,9 +76,6 @@ export function businessErrors(b: BusinessDetails) {
   if (!/^\+[1-9]\d{6,14}$/.test(formatPhone(b.phone)))
     errors.phone =
       "Enter a phone number with a country code, such as +1 (206) 555-0123.";
-  if (!/^[a-z0-9][a-z0-9-]{2,62}$/.test(b.slug.trim().toLowerCase()))
-    errors.slug =
-      "Choose 3–63 letters, numbers or dashes, such as your-business.";
   for (const key of ["billing_address", "location_address"] as const) {
     const a = parseAddress(b[key]);
     for (const field of [

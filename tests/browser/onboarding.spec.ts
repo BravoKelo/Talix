@@ -64,16 +64,7 @@ for (const changedPrice of [false, true])
           .getByLabel(title + " — Postal code", { exact: true })
           .fill("98101");
       }
-      await page
-        .getByLabel("Your online store address")
-        .fill("https://invalid-store.com");
-      await page.getByRole("button", { name: "Choose your plan →" }).click();
-      await expect(page.getByRole("status")).toContainText(
-        "highlighted details",
-      );
-      await page
-        .getByLabel("Your online store address")
-        .fill("independent-shop");
+      await expect(page.getByLabel("Your online store address")).toHaveCount(0);
       await page.getByRole("button", { name: "Choose your plan →" }).click();
       await page
         .getByRole("combobox", { name: "Business type", exact: true })

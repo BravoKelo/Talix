@@ -399,14 +399,11 @@ export function Onboarding({
                     ["contact_name", "Your full name", "name", 100],
                     ["phone", "Business phone", "tel", 40],
                     ["location_name", "First location name", "off", 100],
-                    ["slug", "Your online store address", "off", 63],
                   ] as const
                 ).map(([key, label, auto, max]) => (
                   <label
                     key={key}
-                    className={
-                      key.includes("address") || key === "slug" ? "wide" : ""
-                    }
+                    className={key.includes("address") ? "wide" : ""}
                   >
                     {label}
                     <input
@@ -423,12 +420,6 @@ export function Onboarding({
                     />
                     {errors[key] && (
                       <small className="field-error">{errors[key]}</small>
-                    )}
-                    {key === "slug" && (
-                      <small>
-                        Choose 3–63 lowercase letters, numbers or dashes, such
-                        as your-business.
-                      </small>
                     )}
                   </label>
                 ))}
@@ -586,10 +577,6 @@ export function Onboarding({
                       <br />
                       {business.location_address}
                     </dd>
-                  </div>
-                  <div>
-                    <dt>Online store address</dt>
-                    <dd>/shop/{business.slug}</dd>
                   </div>
                 </dl>
                 <button
