@@ -1,4 +1,6 @@
 import { Login } from "@/components/login";
+import { emailConfirmationPending } from "@/lib/email-confirmation";
+export const dynamic = "force-dynamic";
 export default async function Page({
   searchParams,
 }: {
@@ -17,6 +19,7 @@ export default async function Page({
       <Login
         next={next}
         confirmationFailed={params.confirmation === "failed"}
+        confirmationPending={emailConfirmationPending()}
       />
     </main>
   );

@@ -16,7 +16,7 @@ npm run dev
 
 Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to the existing Talix development project. Never use a service-role/secret key in the browser.
 
-See [setup](docs/SETUP.md), [current state](docs/CURRENT-STATE.md), [architecture](docs/ARCHITECTURE.md), and [governance](AGENTS.md). Customers enter through Sign up, review their sample selection and confirm their email before starting a subscription. See setup for email delivery and explicit Talix staff access.
+See [setup](docs/SETUP.md), [current state](docs/CURRENT-STATE.md), [architecture](docs/ARCHITECTURE.md), and [governance](AGENTS.md). Customers enter through Sign up, review their sample selection and continue through a pending email-confirmation page before starting a subscription. Actual email delivery/verification is deferred for development and required before live launch. See setup for email delivery and explicit Talix staff access.
 
 ## Checks
 

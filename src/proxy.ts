@@ -36,5 +36,6 @@ export const config = {
     "/onboarding",
     "/admin/:path*",
     "/auth/confirm",
+    "/signup/:path*",
   ],
 };

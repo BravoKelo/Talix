@@ -7,13 +7,15 @@ import { browserClient, configured } from "@/lib/supabase/client";
 export function Login({
   next = "workspace",
   confirmationFailed = false,
+  confirmationPending = false,
 }: {
   next?: "workspace" | "admin" | "onboarding";
   confirmationFailed?: boolean;
+  confirmationPending?: boolean;
 }) {
   const router = useRouter();
   const [message, setMessage] = useState(
-    confirmationFailed
+    confirmationFailed && !confirmationPending
       ? "That confirmation link could not be opened. Please request a new one or sign in if your email is already confirmed."
       : "",
   );
@@ -82,14 +84,16 @@ export function Login({
       <button disabled={busy || !configured()}>
         {busy ? "Signing in…" : "Sign in"}
       </button>
-      <button
-        type="button"
-        className="secondary"
-        disabled={busy || !configured()}
-        onClick={(e) => void resend(e.currentTarget.form!)}
-      >
-        Resend confirmation email
-      </button>
+      {!confirmationPending && (
+        <button
+          type="button"
+          className="secondary"
+          disabled={busy || !configured()}
+          onClick={(e) => void resend(e.currentTarget.form!)}
+        >
+          Resend confirmation email
+        </button>
+      )}
       <p role="status">
         {message ||
           (!configured() ? "Sign-in is temporarily unavailable." : "")}

@@ -20,6 +20,7 @@ export default defineConfig({
     env: {
       NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:3290",
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-only-public-key",
+      TALIX_EMAIL_CONFIRMATION_PENDING: "true",
     },
   },
   projects: [

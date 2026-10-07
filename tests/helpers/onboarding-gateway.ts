@@ -18,6 +18,8 @@ export async function onboardingGateway() {
   const users = new Map<string, User>();
   let confirmedUser: User | undefined;
   let signupBody: Record<string, unknown> | undefined;
+  let autoconfirm = true;
+  let mailRequests = 0;
   async function user(email: string, confirmed = true, admin = false) {
     const value: User = {
       id: crypto.randomUUID(),
@@ -83,13 +85,31 @@ export async function onboardingGateway() {
         current = users.get(id);
       }
       if (url.pathname.includes("/auth/v1/")) {
-        if (url.pathname.endsWith("/signup")) {
-          signupBody = input;
-          const u = await user(input.email, false);
-          u.user_metadata = input.data ?? {};
-          res.end(JSON.stringify(u));
+        if (url.pathname.endsWith("/settings")) {
+          res.end(JSON.stringify({ mailer_autoconfirm: autoconfirm }));
           return;
         }
+        if (url.pathname.endsWith("/signup")) {
+          signupBody = input;
+          const u = await user(input.email, autoconfirm);
+          u.user_metadata = input.data ?? {};
+          if (!autoconfirm) mailRequests++;
+          res.end(
+            JSON.stringify(
+              autoconfirm
+                ? {
+                    access_token: token(u),
+                    refresh_token: "test-refresh",
+                    expires_in: 3600,
+                    token_type: "bearer",
+                    user: u,
+                  }
+                : u,
+            ),
+          );
+          return;
+        }
+        if (url.pathname.endsWith("/resend")) mailRequests++;
         if (
           url.pathname.endsWith("/verify") &&
           input.token_hash === "verification-token" &&
@@ -261,6 +281,12 @@ export async function onboardingGateway() {
     db,
     admin,
     users,
+    setAutoconfirm(value: boolean) {
+      autoconfirm = value;
+    },
+    get mailRequests() {
+      return mailRequests;
+    },
     get signupBody() {
       return signupBody;
     },

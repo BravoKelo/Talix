@@ -37,12 +37,9 @@ test("landing → signup → confirmation → price review → workspace; staff 
     await page
       .getByLabel("Email", { exact: true })
       .fill("newowner@example.invalid");
-    await page
-      .getByRole("button", { name: "Resend confirmation email" })
-      .click();
-    await expect(page.getByRole("status")).toContainText(
-      "If your account needs confirmation",
-    );
+    await expect(
+      page.getByRole("button", { name: "Resend confirmation email" }),
+    ).toHaveCount(0);
     await page.goto("/");
     await page.getByRole("link", { name: "Sign up →", exact: true }).click();
     await page
@@ -75,10 +72,36 @@ test("landing → signup → confirmation → price review → workspace; staff 
       .getByLabel("Password", { exact: true })
       .fill("Test-only-long-password!");
     await page.getByLabel("Confirm password").fill("Test-only-long-password!");
+    gateway.setAutoconfirm(false);
+    await page.getByRole("button", { name: "Sign up", exact: true }).click();
+    await expect(page.getByRole("status")).toContainText(
+      "Signup is temporarily unavailable.",
+    );
+    expect(gateway.signupBody).toBeUndefined();
+    expect(gateway.mailRequests).toBe(0);
+    gateway.setAutoconfirm(true);
     await page.getByRole("button", { name: "Sign up", exact: true }).click();
     await expect(
-      page.getByRole("heading", { name: "Check your email." }),
+      page.getByRole("heading", { name: "Thanks for signing up." }),
     ).toBeVisible();
+    await expect(page).toHaveURL(/\/signup\/confirmation$/);
+    await expect(page.getByText("Email confirmation sent to:")).toContainText(
+      "newowner@example.invalid",
+    );
+    await expect(
+      page.getByText("(Feature coming soon)", { exact: true }),
+    ).toBeVisible();
+    await page.reload();
+    await expect(
+      page.getByText("(Feature coming soon)", { exact: true }),
+    ).toBeVisible();
+    expect(await page.locator("body").innerText()).not.toMatch(
+      /demonstration|Supabase|schema|RPC/i,
+    );
+    await page.screenshot({
+      path: `test-results/signup-confirmation-${test.info().project.name}.png`,
+      fullPage: true,
+    });
     expect(gateway.signupBody).toMatchObject({
       email: "newowner@example.invalid",
       data: {
@@ -91,7 +114,7 @@ test("landing → signup → confirmation → price review → workspace; staff 
     expect(
       (await gateway.db.query("select id from public.clients")).rows,
     ).toEqual([]);
-    // Confirming mail is test scaffolding, not a claim of provider mail delivery.
+    // This also retains coverage of the future email-token callback, independent of signup.
     await gateway.confirm("newowner@example.invalid");
     const staffContext = await browser.newContext();
     await connect(staffContext);
@@ -124,9 +147,7 @@ test("landing → signup → confirmation → price review → workspace; staff 
     await expect(
       staff.getByRole("status").filter({ hasText: "Changes saved." }),
     ).toBeVisible();
-    await page.goto(
-      "/auth/confirm?token_hash=verification-token&type=email&next=https://example.com",
-    );
+    await page.getByRole("link", { name: "Continue →", exact: true }).click();
     await expect(page).toHaveURL(/\/onboarding$/);
     await expect(
       page.getByText("$59.00 / month", { exact: true }),
@@ -221,6 +242,13 @@ test("landing → signup → confirmation → price review → workspace; staff 
       fullPage: true,
     });
     expect(errors).toEqual([]);
+    expect(gateway.mailRequests).toBe(0);
+    await page.goto("/signup/confirmation?email=someone-else@example.invalid");
+    await expect(page).toHaveURL(/\/workspace$/);
+    await page.goto(
+      "/auth/confirm?token_hash=verification-token&type=email&next=https://example.com",
+    );
+    await expect(page).toHaveURL(/\/onboarding$/);
     await staffContext.close();
   } finally {
     await gateway.close();

@@ -54,7 +54,7 @@ Talix Admin has a separate CRM covering client relationships, subscription infor
 
 ## Talix customer signup and subscription selection
 
-The owner approved the landing-page signup experience on October 6, 2026 (Pacific). Prospective Talix customers enter business/contact details, choose one business type, select a subscription tier and optional Talix products, and review the total and billing frequency before confirmation. Email verification precedes subscription creation. Their selection and business details must survive confirmation and later sign-in. Additional subscriptions use the same selection/review experience.
+The owner approved the landing-page signup experience on October 6, 2026 (Pacific). Prospective Talix customers enter business/contact details, choose one business type, select a subscription tier and optional Talix products, and review the total and billing frequency before confirmation. Before live launch, email verification must precede subscription creation. For current development the owner approved deferring email delivery/verification: account creation leads to a confirmation page showing the account email and “(Feature coming soon)”, then Continue to the saved selection and final review. Their selection and business details must survive confirmation and later sign-in. Additional subscriptions use the same selection/review experience.
 
 The signup information is intended to feed the Talix administrative CRM as it grows. The current slice collects business name, contact name/email/phone, billing address, first location name/address and online store address. Additional CRM fields remain to be defined rather than invented now.
 

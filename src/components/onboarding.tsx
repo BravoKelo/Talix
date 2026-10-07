@@ -2,7 +2,11 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { browserClient, configured } from "@/lib/supabase/client";
+import {
+  browserClient,
+  configured,
+  immediateSignupClient,
+} from "@/lib/supabase/client";
 import { money } from "@/lib/types";
 import {
   accountMessage,
@@ -16,9 +20,11 @@ import {
 export function Onboarding({
   email = "",
   draft = null,
+  confirmationPending = false,
 }: {
   email?: string;
   draft?: Draft | null;
+  confirmationPending?: boolean;
 }) {
   const router = useRouter();
   const [types, setTypes] = useState<BusinessType[]>([]),
@@ -154,7 +160,28 @@ export function Onboarding({
     try {
       const db = browserClient();
       if (!email) {
-        const { data, error } = await db.auth.signUp({
+        if (confirmationPending) {
+          // Do not attempt signup/mail while the development service still requires email.
+          const response = await fetch(
+            process.env.NEXT_PUBLIC_SUPABASE_URL + "/auth/v1/settings",
+            {
+              headers: {
+                apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+              },
+              cache: "no-store",
+            },
+          );
+          const settings = response.ok ? await response.json() : null;
+          if (settings?.mailer_autoconfirm !== true) {
+            setMessage(
+              "Signup is temporarily unavailable. Please try again shortly.",
+            );
+            return;
+          }
+        }
+        const { data, error } = await (
+          confirmationPending ? immediateSignupClient() : db
+        ).auth.signUp({
           email: accountEmail,
           password,
           options: {
@@ -167,10 +194,25 @@ export function Onboarding({
           return;
         }
         if (!data.session) {
+          if (confirmationPending) {
+            setMessage("We couldn’t complete signup. Please try again.");
+            return;
+          }
           setSentEmail(accountEmail);
           return;
         }
-        router.replace("/onboarding");
+        if (confirmationPending) {
+          const { error: sessionError } = await db.auth.setSession(
+            data.session,
+          );
+          if (sessionError) {
+            setMessage("Your account is ready. Please sign in to continue.");
+            return;
+          }
+        }
+        router.replace(
+          confirmationPending ? "/signup/confirmation" : "/onboarding",
+        );
         router.refresh();
         return;
       }
@@ -578,7 +620,7 @@ export function Onboarding({
                       ? "Confirm subscription"
                       : "Sign up"}
                 </button>
-                {!email && (
+                {!email && !confirmationPending && (
                   <small>
                     We’ll ask you to confirm your email before starting your
                     subscription.
