@@ -26,8 +26,8 @@ Private random UUID order tokens are bearer secrets and are not granted as reada
 
 Only simulated approved/declined payments and full/partial refunds exist. There are no card fields, processor SDKs, API keys, payment webhooks or money movements. Processor selection is deferred; the current simulator is not a production payment integration.
 
-## Verification and unresolved infrastructure
+## Verification and development infrastructure
 
-Versioned migration: `supabase/migrations/20261007002309_core_commerce.sql`. Embedded PostgreSQL tests verify real SQL/RLS using small Auth/Storage fixtures; browser tests adapt RPC requests to that database. They do not verify Supabase service configuration. Migration application and live Auth/PostgREST/Storage checks require access to the existing Talix development project.
+Versioned migration: `supabase/migrations/20261007005603_core_commerce.sql`. Embedded PostgreSQL tests verify real SQL/RLS using small Auth/Storage fixtures; browser tests adapt RPC requests to that database. They do not verify Supabase service configuration. The core and two corrective migrations are applied to the existing Talix development project. The corrections revoke client execution on the platform-only event-trigger function and tune existing access policies/indexes without changing authorization behavior. Live service verification is recorded in `CURRENT-STATE.md`.
 
 Preserve the evidence-driven governance in `AGENTS.md`: build only demonstrated requirements; avoid speculative module frameworks; protected changes require owner approval; acceptance precedes merge.

@@ -2,7 +2,7 @@
 
 ## Connect the existing development project
 
-1. Verify the project identity and existing tables/migrations first. The known Talix project was not exposed by the connector during implementation. Do not use AMZ-PSE or create a substitute project.
+1. Verify the project identity and existing tables/migrations first. The connected Talix development project is `lzepujggusieapablzhn`; its three checked-in migrations have been applied. Do not use AMZ-PSE or create a substitute project.
 2. Use Node.js 24 and `npm ci`. Authenticate the Supabase CLI with your own authorized account, then `npx supabase link --project-ref <talix-ref>`.
 3. Inspect `npx supabase migration list` and `npx supabase db push --dry-run`. If existing schema conflicts with the new migration, investigate before applying it. Then apply the reviewed development migration with `npx supabase db push`.
 4. Obtain the Talix URL and publishable key. Set the two variables in `.env.local` and in the Talix Vercel project's preview/development environment. These are public browser credentials; no service-role key is required. Redeploy after changing public build-time variables.
@@ -25,6 +25,6 @@
 
 This is a development slice, not a live commercial launch. Currency is USD; taxes, shipping, stock deductions, operating-hour enforcement and scheduled ordering are not implemented. Hours are descriptive text. No emails/texts, actual billing, real payments, custom roles, CRM reporting, customer accounts, integrations, or industry modules exist yet.
 
-Publishable locations are publicly readable and permit anonymous simulated checkout. A production launch needs its own approved payment/tax/fulfillment policies and abuse controls; no production credentials or database changes were made during this implementation.
+Publishable locations are publicly readable and permit anonymous simulated checkout. A production launch needs its own approved payment/tax/fulfillment policies and abuse controls; production environment values remain unset; database changes were applied only to the Talix development project.
 
 The private order link is a bearer secret. Its read RPC returns status/items/totals, never customer contact details. Do not paste real customer links into public tickets. Product images are public business assets. Replacing an image leaves the old asset in storage; cleanup is deferred.
