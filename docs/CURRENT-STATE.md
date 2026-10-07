@@ -36,6 +36,10 @@ Dashboard fallback was approved but its remote-browser GitHub/passkey login coul
 
 GitHub Actions completed successfully for implementation commit `00f0e8d46e5cc2cb08882e12bf03606b8e68049b` on both push (run 37560008900) and draft PR (run 37560013049). The complete checks include lint, TypeScript, 20 database tests, four desktop/mobile browser scenarios and production build. This handoff-only documentation update does not change the tested implementation.
 
+## Deferred-confirmation delivery checkpoint
+
+Implementation commit `f79abf76bba424e809da4a54b0e053a025b91163` is saved in draft PR #4. Its full push GitHub Actions run 37567888778 completed successfully. Deployment `dpl_9jDugwG3tBTVdaFfrNbmaGE3wE8h` is READY for this source, with stable protected preview https://talix-git-feature-customer-onboarding-bravokelo.vercel.app/signup . The deployed signup page returned HTTP 200 and no longer asks for immediate email verification in pending mode. The development flag is branch-scoped. A fresh public Auth settings read still returned `mailer_autoconfirm=false` and signup enabled. Actual no-mail signup remains blocked until the owner saves the Confirm email toggle; no live account was created or email sent by this amendment. This handoff-only documentation change does not alter the tested implementation.
+
 ## Exact restart
 
 1. Inspect Issue #3, this branch, its draft PR, latest CI and connected preview; retain the foundation governance and underlying unmerged core.
