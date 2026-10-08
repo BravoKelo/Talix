@@ -28,7 +28,7 @@ Only simulated approved/declined payments and full/partial refunds exist. There 
 
 ## Verification and development infrastructure
 
-Migration history is append-only in `supabase/migrations`. Nine migrations are applied to development: core commerce, trigger execution restriction, access-query tuning, customer onboarding, catalog-policy tuning, signup validation, generated ordering addresses, configurable Users, and the membership-role index. The additional client-profile preservation migration is prepared but unapplied; see CURRENT-STATE for the exact pending file. Embedded PostgreSQL tests execute migration SQL/RLS with Auth/Storage fixtures; browser tests use an adapter to that database. Those checks do not establish live service configuration or full deployed end-to-end behavior.
+Migration history is append-only in `supabase/migrations`. The original nine migrations are applied to development: core commerce, trigger execution restriction, access-query tuning, customer onboarding, catalog-policy tuning, signup validation, generated ordering addresses, configurable Users, and the membership-role index. The tenth, client-profile preservation migration is also applied after separate owner execution approval; see CURRENT-STATE for its exact version and live verification. Embedded PostgreSQL tests execute migration SQL/RLS with Auth/Storage fixtures; browser tests use an adapter to that database. Those checks do not establish live service configuration or full deployed end-to-end behavior.
 
 Preserve the evidence-driven governance in `AGENTS.md`: build only demonstrated requirements; avoid speculative module frameworks; protected changes require owner approval; acceptance precedes merge.
 
@@ -54,7 +54,7 @@ Development migration `20261007043143_generate_ordering_address` is applied. Dat
 
 ## Shared client profile correction — Issue #10
 
-The owner approved preserving the existing client profile when purchasing another subscription. The prepared additive migration changes only `start_subscription`: insert a client if absent; on conflict retain its fields and select its existing ID. Existing owner transaction locking, confirmed-user checks, quote validation, generated address allocation, purchase snapshots, idempotency, grants and permission seeding remain intact. No existing business rows are rewritten, and no table, policy or function signature changes. Do not describe this behavior as active on the development service until the pending migration is approved, applied and verified.
+The owner approved preserving the existing client profile when purchasing another subscription. The approved and applied additive migration changes only `start_subscription`: insert a client if absent; on conflict retain its fields and select its existing ID. Existing owner transaction locking, confirmed-user checks, quote validation, generated address allocation, purchase snapshots, idempotency, grants and permission seeding remain intact. No existing business rows are rewritten, and no table, policy or function signature changes. The corrected behavior is active and SQL-verified on development; complete deployed browser acceptance remains separate.
 
 ## Decision provenance
 

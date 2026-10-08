@@ -29,7 +29,7 @@ This supersedes the earlier restriction against disabling confirmation for the e
 
 ## Shared client profile amendment — Issue #10
 
-On 2026-10-07 Pacific (2026-10-08 UTC), the owner approved preserving the existing shared client profile when adding another subscription. The new subscription keeps its own name/contact/location details in the immutable purchase snapshot. The prepared migration replaces only the existing subscription function's client upsert with insert-if-absent and an existing-client lookup, within its owner transaction lock. Original migrations, signatures, policies, grants and history remain unchanged. Applying that migration requires explicit development execution approval. This amendment does not introduce profile editing or repair historical overwritten profiles.
+On 2026-10-07 Pacific (2026-10-08 UTC), the owner approved preserving the existing shared client profile when adding another subscription. The new subscription keeps its own name/contact/location details in the immutable purchase snapshot. The additive migration replaces only the existing subscription function's client upsert with insert-if-absent and an existing-client lookup, within its owner transaction lock. Original migrations, signatures, policies, grants and history remain unchanged. Separate development execution approval was obtained and the migration applied; CURRENT-STATE records its version and verification. This amendment does not introduce profile editing or repair historical overwritten profiles.
 
 ## Approval provenance and validation
 

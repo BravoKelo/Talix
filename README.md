@@ -33,4 +33,4 @@ Database tests apply all checked-in migrations to embedded PostgreSQL with minim
 
 ## Integration checkpoint
 
-Main currently contains only the initial README; this review branch carries the foundation and application. PR #2 and dependent PR #4 remain unmerged. Issue #10 tracks reconciliation/stabilization. The prepared client-profile migration is not yet applied to development. Read CURRENT-STATE before testing additional subscriptions or proposing a merge; approval of preparation is separate from database execution and final merge acceptance.
+Main currently contains only the initial README; this review branch carries the foundation and application. PR #2 and dependent PR #4 remain unmerged. Issue #10 tracks reconciliation/stabilization. The separately approved client-profile migration is applied and verified on Talix development. Read CURRENT-STATE before testing additional subscriptions or proposing a merge; final merge acceptance remains separate.
