@@ -6,7 +6,7 @@ for (const changedPrice of [false, true])
     page,
     browser,
   }) => {
-    test.setTimeout(60000);
+    test.setTimeout(120000);
     const gateway = await onboardingGateway();
     async function connect(context: import("@playwright/test").BrowserContext) {
       await context.route("http://127.0.0.1:3290/**", async (route) => {
@@ -105,7 +105,7 @@ for (const changedPrice of [false, true])
       );
       gateway.setAutoconfirm(false);
       await page.getByRole("button", { name: "Sign up", exact: true }).click();
-      await expect(page.getByRole("status")).toContainText(
+      await expect(page.locator(".signup-review [role=alert]")).toContainText(
         "Signup is temporarily unavailable.",
       );
       expect(gateway.signupBody).toBeUndefined();
@@ -311,6 +311,156 @@ for (const changedPrice of [false, true])
         "/auth/confirm?token_hash=verification-token&type=email&next=https://example.com",
       );
       await expect(page).toHaveURL(/\/workspace$/);
+      await expect(
+        page.getByRole("link", { name: "Add subscription", exact: true }),
+      ).toBeVisible();
+      await gateway.addAccount("employee@example.invalid");
+      await page.getByRole("button", { name: "Users", exact: true }).click();
+      await expect(
+        page.getByRole("table", { name: "Configured users" }),
+      ).toContainText("Owner");
+      await page
+        .getByLabel("Role name", { exact: true })
+        .fill("Order observer");
+      await page.getByRole("checkbox", { name: /View orders/ }).check();
+      await page
+        .getByRole("button", { name: "Save custom role", exact: true })
+        .click();
+      await expect(
+        page.getByRole("status").filter({ hasText: "Changes saved." }),
+      ).toBeVisible();
+      await page
+        .getByLabel("User email", { exact: true })
+        .fill("employee@example.invalid");
+      await page
+        .getByLabel("Subscription role", { exact: true })
+        .selectOption({ label: "Viewer" });
+      await page
+        .getByLabel("Role at Main shop", { exact: true })
+        .selectOption({ label: "Order observer" });
+      await page
+        .getByRole("button", { name: "Save user", exact: true })
+        .click();
+      await expect(
+        page.getByRole("table", { name: "Configured users" }),
+      ).toContainText("employee@example.invalid");
+      await page
+        .getByRole("button", {
+          name: "Edit employee@example.invalid",
+          exact: true,
+        })
+        .click();
+      await page
+        .getByLabel("Role at Main shop", { exact: true })
+        .selectOption({ label: "Lead" });
+      await page
+        .getByRole("button", { name: "Save user", exact: true })
+        .click();
+      await expect(
+        page.getByRole("table", { name: "Configured users" }),
+      ).toContainText("Lead");
+      if (!changedPrice) {
+        await page
+          .getByRole("link", { name: "Add subscription", exact: true })
+          .click();
+        await page
+          .getByLabel("Business name", { exact: true })
+          .fill("Second business");
+        await page.getByLabel("Your full name").fill("Alex Owner");
+        await page.getByLabel("Business phone").fill("2065550123");
+        await page.getByLabel("First location name").fill("Second location");
+        for (const title of ["Billing address", "Location address"]) {
+          await page
+            .getByLabel(title + " — Street address", { exact: true })
+            .fill("100 Main Road");
+          await page
+            .getByLabel(title + " — City or town", { exact: true })
+            .fill("Seattle");
+          await page
+            .getByLabel(title + " — Postal code", { exact: true })
+            .fill("98101");
+        }
+        await page.getByRole("button", { name: "Choose your plan →" }).click();
+        await page
+          .getByRole("combobox", { name: "Business type", exact: true })
+          .selectOption({ label: "Other business" });
+        await page.getByRole("radio", { name: /Starter/ }).check();
+        await page
+          .getByRole("button", { name: "Review your selection →" })
+          .click();
+        await expect(page.getByLabel("Password", { exact: true })).toHaveCount(
+          0,
+        );
+        await page
+          .getByRole("button", { name: "Confirm subscription", exact: true })
+          .click();
+        await expect(page).toHaveURL(/\/workspace$/);
+        await page
+          .getByLabel("Subscription", { exact: true })
+          .selectOption({ label: "Second business" });
+        await expect(
+          page.getByRole("heading", { name: "Second business", exact: true }),
+        ).toBeVisible();
+      }
+      await page.getByRole("button", { name: "Sign out", exact: true }).click();
+      await expect(page).toHaveURL(/\/login$/);
+      await expect(
+        page.getByRole("link", { name: "Business workspace", exact: true }),
+      ).toHaveCount(0);
+      await page.goto("/workspace");
+      await expect(page).toHaveURL(/\/login$/);
+      await page.goBack();
+      await expect(
+        page.getByRole("heading", { name: "Independent shop", exact: true }),
+      ).toHaveCount(0);
+      await page.goto("/signup");
+      await page
+        .getByLabel("Business name", { exact: true })
+        .fill("Third business");
+      await page.getByLabel("Your full name").fill("Alex Owner");
+      await page.getByLabel("Business phone").fill("2065550123");
+      await page.getByLabel("First location name").fill("Main");
+      for (const title of ["Billing address", "Location address"]) {
+        await page
+          .getByLabel(title + " — Street address", { exact: true })
+          .fill("100 Main Road");
+        await page
+          .getByLabel(title + " — City or town", { exact: true })
+          .fill("Seattle");
+        await page
+          .getByLabel(title + " — Postal code", { exact: true })
+          .fill("98101");
+      }
+      await page.getByRole("button", { name: "Choose your plan →" }).click();
+      await page
+        .getByRole("combobox", { name: "Business type", exact: true })
+        .selectOption({ label: "Retail" });
+      await page.getByRole("radio", { name: /Starter/ }).check();
+      await page
+        .getByRole("button", { name: "Review your selection →" })
+        .click();
+      await page
+        .getByLabel("Email", { exact: true })
+        .fill("newowner@example.invalid");
+      await page
+        .getByLabel("Password", { exact: true })
+        .fill("Test-only-long-password!");
+      await page
+        .getByLabel("Confirm password")
+        .fill("Test-only-long-password!");
+      await page.getByRole("button", { name: "Sign up", exact: true }).click();
+      await expect(page.locator(".signup-review [role=alert]")).toContainText(
+        "already registered",
+      );
+      await expect(
+        page.getByRole("link", {
+          name: "Sign in to your account",
+          exact: true,
+        }),
+      ).toBeVisible();
+      await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
+        "newowner@example.invalid",
+      );
       await staffContext.close();
     } finally {
       await gateway.close();

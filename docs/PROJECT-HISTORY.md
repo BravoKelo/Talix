@@ -85,3 +85,10 @@ Migration `20261007041833_validate_signup_details` adds format checks to the exi
 The owner confirmed that prospective customers should not choose an internal ordering address at signup. The address field and review row are removed. The purchase transaction derives an address from the business name, uses `store` for names without a usable ASCII form, and adds a numeric suffix when needed. A shared transaction lock serializes competing allocations; prior purchase retries retain their original address. Saved draft address input is ignored for new allocation. No new table, role, or external domain configuration is involved. Existing ordering links remain unchanged. Owner customization in Settings is a later follow-up, not part of this correction.
 
 Development migration `20261007043143_generate_ordering_address` is applied. Database checks verify duplicate-name allocation and repeat-safe completion. The live check used a rolled-back transaction and left no records. Customer signup no longer exposes this internal requirement.
+
+
+## Review batch — October 8, 2026
+
+The owner authorized correcting five reported defects together and creating GitHub traceability (Issues #5–9). Implemented verified-user workspace entry/logout, logged-out navigation, adjacent duplicate-email feedback, prominent additional subscriptions and Users with protected Owner, leadership/custom roles and independent location assignments. The minimum permission schema and checked RPCs are recorded in ADR 0003; both development migrations are applied.
+
+Validation: lint/typecheck, 33 unit/SQL tests, six desktop/mobile browser scenarios and production build passed. Actual Supabase disposable accounts verified role assignment, denied access, revocation/removal, duplicate signup and signout; associated records were removed. Draft PR #4 remains stacked on PR #2; no merge or production promotion.

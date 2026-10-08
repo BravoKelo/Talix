@@ -60,6 +60,8 @@ export async function onboardingGateway() {
   }
   const server = createServer(async (req, res) => {
     res.setHeader("Content-Type", "application/json");
+    res.setHeader("X-Supabase-Api-Version", "2024-01-01");
+    res.setHeader("Access-Control-Expose-Headers", "X-Supabase-Api-Version");
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
       "Access-Control-Allow-Headers",
@@ -91,6 +93,17 @@ export async function onboardingGateway() {
         }
         if (url.pathname.endsWith("/signup")) {
           signupBody = input;
+          if ([...users.values()].some((u) => u.email === input.email)) {
+            res.statusCode = 422;
+            res.end(
+              JSON.stringify({
+                code: "user_already_exists",
+                error_code: "user_already_exists",
+                msg: "User already registered",
+              }),
+            );
+            return;
+          }
           const u = await user(input.email, autoconfirm);
           u.user_metadata = input.data ?? {};
           if (!autoconfirm) mailRequests++;
@@ -170,6 +183,7 @@ export async function onboardingGateway() {
       }
       const resource = url.pathname.split("/").pop()!;
       const allowedTables = [
+        "business_roles",
         "business_types",
         "talix_offerings",
         "clients",
@@ -193,6 +207,21 @@ export async function onboardingGateway() {
           "p_quote",
         ],
         talix_admin_access: [],
+        workspace_permissions: ["p_subscription", "p_location"],
+        list_business_users: ["p_subscription"],
+        save_business_role: [
+          "p_subscription",
+          "p_id",
+          "p_name",
+          "p_permissions",
+        ],
+        save_business_user: [
+          "p_subscription",
+          "p_email",
+          "p_role",
+          "p_locations",
+          "p_remove",
+        ],
       };
       const output = await db.transaction(async (tx) => {
         await tx.query("select set_config('request.jwt.claim.sub',$1,true)", [
@@ -201,7 +230,9 @@ export async function onboardingGateway() {
         await tx.exec("set local role " + (current ? "authenticated" : "anon"));
         if (url.pathname.includes("/rpc/")) {
           if (!functions[resource]) throw new Error("Unknown test RPC");
-          const args = functions[resource].map((k) => input[k]);
+          const args = functions[resource].map((k) =>
+            k === "p_remove" ? (input[k] ?? false) : (input[k] ?? null),
+          );
           return (
             await tx.query<{ value: unknown }>(
               `select public.${resource}(${args.map((_, i) => "$" + (i + 1)).join(",")}) as value`,
@@ -279,6 +310,7 @@ export async function onboardingGateway() {
   );
   return {
     db,
+    addAccount: user,
     admin,
     users,
     setAutoconfirm(value: boolean) {

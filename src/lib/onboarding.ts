@@ -74,7 +74,7 @@ export function readDraft(value: unknown): Draft | null {
 }
 export function accountMessage(code?: string) {
   if (code === "email_exists" || code === "user_already_exists")
-    return "An account may already use this email. Please sign in.";
+    return "This email is already registered. Please sign in.";
   if (
     code === "over_email_send_rate_limit" ||
     code === "over_request_rate_limit"

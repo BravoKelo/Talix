@@ -361,9 +361,11 @@ export function Onboarding({
           </li>
         ))}
       </ol>
-      <p role="status" className={message ? "message" : ""}>
-        {message}
-      </p>
+      {step !== 3 && (
+        <p role="status" className={message ? "message" : ""}>
+          {message}
+        </p>
+      )}
       {loading ? (
         <p>Loading your options…</p>
       ) : (
@@ -684,6 +686,21 @@ export function Onboarding({
                     We’ll ask you to confirm your email before starting your
                     subscription.
                   </small>
+                )}
+                {message && (
+                  <div
+                    role="alert"
+                    className="message"
+                    tabIndex={-1}
+                    ref={(node) => node?.scrollIntoView({ block: "nearest" })}
+                  >
+                    <p>{message}</p>
+                    {!email && (
+                      <Link href="/login?next=onboarding">
+                        Sign in to your account
+                      </Link>
+                    )}
+                  </div>
                 )}
               </aside>
             </form>

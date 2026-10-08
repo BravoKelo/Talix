@@ -64,9 +64,9 @@ The approved bounded core is now implemented. Screen layouts and visual styling 
 
 ## Implemented for review — October 7, 2026
 
-Owner/employee sign-in leads to subscription/location selectors and orders, products, settings and access areas. Only owners see management controls. Customers enter `/shop/<slug>`, choose a location before seeing products, select generic optional extras, and check out as guests with name/email/phone. A clearly labeled simulated outcome selector replaces card collection. The resulting private order link shows fulfillment/payment/refund state and allows declined-payment retry. No transactional messages are sent yet.
+Owner/employee sign-in leads to subscription/location selectors and orders, products, settings and Users areas. Effective permissions determine management controls. Customers enter `/shop/<slug>`, choose a location before seeing products, select generic optional extras, and check out as guests with name/email/phone. A clearly labeled simulated outcome selector replaces card collection. The resulting private order link shows fulfillment/payment/refund state and allows declined-payment retry. No transactional messages are sent yet.
 
-The workspace polls the latest 100 location orders, shows contact and item snapshots, advances the sequential generic statuses, and records owner refunds with reasons and history. Subscription-level branding applies across locations. Product image upload and general/local scope are included. Predefined viewer and fulfillment roles are the initial options; custom roles remain later scope.
+The workspace polls the latest 100 location orders, shows contact and item snapshots, advances the sequential generic statuses, and records owner refunds with reasons and history. Subscription-level branding applies across locations. Product image upload and general/local scope are included. Owner, Manager, Supervisor, Lead, Fulfillment and Viewer roles are shown with explicit allowed/denied permissions; custom roles are now included in Issue #9.
 
 ## Customer signup and Talix admin — Issue #3
 
@@ -85,3 +85,10 @@ The owner explicitly deferred email delivery and verification for current develo
 The owner confirmed that prospective customers should not choose an internal ordering address at signup. The address field and review row are removed. The purchase transaction derives an address from the business name, uses `store` for names without a usable ASCII form, and adds a numeric suffix when needed. A shared transaction lock serializes competing allocations; prior purchase retries retain their original address. Saved draft address input is ignored for new allocation. No new table, role, or external domain configuration is involved. Existing ordering links remain unchanged. Owner customization in Settings is a later follow-up, not part of this correction.
 
 Development migration `20261007043143_generate_ordering_address` is applied. Database checks verify duplicate-name allocation and repeat-safe completion. The live check used a rolled-back transaction and left no records. Customer signup no longer exposes this internal requirement.
+
+
+## Review corrections — October 8, 2026
+
+Issues #5–9 implement the owner-requested batch. Logged-out navigation offers Sign in and Sign up. Logout clears the Auth session and opens sign-in with a full navigation; workspace/admin entry verifies the current user and private responses are not cached. Duplicate-email feedback appears beside the signup action with a sign-in link and preserves typed values. Owners have a visible Add subscription action alongside subscription selection, using their existing account.
+
+Users starts with configured users, protected Owner, subscription roles and separately assigned location roles. Managers with user-management permission may edit users within their own authority, but cannot change the Owner, their own access or grant access they lack. The permission matrix explicitly shows Allowed/Denied for every current section/action. Owners can create and edit custom roles with checkboxes; built-in roles are fixed. Unassigned locations remain inaccessible. Existing accounts are required; invitation delivery and owner transfer remain deferred. Layouts remain provisional for acceptance.

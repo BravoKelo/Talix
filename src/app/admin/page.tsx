@@ -11,8 +11,8 @@ export default async function Page() {
       </main>
     );
   const db = await serverClient();
-  const { data, error } = await db.auth.getClaims();
-  if (error || !data?.claims) redirect("/login?next=admin");
+  const { data, error } = await db.auth.getUser();
+  if (error || !data?.user) redirect("/login?next=admin");
   const access = await db.rpc("talix_admin_access");
   if (access.error || !access.data)
     return (

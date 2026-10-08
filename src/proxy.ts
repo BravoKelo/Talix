@@ -27,6 +27,7 @@ export async function proxy(request: NextRequest) {
     },
   );
   await db.auth.getClaims();
+  response.headers.set("Cache-Control", "private, no-store");
   return response;
 }
 export const config = {

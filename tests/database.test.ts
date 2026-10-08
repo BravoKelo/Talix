@@ -270,7 +270,7 @@ describe.sequential("core commerce database", () => {
     await rpc("advance_order", [oid, "completed"]);
     await expect(
       rpc("refund_simulated", [oid, req(), 100, "Return"]),
-    ).rejects.toThrow("Owner");
+    ).rejects.toThrow("Refund permission");
   });
   it("records partial/full refunds once and rejects over-refunds", async () => {
     await asUser(owner);
@@ -343,7 +343,7 @@ describe.sequential("schema and business boundaries", () => {
     const tables = await db.query<{ relrowsecurity: boolean }>(
       "select relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r'",
     );
-    expect(tables.rows).toHaveLength(12);
+    expect(tables.rows).toHaveLength(13);
     expect(tables.rows.every((t) => t.relrowsecurity)).toBe(true);
   });
   it("supports multiple subscriptions for a single client without tenant leakage", async () => {

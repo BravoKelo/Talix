@@ -14,18 +14,15 @@ export default async function Page() {
       </main>
     );
   const db = await serverClient();
-  const { data, error } = await db.auth.getClaims();
-  if (error || !data?.claims) redirect("/login");
+  const { data, error } = await db.auth.getUser();
+  if (error || !data?.user) redirect("/login");
   const membership = await db
     .from("memberships")
     .select("subscription_id")
-    .eq("user_id", data.claims.sub)
+    .eq("user_id", data.user.id)
     .limit(1);
   if (!membership.error && !membership.data?.length) redirect("/onboarding");
   return (
-    <Workspace
-      userId={data.claims.sub}
-      email={String(data.claims.email ?? "")}
-    />
+    <Workspace userId={data.user.id} email={String(data.user.email ?? "")} />
   );
 }

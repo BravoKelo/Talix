@@ -669,3 +669,28 @@ input[type="radio"] {
 input[aria-invalid="true"] {
   border-color: #b42318;
 }
+
+.table-scroll {
+  overflow-x: auto;
+}
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-scroll th,
+.table-scroll td {
+  padding: 0.7rem;
+  text-align: left;
+  border-bottom: 1px solid #dce0ee;
+}
+.permission-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.permission-option input {
+  width: auto;
+}
+fieldset:disabled {
+  opacity: 0.75;
+}

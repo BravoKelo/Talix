@@ -6,7 +6,7 @@
 2. Use Node.js 24 and `npm ci`. Authenticate the Supabase CLI with your own authorized account, then `npx supabase link --project-ref <talix-ref>`.
 3. Inspect `npx supabase migration list` and `npx supabase db push --dry-run`. If existing schema conflicts with the new migration, investigate before applying it. Then apply the reviewed development migration with `npx supabase db push`.
 4. Obtain the Talix URL and publishable key. Set the two variables in `.env.local` and in the Talix Vercel project's preview/development environment. These are public browser credentials; no service-role key is required. Redeploy after changing public build-time variables.
-5. Business owners enter `/signup`, choose their sample plan and extras, review once, then Continue on the pending email-confirmation page to open the workspace. Their first location starts unpublished; add products and publish it in Settings. There is no public employee signup or email invitation implementation in this slice. Create employee Auth accounts explicitly, then owners grant each location's viewer/fulfillment access through the workspace.
+5. Business owners enter `/signup`, choose their sample plan and extras, review once, then Continue on the pending email-confirmation page to open the workspace. Their first location starts unpublished; add products and publish it in Settings. There is no public employee signup or email invitation implementation in this slice. Create employee Auth accounts explicitly, then authorized managers assign subscription and separate location roles in Users.
 6. Review Supabase authentication redirects/site URL for the actual deployment and run the acceptance workflow below.
 
 ## Acceptance workflow
@@ -16,14 +16,14 @@
 - Customer chooses a location, adds products/options, enters name/email/phone, and selects an approved or declined simulated payment.
 - Declined orders remain outside active fulfillment. The private link permits a simulated approval retry on the same order.
 - The correct location receives the paid order. Authorized fulfillment staff advance received → in progress → ready → completed.
-- Viewer cannot advance orders; employee cannot access another tenant or unassigned location, manage settings/products, or refund.
+- Viewer cannot advance orders. Verify each assigned role permits only its explicit actions; employees cannot access another tenant or unassigned location. Test custom-role edits, user removal and revocation.
 - Owner issues partial and full simulated refunds with reasons; histories and private tracking reflect them. Full refund cancels uncompleted orders; completed orders retain fulfillment history.
 - Disable a location/product and verify new checkout is rejected. Remove an employee's location access and verify access disappears.
 - Retry identical checkout/refund request IDs and verify no duplicate payment/refund. Altering details with the same ID must fail.
 
 ## Limits before production use
 
-This is a development slice, not a live commercial launch. Currency is USD; taxes, shipping, stock deductions, operating-hour enforcement and scheduled ordering are not implemented. Hours are descriptive text. No emails/texts, actual billing, real payments, custom roles, CRM reporting, customer accounts, integrations, or industry modules exist yet.
+This is a development slice, not a live commercial launch. Currency is USD; taxes, shipping, stock deductions, operating-hour enforcement and scheduled ordering are not implemented. Hours are descriptive text. No emails/texts, actual billing, real payments, CRM reporting, customer accounts, integrations, or industry modules exist yet.
 
 Publishable locations are publicly readable and permit anonymous simulated checkout. A production launch needs its own approved payment/tax/fulfillment policies and abuse controls; production environment values remain unset; database changes were applied only to the Talix development project.
 
@@ -40,3 +40,4 @@ The default Supabase mail service only sends to organization team addresses and 
 After the owner creates their authenticated account through signup, explicitly identify that account for staff access. An authorized operator adds its Auth UUID to `private.talix_admins` through an administrative channel. There is no first-user or public self-grant mechanism. The customer does not need the dashboard to create a business. The application reveals the Talix admin link only to allowed staff; `/admin` and catalog writes independently check access. Never use user metadata or a client-submitted role to grant staff privileges.
 
 Admin adds/edits business types, plans and extras; availability controls new sales. Name/description/price/frequency changes preserve existing purchase snapshots. Extras must have the selected plan’s billing frequency and either match its business type or apply to all types. Current pricing is USD, sample-only, and does not activate future addon benefits.
+
