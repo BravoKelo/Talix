@@ -54,12 +54,14 @@ export function ProductEditor({
   sid,
   locations,
   product,
+  allowGeneral = true,
   busy,
   save,
 }: {
   sid: string;
   locations: Location[];
   product?: Product;
+  allowGeneral?: boolean;
   busy: boolean;
   save: (v: Omit<Product, "id">) => Promise<void>;
 }) {
@@ -132,8 +134,13 @@ export function ProductEditor({
         </label>
         <label>
           Scope
-          <select name="scope" defaultValue={product?.location_id || ""}>
-            <option value="">General — all locations</option>
+          <select
+            name="scope"
+            defaultValue={
+              product?.location_id || (allowGeneral ? "" : locations[0]?.id)
+            }
+          >
+            {allowGeneral && <option value="">General — all locations</option>}
             {locations.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}

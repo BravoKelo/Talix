@@ -262,3 +262,13 @@ partially integrated
 ```
 
 Optimize product-owner involvement for decisions and acceptance, not mechanical file transfer or routine debugging.
+
+## Integration and approval records
+
+Record the owner-approved bounded scope in a GitHub issue, with relevant PRs and decision records. Preserve prior approvals and supersessions without inventing historical approval details. Routine corrective commits within that scope may proceed directly; a protected change still requires specific approval.
+
+Implementation authorization, defect acceptance, database/infrastructure execution approval, and merge acceptance are distinct. A closed defect issue or successful CI does not authorize a merge or operational change. Record acceptance against the exact reviewed commit and material boundaries. Significant implemented decisions with incomplete approval provenance must be surfaced for owner acceptance, not retrospectively stamped approved.
+
+Review stacked PR ancestry before selecting an integration sequence. Preserve original foundation history when already inherited by implementation branches. Prefer merge commits for the approved baseline integration; do not squash, rebase, delete branches or force-push history without separate approval. Recheck retargeted diffs, dependencies and mergeability.
+
+Verify deployed code/database compatibility and automatic deployment behavior before merging. Do not activate an intermediate older application against incompatible newer migrations. Never replay or rewrite applied migrations to make an old branch work. CI using isolated fixtures and actual deployed end-to-end verification are separate evidence and must be reported separately.

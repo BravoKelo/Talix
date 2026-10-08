@@ -2,6 +2,7 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "tests/browser",
   fullyParallel: false,
+  workers: 1,
   use: {
     baseURL: "http://127.0.0.1:3100",
     trace: "retain-on-failure",
@@ -17,8 +18,9 @@ export default defineConfig({
     url: "http://127.0.0.1:3100",
     reuseExistingServer: false,
     env: {
-      NEXT_PUBLIC_SUPABASE_URL: "https://local-test.supabase.co",
+      NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:3290",
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-only-public-key",
+      TALIX_EMAIL_CONFIRMATION_PENDING: "true",
     },
   },
   projects: [

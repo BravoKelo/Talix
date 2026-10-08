@@ -1,50 +1,74 @@
-# Talix Current State
+# Talix current state
 
-## Verified checkpoint — October 7, 2026
+## Recovery checkpoint — 2026-10-08 UTC / 2026-10-07 Pacific
 
-Repository: `BravoKelo/Talix`. Implementation branch: `feature/core-commerce`, based on `foundation/project-governance` at `4d547496998c50a30ee20afec5ef423b7145381d`. `main` remains the initial README commit until accepted merge. [Issue #1](https://github.com/BravoKelo/Talix/issues/1) owns the approved implementation scope. Governance remains in `AGENTS.md`.
+Repository: BravoKelo/Talix. Active review branch: `feature/customer-onboarding`, draft PR #4 stacked on unmerged core PR #2. Issue #10 authorizes reconciliation/stabilization; development database execution was separately approved and completed; final merge acceptance remains separate. Recover exact branch heads, CI and preview again before continuing; this document cannot contain its own commit SHA.
 
-## Approved direction
+Last verified pre-reconciliation heads:
 
-Talix primarily provides online ordering and fulfillment. Build the business-neutral core first; restaurants are the first audience and industry modules come later. The owner approved Next.js, Supabase and Vercel. Payments/refunds must be simulated; processor selection is deferred. No real card data or money movement.
+| Branch | Commit | State |
+|---|---|---|
+| main | 133cb2450a422ed550a8d646d3a7626d36c68519 | Initial README only |
+| foundation/project-governance | 4d547496998c50a30ee20afec5ef423b7145381d | Original foundation |
+| feature/core-commerce | e6fc00a56bf3aca5e0955f74a1c18a5131d9ed43 | Foundation plus core, PR #2 |
+| feature/customer-onboarding | 7d7b5584c6c4e76ffed20a2322fe80094caa2c9e | Core plus onboarding/Users before Issue #10 corrections |
 
-## Implemented on this branch
+Ancestry is linear, with 8 foundation, 4 core and 8 onboarding commits before reconciliation. Both PRs are draft and mergeable at assessment. No human GitHub review or merge acceptance exists. Issues #1/#3 remain open; owner closed #5–9. Keep those defect issues closed; their closure does not approve a merge. The accessible local tree is an API-recovered mirror without `.git`; no substantive unpublished source was found at assessment. Publish only intended files, not generated output or environment files.
 
-- Next.js App Router/TypeScript with Supabase SSR Auth clients and guarded workspace.
-- Owner onboarding; multiple subscriptions per client; authorized subscription/location switching; predefined viewer/fulfillment location access for explicitly provisioned employee accounts.
-- Subscription branding and location details/publication.
-- General/location-specific products with images, descriptions, integer-cent prices, availability and generic optional extras.
-- Location-first storefront, cart and guest online checkout requiring name/email/phone.
-- Database-priced order snapshots, approved/declined simulated payments, duplicate-safe checkout/retry, private customer order status.
-- Location order queue and sequential received/in-progress/ready/completed fulfillment; owner partial/full simulated refunds, reasons and histories.
-- Versioned migration, RLS/least-privilege grants, public catalog and narrow checked RPCs; read-only GitHub Actions checks.
+## Implemented capabilities
 
-This is implementation for review, not full-product completion or production launch. Detailed final layout/design remains subject to product-owner acceptance.
+Business-neutral Next.js/Supabase/Vercel ordering/fulfillment, multiple subscriptions per client, one selected business type per subscription, multiple locations, subscription branding, general/local products with generic extras/images, guest ordering, private order tracking, generic fulfillment and simulated payments/refunds. Restaurant-specific behavior and module frameworks are absent.
 
-## Validation evidence
+Landing signup, structured business/contact/address validation, single selection review, automatic ordering addresses, saved onboarding drafts, changed-price re-review, editable sample Talix offerings and a staff customer summary exist. No card collection or money movement. Purchased terms are immutable; future addon benefits are not implemented by selecting sample offerings.
 
-Local lint and TypeScript checks pass. Production build passes. GitHub Actions run `37552938983` passed the complete suite for application commit `9b0e35ea24223e4dc7b145e89524250ca650f175`. Final review narrowed private-function revocations to this migration's helpers and recorded refund cancellations in the fulfillment audit. Local database/browser checks also pass after those corrections; GitHub Actions run `37553263375` passed the full suite for corrected application commit `ee29781ed9b097cc16433dc8270a294dd9ec2b97`. The latest preview was also fetched successfully with the expected connection notice. Eleven embedded PostgreSQL tests pass for schema/RLS, tenant/location restrictions, server pricing, snapshots, retry/idempotency, fulfillment/refunds and image-upload permissions. Desktop and mobile Playwright customer flows pass against the actual migration through a test-only RPC adapter.
+Current-user server verification and full-navigation signout protect workspace entry. Users begins with configured accounts; Owner is protected. Predefined/custom subscription roles and separate location roles expose allowed/denied permissions. Managers cannot modify Owner, themselves or grant authority/location access they lack. Existing Auth accounts are required; invitations are deferred. ADR 0003 exposes the exact implementation mapping and its separate protected-decision acceptance boundary.
 
-Automated tests use Supabase Auth/Storage scaffolding and an RPC adapter. Additional live development checks exercised real Supabase password authentication and SSR workspace entry, owner onboarding/configuration, two locations, a general product/image upload, location-restricted employee access, guest checkout/private tracking, employee fulfillment to ready, and a partial refund. Full refunds, cancelled-order tracking without contact details, public image retrieval and revoked employee access also passed. Disposable Auth accounts and application rows were removed after verification. Two synthetic 1×1 PNG images remain in Storage folders `a76900bf-1d6c-45c9-ade8-ad5a71a832d7` and `081c7e39-61b7-428c-a313-f8b234f2c1b3`; owner dashboard cleanup is pending because this slice deliberately has no Storage delete policy. Browser requests were forwarded through Node fetch to the actual Supabase service because direct Chromium networking fails in this runtime; service responses were not mocked. This does not claim the full workflow ran on Vercel. A temporary npm-distributed Chromium executable was used locally; CI uses standard Playwright installation. Production dependency audit found zero reported vulnerabilities.
+## Issue #10 corrections and approved development application
 
-## Connected development infrastructure
+Browser regression tests reproduced repeat custom-role Save creating a duplicate and denied removal clearing the editor. Corrected UI retains the newly created role ID and resets the user editor only after success. Tests cover repeated Save, failure retention, successful removal and desktop/mobile flows.
 
-The Supabase connection now exposes the existing Talix project `lzepujggusieapablzhn` in organization `geynfrdnzxyklsuuwcte`. Its application schema and migration history were empty before applying the approved core. AMZ-PSE was not changed. The three checked-in migrations match remote history: core commerce, removal of client execution on the platform event-trigger helper, and access-query performance corrections. All nine public application tables have RLS enabled.
+A database regression reproduced additional subscriptions overwriting shared client details. Migration `20261008033814_preserve_client_profile.sql` replaces only `start_subscription` client upsert with insert-if-absent and existing-client lookup. It preserves transaction locking, quote checks, generated addresses, membership/role seeding, immutable per-subscription details and request replay. No tables, policies, signatures or grants change; original nine migrations are unmodified. **The owner separately approved execution, and this migration is applied to Talix development.** Supabase assigned version 20261008033814; the prepared file was renamed from 20261008030839 to match recorded history without changing its reviewed SQL. Its preparation-time comment remains historical. The correction does not repair historical data or create a client-profile editor.
 
-Vercel project `talix` (`prj_Xmg24E6djhGtCFIJsmP9EblkLDym`) has the Talix URL and publishable key configured for development and the `feature/core-commerce` preview branch. No service-role key is used. Production variables remain unset. Default deployment protection remains enabled. Initial repository linking automatically created a production-labelled deployment with no database connection; no manual production promotion occurred.
+## Development services
 
-[Draft PR #2](https://github.com/BravoKelo/Talix/pull/2) targets the foundation branch. Governance is unchanged. Next.js automatic agent-rule generation is disabled to preserve `AGENTS.md`. Repository operations used GitHub APIs because ordinary authenticated clone was unavailable.
+Supabase project `lzepujggusieapablzhn` (Talix), us-east-1, healthy PostgreSQL 17. All 13 public application tables have RLS. Fresh assessment compared all nine remote migration versions and 18 checked authorization/transaction function bodies to the repository; no mismatch. After the approved application, remote history contains these ten versions:
 
-Security advisors flag the intentionally exposed, narrowly checked security-definer RPCs and disabled leaked-password protection. These are recorded review items, not authorization to change Auth plans or the security model. Performance advisor findings for access-query initplans and composite foreign-key indexes were corrected. Unused-index notices are expected in a fresh development database.
+1. 20261007005603 core_commerce
+2. 20261007005736 restrict_platform_trigger_access
+3. 20261007005951 tune_core_access_queries
+4. 20261007015259 customer_onboarding
+5. 20261007015458 streamline_catalog_policies
+6. 20261007041833 validate_signup_details
+7. 20261007043143 generate_ordering_address
+8. 20261008021501 configurable_user_roles
+9. 20261008021928 index_membership_business_roles
+10. 20261008033814 preserve_client_profile
 
-## Exact restart
+Owner-approved no-mail development confirmation uses Auth automatic confirmation and `TALIX_EMAIL_CONFIRMATION_PENDING=true` on the protected onboarding preview. The confirmation page displays the authenticated email and '(Feature coming soon)'; Continue completes the saved purchase. Automatically confirmed development accounts do not prove mailbox ownership. Before live launch restore mandatory service email verification, disable the application flag and configure delivery/redirects.
 
-1. Inspect this branch, Issue #1, PR, latest checks and deployment status; preserve foundation governance/history.
-2. Product owner creates their own account in the Talix Supabase Auth dashboard, signs into the connected preview, creates a subscription, adds products and publishes a location. No public signup or automatic email invitation exists.
-3. Review the complete diff and provisional experience with the owner. Acceptance is required before merge under `AGENTS.md`.
+Stable review URL: https://talix-git-feature-customer-onboarding-bravokelo.vercel.app/ . Correction commit `c330cf1dbb91bb66fb4f7327f25c07f55df4b37f` is followed by reconciliation commit `0496d46dee120f0a2f742b34c4bc1f99cdce0ec2`. Matching deployment `dpl_5VsbDN4Ppe6NpKCsLamF3ynhmeqX` is READY for 0496d46; protected landing/signup returned HTTP 200, and signed-out workspace resolved to login with private/no-store responses. Documentation checkpoint e1d4abddb4f6b6f38efacd5780e465b317bcfedf also passed both CI runs (37722217624 and 37722221656), with matching READY deployment dpl_8xeiBavmNYHBsfpBwiyHqVYm3Drk. Verify subsequent heads again.
 
-## Deferred
+Vercel project `prj_Xmg24E6djhGtCFIJsmP9EblkLDym`, team `team_eTPaf9j2OvuQWUZGssM8wVjv`, Node 24, deployment protection retained. Development and the two feature branches have public Supabase environment values; only onboarding preview has the pending-confirmation flag. No production or generic-preview Supabase environment values are configured. An initial production-labelled deployment from older core commit 9b0e35ea exists from project linking; it is disconnected from Supabase. No production promotion has occurred. Normalized project/Git-context tools do not expose the production branch or merge-trigger policy: **verify before merging**. The settings page requires Vercel sign-in. Automatic approval review rejected the sign-in prompt, interpreting the latest approval as database execution only; explicit sign-in authorization remains pending. No sign-in occurred. Do not assume main inherits feature environment settings or activate intermediate core against the newer live database.
 
-Business-type modules, restaurant specifics, inventory/BOM/COGS, custom roles, CRM/reporting, customer accounts, tax/shipping/scheduling, notifications/marketing, billing, external integrations and real payment processors. These remain overall vision, not this implementation slice.
+Two synthetic 1×1 image fixtures from historical core tests remain in Storage. They were confirmed present at assessment and are not deleted by Issue #10 preparation. Product-image replacement also retains previous objects. Cleanup requires separately authorized scope. Existing advisor notices include intentional checked RPC/private allowlist warnings, informational unused indexes, and disabled leaked-password protection as a launch-hardening item. No security setting was changed.
 
-Advisor references: [anonymous security-definer execution](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable), [authenticated security-definer execution](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable), and [password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+## Validation and limits
+
+Fresh local checks for the prepared corrections passed: lint, TypeScript, 34 unit/SQL tests, production build and six desktop/mobile browser scenarios. Browser tests use a test-only Auth/PostgREST gateway backed by real migration SQL/RLS, not the live Supabase service. Regression tests failed against the old behavior before correction. The profile migration was also applied and checked on the actual development service; after aligning its filename, all 34 local unit/SQL tests passed again.
+
+GitHub push run 37721909541 and PR run 37721913655 completed successfully for 0496d46, including dependency installation, lint, typecheck, unit/SQL tests, production build and browser suite. Core run 37556360833 passed for e6fc00a5. This is exact-commit automated evidence, separate from the limited deployed checks. Future heads still require their own reviewed workflow results.
+
+Actual service evidence: assessment verified Auth automatic confirmation, active public offerings, denied anonymous restricted RPC, migration/function consistency and protected signed-out landing/workspace rendering. Preparation rechecked protected workspace → login with private/no-store response. Historical core tests used browser requests forwarded to the real service through Node; prior onboarding/Users checks used disposable actual accounts and removed associated rows. Those are historical service evidence, not a fresh full Vercel → live Supabase journey for this correction. Full deployed signup/additional subscription/owner/staff/employee isolation/ordering/refunds remains unverified pending controlled live testing. The approved database function changed; no existing owner records or security policies were rewritten.
+
+Actual development SQL verification executed two purchases and an idempotent retry under authenticated user context inside a transaction that rolled back. It confirmed the complete original client profile stayed unchanged, the second purchase retained its own details, two subscriptions and five seeded roles existed, replay produced no duplicate, and another authenticated user could not read those clients/purchases. This is live database/RLS evidence, not browser or Auth-service signup evidence. Fixture accounts and rows were rolled back. The live function matches the reviewed definition (MD5 8b1e0fdbe3a0aa9a3af6a73c1e7eb286); fixed empty search path, SECURITY DEFINER, denied anonymous execution and allowed authenticated execution remain unchanged. Fresh security advisor findings match the assessed baseline.
+
+## Exact restart and controlled integration
+
+1. Inspect Issue #10, PR #4 head, the complete correction diff, exact CI and matching preview. Read AGENTS and ADRs 0001–0003.
+2. Confirm the ten recorded migrations and matching function definition; do not replay the completed correction. Obtain explicit Vercel sign-in authorization to inspect the deployment settings read-only.
+3. Complete controlled actual deployed acceptance checks. Report browser/service limits honestly; new material boundaries require approval.
+4. Obtain explicit baseline acceptance of the implemented role mapping/protected delegation boundaries and separate merge acceptance for exact PR heads. Plan approval and closed bugs do not substitute.
+5. Verify Vercel Git deployment triggers before either merge. Retarget PR #2 to main, review its expanded foundation/core diff, then merge by merge commit without activating incompatible intermediate core. Verify commit/CI and remaining mergeability; retarget/merge accepted PR #4 only after dependency checks. Preserve all branches/commits and do not replay migrations.
+6. Verify final main tree/SHA/checks; record confirmed integration in this file/HISTORY and reconcile #1/#3 completion. No integration milestone is claimed yet.
+
+Deferred: invitations, shared ownership/owner transfer, real billing/payment providers, taxes/shipping/stock deductions, scheduled ordering/hour enforcement, commercial entitlements, industry modules, inventory/BOM/COGS, full CRM/support/reporting, consumer accounts, integrations and transactional/marketing delivery. USD only; hours descriptive; queue limited to latest 100 location orders; detailed visual design remains provisional. Continue owner testing of existing core after stabilization, not new feature expansion.
