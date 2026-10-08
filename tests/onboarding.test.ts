@@ -222,6 +222,38 @@ describe.sequential("customer signup and Talix offerings", () => {
       db.query("update public.subscriptions set business_type_id=null"),
     ).rejects.toThrow("permission denied");
   });
+  it("adding a subscription preserves the shared client profile and snapshots its own details", async () => {
+    await as(owner);
+    await db.exec("begin");
+    try {
+      const before = (await db.query("select * from public.clients")).rows[0];
+      const additional = {
+        ...business,
+        business_name: "Second business",
+        contact_name: "Taylor Contact",
+        phone: "+12065550123",
+        billing_address: "300 Other Road, Tacoma, WA, 98401, United States",
+        location_name: "Second location",
+      };
+      const request = crypto.randomUUID();
+      const args = [request, additional, type, plan, [addon], quote];
+      const second = await rpc<string>("start_subscription", args);
+      expect((await db.query("select * from public.clients")).rows[0]).toEqual(
+        before,
+      );
+      expect(await rpc("start_subscription", args)).toBe(second);
+      expect(
+        (
+          await db.query(
+            "select business_details from public.subscription_purchases where subscription_id=$1",
+            [second],
+          )
+        ).rows,
+      ).toEqual([{ business_details: additional }]);
+    } finally {
+      await db.exec("reset role; rollback");
+    }
+  });
   it("admin edits affect new quotes but never rewrite existing subscription terms", async () => {
     await as(admin);
     expect(await rpc("talix_admin_access", [])).toBe(true);

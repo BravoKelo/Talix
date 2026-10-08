@@ -329,6 +329,20 @@ for (const changedPrice of [false, true])
       await expect(
         page.getByRole("status").filter({ hasText: "Changes saved." }),
       ).toBeVisible();
+      // Saving again must edit the new role instead of creating a duplicate.
+      await page
+        .getByRole("button", { name: "Save custom role", exact: true })
+        .click();
+      await expect(
+        page.getByRole("status").filter({ hasText: "Changes saved." }),
+      ).toBeVisible();
+      expect(
+        (
+          await gateway.db.query(
+            "select id from public.business_roles where name='Order observer'",
+          )
+        ).rows,
+      ).toHaveLength(1);
       await page
         .getByLabel("User email", { exact: true })
         .fill("employee@example.invalid");
@@ -359,7 +373,50 @@ for (const changedPrice of [false, true])
       await expect(
         page.getByRole("table", { name: "Configured users" }),
       ).toContainText("Lead");
+      // A denied removal must retain the selected user and all typed choices.
+      const removalEndpoint =
+        "http://127.0.0.1:3290/rest/v1/rpc/save_business_user";
+      await page.route(removalEndpoint, async (route) => {
+        await route.fulfill({
+          status: 403,
+          contentType: "application/json",
+          body: JSON.stringify({ code: "42501", message: "Permission denied" }),
+        });
+      });
+      await page
+        .getByRole("button", { name: "Remove user access", exact: true })
+        .click();
+      await expect(
+        page.getByRole("status").filter({ hasText: "We couldn’t save" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Edit user", exact: true }),
+      ).toBeVisible();
+      await expect(page.getByLabel("User email", { exact: true })).toHaveValue(
+        "employee@example.invalid",
+      );
+      await expect(
+        page.getByLabel("Role at Main shop", { exact: true }),
+      ).toHaveValue(
+        (await page
+          .getByLabel("Role at Main shop", { exact: true })
+          .locator("option", { hasText: /^Lead$/ })
+          .getAttribute("value")) ?? "",
+      );
+      await page.unroute(removalEndpoint);
+      await page
+        .getByRole("button", { name: "Remove user access", exact: true })
+        .click();
+      await expect(
+        page.getByRole("heading", { name: "Add a user", exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("table", { name: "Configured users" }),
+      ).not.toContainText("employee@example.invalid");
       if (!changedPrice) {
+        const clientBefore = (
+          await gateway.db.query("select * from public.clients")
+        ).rows;
         await page
           .getByRole("link", { name: "Add subscription", exact: true })
           .click();
@@ -395,6 +452,16 @@ for (const changedPrice of [false, true])
           .getByRole("button", { name: "Confirm subscription", exact: true })
           .click();
         await expect(page).toHaveURL(/\/workspace$/);
+        expect(
+          (await gateway.db.query("select * from public.clients")).rows,
+        ).toEqual(clientBefore);
+        expect(
+          (
+            await gateway.db.query(
+              "select business_details->>'business_name' as name from public.subscription_purchases order by created_at",
+            )
+          ).rows,
+        ).toEqual([{ name: "Independent shop" }, { name: "Second business" }]);
         await page
           .getByLabel("Subscription", { exact: true })
           .selectOption({ label: "Second business" });

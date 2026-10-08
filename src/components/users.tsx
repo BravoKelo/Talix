@@ -68,27 +68,32 @@ export function Users({
       .catch((e) => setMessage(e.message))
       .finally(() => setLoading(false));
   }, [load]);
-  async function save(
+  async function save<T = unknown>(
     action: () => PromiseLike<{
+      data?: T | null;
       error: { code?: string; message: string } | null;
     }>,
+    onSuccess?: (data: T | null | undefined) => void,
   ) {
     setBusy(true);
     setMessage("");
     try {
-      const { error } = await action();
+      const { data, error } = await action();
       if (error) {
         setMessage(
           error.code === "P0001"
             ? error.message
             : "We couldn’t save these changes. Please check your choices and try again.",
         );
-        return;
+        return false;
       }
       await load();
+      onSuccess?.(data);
       setMessage("Changes saved.");
+      return true;
     } catch {
       setMessage("We couldn’t save these changes. Please try again.");
+      return false;
     } finally {
       setBusy(false);
     }
@@ -298,7 +303,9 @@ export function Users({
                           p_locations: [],
                           p_remove: true,
                         }),
-                      ).then(() => edit(null));
+                      ).then((saved) => {
+                        if (saved) edit(null);
+                      });
                     }}
                   >
                     Remove user access
@@ -341,13 +348,17 @@ export function Users({
             className="stack"
             onSubmit={(e) => {
               e.preventDefault();
-              void save(() =>
-                browserClient().rpc("save_business_role", {
-                  p_subscription: subscriptionId,
-                  p_id: customId || null,
-                  p_name: customName,
-                  p_permissions: customPermissions,
-                }),
+              void save<string>(
+                () =>
+                  browserClient().rpc("save_business_role", {
+                    p_subscription: subscriptionId,
+                    p_id: customId || null,
+                    p_name: customName,
+                    p_permissions: customPermissions,
+                  }),
+                (id) => {
+                  if (id) setCustomId(id);
+                },
               );
             }}
           >
