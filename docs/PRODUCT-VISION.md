@@ -2,9 +2,9 @@
 
 ## Status and authority
 
-**Stage:** Shared core implementation
+**Stage:** Shared core stabilization and controlled integration preparation
 **Product discovery updated:** October 6, 2026
-**Current approved slices:** Business-neutral commerce/fulfillment (Issue #1) and self-service customer signup/editable Talix offerings (Issue #3)
+**Current approved slices:** Business-neutral commerce/fulfillment (Issue #1), self-service signup/editable offerings (Issue #3), review corrections including configurable Users (Issues #5–9), and bounded reconciliation (Issue #10). Merge acceptance remains separate.
 
 This document owns the confirmed overall product intent. These are requirements for the overall vision, not implemented functionality or authorization to implement the entire product. The bounded core slice and Next.js/Supabase/Vercel foundation are approved. Full-product scope, commercial pricing, provider selection and detailed final UI remain separate decisions.
 
@@ -38,7 +38,7 @@ Build a working shared core before industry-specific modules. Any business type 
 
 Business-facing capabilities include product management, BOM and inventory, financial tracking and reporting, business CRM, settings, payment support, employee management, marketing, and communications.
 
-Industry modules shape business-specific options and workflows. Restaurants are the first supported audience; other industry details are not yet defined.
+Industry modules shape business-specific options and workflows. Restaurants are the first target audience; restaurant-specific modules are planned and not implemented. Other industry details are not yet defined.
 
 ### Website and revenue engine
 
@@ -54,9 +54,9 @@ Talix Admin has a separate CRM covering client relationships, subscription infor
 
 ## Talix customer signup and subscription selection
 
-The owner approved the landing-page signup experience on October 6, 2026 (Pacific). Prospective Talix customers enter business/contact details, choose one business type, select a subscription tier and optional Talix products, and review the total and billing frequency before confirmation. Before live launch, email verification must precede subscription creation. For current development the owner approved deferring email delivery/verification: account creation leads to a confirmation page showing the account email and “(Feature coming soon)”, then Continue to the saved selection and final review. Their selection and business details must survive confirmation and later sign-in. Additional subscriptions use the same selection/review experience.
+The owner approved the landing-page signup experience on October 6, 2026 (Pacific). Prospective Talix customers enter business/contact details, choose one business type, select a subscription tier and optional Talix products, and review the total and billing frequency before confirmation. Before live launch, email verification must precede subscription creation. For current development the owner approved deferring email delivery/verification: account creation leads to a confirmation page showing the account email and “(Feature coming soon)”, then Continue completes the already-reviewed subscription and opens the workspace. Only changed pricing or an unavailable selection requires a new review. Their selection and business details must survive confirmation and later sign-in. Additional subscriptions use the same selection/review experience.
 
-The signup information is intended to feed the Talix administrative CRM as it grows. The current slice collects business name, contact name/email/phone, billing address, first location name/address and online store address. Additional CRM fields remain to be defined rather than invented now.
+The signup information is intended to feed the Talix administrative CRM as it grows. The current slice collects business name, contact name/email/phone, billing address, first location name/address. Talix automatically generates the ordering address; customers do not enter it at signup. Additional CRM fields remain to be defined rather than invented now.
 
 Business types, subscription plans and optional Talix products are managed in Talix admin and can be added, edited or withdrawn from new sales at any time. Existing subscriptions preserve their agreed terms. Sample offerings/prices are approved for development; commercial offerings will be defined later. Current subscription billing is simulated, with no charges or card data. Selecting a sample offering does not implement its future benefits. Customer copy uses business language without technology/provider/implementation references.
 
@@ -173,3 +173,6 @@ The owner approved the initial business-neutral core slice: subscription/locatio
 
 The discovery record alone did not authorize implementation. Subsequent owner approval authorized the bounded core and Next.js, Supabase and Vercel. Real payment processing is explicitly deferred: simulate card approvals/declines/refunds without collecting card data or moving money.
 
+## Approved reconciliation amendment — October 7, 2026 (Pacific; October 8 UTC)
+
+Issue #10 authorizes stabilizing the existing implementation and reconciling its durable records before controlled integration. Adding another subscription must preserve the existing shared client profile while storing that subscription's own business/contact/location details in its purchase record. This does not authorize a new client-profile editor, ownership model or CRM redesign. The necessary database-function migration awaits explicit development execution approval; implementation status belongs in CURRENT-STATE.

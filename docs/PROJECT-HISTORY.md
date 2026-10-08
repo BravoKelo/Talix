@@ -92,3 +92,11 @@ Development migration `20261007043143_generate_ordering_address` is applied. Dat
 The owner authorized correcting five reported defects together and creating GitHub traceability (Issues #5–9). Implemented verified-user workspace entry/logout, logged-out navigation, adjacent duplicate-email feedback, prominent additional subscriptions and Users with protected Owner, leadership/custom roles and independent location assignments. The minimum permission schema and checked RPCs are recorded in ADR 0003; both development migrations are applied.
 
 Validation: lint/typecheck, 33 unit/SQL tests, six desktop/mobile browser scenarios and production build passed. Actual Supabase disposable accounts verified role assignment, denied access, revocation/removal, duplicate signup and signout; associated records were removed. Draft PR #4 remains stacked on PR #2; no merge or production promotion.
+
+## Controlled reconciliation preparation — October 7, 2026 (Pacific; October 8 UTC)
+
+The owner closed Issues #5–9 and requested a controlled repository, governance, implementation and infrastructure assessment. Phases 1–6 confirmed main still contained only the initial README, with linear foundation → core → onboarding ancestry and two draft PRs. Governance principles remain intact; stale documentation and incomplete separate approval provenance for specific Users schema/security choices were surfaced.
+
+The owner approved the bounded Phase 7 reconciliation plan and preservation of the shared client profile when adding a subscription. Issue #10 records the authorized scope. Regression checks reproduced repeat custom-role creation, editor clearing after denied removal, and additional-subscription client-profile overwrite. Focused corrections preserve the selected role/editor and prepare an additive replacement of the existing subscription transaction function. The original nine migrations remain unchanged; the new migration is not applied pending explicit execution approval.
+
+This is preparation, not an integration milestone: no PR has merged, main remains unchanged, and no production configuration or promotion has occurred. Earlier UTC headings and explicitly Pacific headings describe the same development period; this checkpoint records both time zones. Final integration facts will be appended only after confirmed, accepted merges.

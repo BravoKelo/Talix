@@ -30,3 +30,7 @@ npm run test:e2e
 ```
 
 Database tests apply all checked-in migrations to embedded PostgreSQL with minimal Auth/Storage fixtures. Browser tests exercise commerce, signup/resume and admin editing through a test-only Auth/PostgREST gateway backed by the migration SQL/RLS. They do not claim to verify live Supabase Auth, PostgREST, Storage, or deployment configuration.
+
+## Integration checkpoint
+
+Main currently contains only the initial README; this review branch carries the foundation and application. PR #2 and dependent PR #4 remain unmerged. Issue #10 tracks reconciliation/stabilization. The prepared client-profile migration is not yet applied to development. Read CURRENT-STATE before testing additional subscriptions or proposing a merge; approval of preparation is separate from database execution and final merge acceptance.

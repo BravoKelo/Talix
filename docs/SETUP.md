@@ -2,9 +2,9 @@
 
 ## Connect the existing development project
 
-1. Verify the project identity and existing tables/migrations first. The connected Talix development project is `lzepujggusieapablzhn`; its core migrations are already applied; inspect current history for the customer-onboarding update. Do not use AMZ-PSE or create a substitute project.
+1. Verify the project identity and existing tables/migrations first. The connected Talix development project is `lzepujggusieapablzhn`; nine migrations through `20261008021928_index_membership_business_roles` are already applied. The client-profile correction is prepared and awaits explicit application approval. Do not use AMZ-PSE or create a substitute project.
 2. Use Node.js 24 and `npm ci`. Authenticate the Supabase CLI with your own authorized account, then `npx supabase link --project-ref <talix-ref>`.
-3. Inspect `npx supabase migration list` and `npx supabase db push --dry-run`. If existing schema conflicts with the new migration, investigate before applying it. Then apply the reviewed development migration with `npx supabase db push`.
+3. Inspect `npx supabase migration list` and `npx supabase db push --dry-run`. If existing schema conflicts with the new migration, investigate before applying it. Apply only specifically approved pending migrations to development. Current Issue #10 preparation does not authorize applying its pending migration; do not replay the nine applied migrations.
 4. Obtain the Talix URL and publishable key. Set the two variables in `.env.local` and in the Talix Vercel project's preview/development environment. These are public browser credentials; no service-role key is required. Redeploy after changing public build-time variables.
 5. Business owners enter `/signup`, choose their sample plan and extras, review once, then Continue on the pending email-confirmation page to open the workspace. Their first location starts unpublished; add products and publish it in Settings. There is no public employee signup or email invitation implementation in this slice. Create employee Auth accounts explicitly, then authorized managers assign subscription and separate location roles in Users.
 6. Review Supabase authentication redirects/site URL for the actual deployment and run the acceptance workflow below.
@@ -17,7 +17,7 @@
 - Declined orders remain outside active fulfillment. The private link permits a simulated approval retry on the same order.
 - The correct location receives the paid order. Authorized fulfillment staff advance received → in progress → ready → completed.
 - Viewer cannot advance orders. Verify each assigned role permits only its explicit actions; employees cannot access another tenant or unassigned location. Test custom-role edits, user removal and revocation.
-- Owner issues partial and full simulated refunds with reasons; histories and private tracking reflect them. Full refund cancels uncompleted orders; completed orders retain fulfillment history.
+- Owner or an employee with the location refund permission issues partial and full simulated refunds with reasons; histories and private tracking reflect them. Full refund cancels uncompleted orders; completed orders retain fulfillment history.
 - Disable a location/product and verify new checkout is rejected. Remove an employee's location access and verify access disappears.
 - Retry identical checkout/refund request IDs and verify no duplicate payment/refund. Altering details with the same ID must fail.
 
@@ -41,3 +41,8 @@ After the owner creates their authenticated account through signup, explicitly i
 
 Admin adds/edits business types, plans and extras; availability controls new sales. Name/description/price/frequency changes preserve existing purchase snapshots. Extras must have the selected plan’s billing frequency and either match its business type or apply to all types. Current pricing is USD, sample-only, and does not activate future addon benefits.
 
+## Controlled baseline integration
+
+PR #2 contains foundation history and the older core. PR #4 contains its dependent onboarding/Users changes. After separate final acceptance, retarget #2 to main and merge without activating its intermediate code against the already-upgraded development database; then retarget/merge #4. Preserve branches/history. Verify Vercel production-branch triggers before merging: available normalized connector metadata does not expose that setting. Existing branch-specific preview environment values do not automatically configure main or another branch. No production configuration or promotion is authorized by Issue #10.
+
+Current live validation is limited to evidence explicitly recorded in CURRENT-STATE. Do not infer a complete deployed service journey from embedded SQL/browser tests or READY deployment status. Controlled live verification after the pending database approval must use designated fixtures and preserve real client data.

@@ -8,7 +8,7 @@ The owner approved a bounded business-neutral commerce and fulfillment core, fol
 
 - Next.js App Router and TypeScript provide the owner/employee workspace, shared business storefront, and private order tracking. Supabase SSR clients maintain Auth sessions; workspace entry checks the current authenticated user. PostgreSQL remains the authorization boundary even if a browser bypasses UI controls.
 - Supabase PostgreSQL holds client/subscription/location relationships, membership and location roles, general/local products with generic optional extras, order snapshots, and payment/fulfillment histories. No business-type behavior or plugin framework is encoded now.
-- Supabase Auth supplies owner/employee identity. In this slice each owner is a client with multiple subscriptions; shared ownership/client administration is not implemented. A signed-in owner can create subscriptions. Employee accounts are explicitly provisioned in Auth, then granted location access by an owner.
+- Supabase Auth supplies owner/employee identity. In this slice each owner is a client with multiple subscriptions; shared ownership/client administration is not implemented. A signed-in owner can create subscriptions. Employees require an existing Auth account; owners or authorized managers grant subscription membership and separate location roles through Users. Invitation delivery is not implemented.
 - Supabase Storage holds public product images. Uploads require effective product-management permission and a subscription-ID folder; only JPEG/PNG/WebP up to 5 MB are allowed.
 - Vercel is the approved deployment target. Configuration and actual deployment state are recorded in `CURRENT-STATE.md`.
 
@@ -16,7 +16,7 @@ The owner approved a bounded business-neutral commerce and fulfillment core, fol
 
 RLS covers every application table. Owners retain full access. Employees require subscription membership and separately configured roles for shared tools and each location. Predefined and custom roles grant explicit permissions; database policies and checked RPCs enforce them. See ADR 0003. Direct browser writes cannot mutate memberships, orders, totals, payment state or histories.
 
-Narrow security-definer RPCs, fixed empty search paths, explicit execution grants, and checked ownership handle privileged transactions. Anonymous access is limited to the published catalog, validated simulated checkout, private order tracking, and private-token simulated payment retry. No service-role key exists in the application.
+Narrow security-definer RPCs, fixed empty search paths, explicit execution grants, and checked ownership handle privileged transactions. Anonymous access is limited to active Talix business-type/offering reads and subscription quotes, the published business catalog, validated simulated checkout, private order tracking, and private-token simulated payment retry. No service-role key exists in the application.
 
 Checkout calculates prices/options from stored products, validates location/product availability and contact details, and atomically snapshots purchased names/prices/options. Integer cents avoid rounding ambiguity. Request IDs and transaction locks make payment retries idempotent; changing the payload for an existing key fails. Refunds lock the order, require the location refund permission and a reason, and cannot exceed the remaining payment.
 
@@ -28,7 +28,7 @@ Only simulated approved/declined payments and full/partial refunds exist. There 
 
 ## Verification and development infrastructure
 
-Versioned migration: `supabase/migrations/20261007005603_core_commerce.sql`. Embedded PostgreSQL tests verify real SQL/RLS using small Auth/Storage fixtures; browser tests adapt RPC requests to that database. They do not verify Supabase service configuration. The core and two corrective migrations are applied to the existing Talix development project. The corrections revoke client execution on the platform-only event-trigger function and tune existing access policies/indexes without changing authorization behavior. Live service verification is recorded in `CURRENT-STATE.md`.
+Migration history is append-only in `supabase/migrations`. Nine migrations are applied to development: core commerce, trigger execution restriction, access-query tuning, customer onboarding, catalog-policy tuning, signup validation, generated ordering addresses, configurable Users, and the membership-role index. The additional client-profile preservation migration is prepared but unapplied; see CURRENT-STATE for the exact pending file. Embedded PostgreSQL tests execute migration SQL/RLS with Auth/Storage fixtures; browser tests use an adapter to that database. Those checks do not establish live service configuration or full deployed end-to-end behavior.
 
 Preserve the evidence-driven governance in `AGENTS.md`: build only demonstrated requirements; avoid speculative module frameworks; protected changes require owner approval; acceptance precedes merge.
 
@@ -38,7 +38,7 @@ See ADR 0002 for the accepted scope and resulting boundaries. New public `busine
 
 `subscription_quote` validates business type/plan/addon compatibility and billing interval, obtains ordered share locks and calculates integer-cent totals from catalog values. `start_subscription` requires a confirmed Auth user, serializes owner creation and idempotent confirmation, rechecks the entire reviewed quote, and creates the client/subscription/membership/location/purchase atomically. Purchase terms/details are snapshots. Business owners cannot rewrite purchased terms or change subscription type directly. Existing core drafts are preserved; client access to the old `create_workspace` shortcut is revoked.
 
-Signup credentials go directly to Auth. Only business form input and the reviewed selection/request ID are persisted as non-authoritative resumable user metadata. A verified session is checked at server entry; database authorization remains the final boundary. The confirmation route exchanges a PKCE code or verifies an email token hash, always redirects internally, and reports failure in plain customer language. Email service/redirect provisioning is tracked in CURRENT-STATE; no new provider, credentials or disabled verification are implied.
+Signup credentials go directly to Auth. Only business form input and the reviewed selection/request ID are persisted as non-authoritative resumable user metadata. A verified session is checked at server entry; database authorization remains the final boundary. The confirmation route exchanges a PKCE code or verifies an email token hash, always redirects internally, and reports failure in plain customer language. Email service/redirect provisioning is tracked in CURRENT-STATE. The explicitly approved development-only confirmation exception below supersedes the original verification requirement for development; no live provider or mailbox verification is established.
 
 ### Deferred development confirmation
 
@@ -52,3 +52,10 @@ The owner confirmed that prospective customers should not choose an internal ord
 
 Development migration `20261007043143_generate_ordering_address` is applied. Database checks verify duplicate-name allocation and repeat-safe completion. The live check used a rolled-back transaction and left no records. Customer signup no longer exposes this internal requirement.
 
+## Shared client profile correction — Issue #10
+
+The owner approved preserving the existing client profile when purchasing another subscription. The prepared additive migration changes only `start_subscription`: insert a client if absent; on conflict retain its fields and select its existing ID. Existing owner transaction locking, confirmed-user checks, quote validation, generated address allocation, purchase snapshots, idempotency, grants and permission seeding remain intact. No existing business rows are rewritten, and no table, policy or function signature changes. Do not describe this behavior as active on the development service until the pending migration is approved, applied and verified.
+
+## Decision provenance
+
+ADRs 0001–0003 record implemented boundaries. Explicit stack, core-first and simulation approvals are established. The Users feature was authorized in Issue #9, but separate prior approval of each specific schema/security choice is not established by the durable evidence. Issue #10 authorizes reconciliation and stabilization, not retrospective blanket architecture/security acceptance. Present the implemented role mapping and delegation boundaries for explicit baseline acceptance before merge.
