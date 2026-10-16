@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
+import { AppearanceEditor } from "./appearance-editor";
 import { Users } from "./users";
 import { type Permission } from "@/lib/permissions";
 import { SubscriptionSummary } from "./subscription-summary";
@@ -347,6 +348,11 @@ export function Workspace({
             )}
           </div>
           <nav className="tabs" aria-label="Workspace sections">
+            <div className="sidebar-brand">
+              talix<span>•</span>
+              <small>BUSINESS WORKSPACE</small>
+            </div>
+            <p className="sidebar-group">MANAGE YOUR BUSINESS</p>
             {[
               ...(can("orders.view") ? ["orders"] : []),
               ...(can("products.view") ? ["products"] : []),
@@ -358,11 +364,27 @@ export function Workspace({
               <button
                 key={t}
                 className={tab === t ? "active" : "secondary"}
+                aria-current={tab === t ? "page" : undefined}
                 onClick={() => setTab(t)}
               >
                 {t[0].toUpperCase() + t.slice(1)}
               </button>
             ))}
+            <div className="sidebar-future">
+              <p className="sidebar-group">GROW & CONNECT</p>
+              <details>
+                <summary>Reports</summary>
+                <span className="coming-soon">Feature coming soon</span>
+              </details>
+              <details>
+                <summary>Communications</summary>
+                <span className="coming-soon">Feature coming soon</span>
+              </details>
+              <details>
+                <summary>Support & training</summary>
+                <span className="coming-soon">Feature coming soon</span>
+              </details>
+            </div>
           </nav>
           {tab === "orders" && can("orders.view") && (
             <div className="workspace-grid">
@@ -647,66 +669,53 @@ export function Workspace({
             (shared("settings.view") || can("settings.view")) &&
             sub && (
               <div>
+                <section className="settings-directory panel">
+                  <div className="section-heading">
+                    <p className="eyebrow">YOUR BUSINESS, YOUR WAY</p>
+                    <h2>Settings</h2>
+                    <p className="muted">Choose an area to manage.</p>
+                  </div>
+                  <div className="settings-cards">
+                    <a href="#storefront-appearance">
+                      <span aria-hidden="true">◈</span>
+                      <strong>Storefront appearance</strong>
+                      <small>Brand name, introduction and color</small>
+                    </a>
+                    <a href="#location-settings">
+                      <span aria-hidden="true">⌖</span>
+                      <strong>Locations & ordering</strong>
+                      <small>Location details and online availability</small>
+                    </a>
+                    <div>
+                      <strong>Support & training</strong>
+                      <span className="coming-soon">Feature coming soon</span>
+                    </div>
+                    <div>
+                      <strong>Account security</strong>
+                      <span className="coming-soon">Feature coming soon</span>
+                    </div>
+                  </div>
+                </section>
                 {owner && <SubscriptionSummary key={sid} id={sid} />}
                 <div className="workspace-grid">
-                  <section className="panel">
-                    <h2>Branding</h2>
-                    <fieldset disabled={!shared("settings.manage")}>
-                      <form
-                        className="stack"
-                        key={sub.id}
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          const f = new FormData(e.currentTarget);
-                          void run(async () => {
-                            const v = {
-                              name: String(f.get("name")),
-                              description: String(f.get("description")),
-                              accent: String(f.get("accent")),
-                            };
-                            const { error } = await browserClient()
-                              .from("subscriptions")
-                              .update(v)
-                              .eq("id", sid);
-                            if (error) throw error;
-                            setSubs(
-                              subs.map((s) =>
-                                s.id === sid ? { ...s, ...v } : s,
-                              ),
-                            );
-                          });
-                        }}
-                      >
-                        <label>
-                          Business name
-                          <input
-                            name="name"
-                            defaultValue={sub.name}
-                            required
-                            maxLength={100}
-                          />
-                        </label>
-                        <label>
-                          Introduction
-                          <textarea
-                            name="description"
-                            defaultValue={sub.description}
-                            maxLength={1000}
-                          />
-                        </label>
-                        <label>
-                          Brand color
-                          <input
-                            type="color"
-                            name="accent"
-                            defaultValue={sub.accent}
-                          />
-                        </label>
-                        <button disabled={busy}>Save branding</button>
-                      </form>
-                    </fieldset>
-                  </section>
-                  <section className="panel">
+                  <AppearanceEditor
+                    key={sub.id}
+                    subscription={sub}
+                    allowed={shared("settings.manage")}
+                    save={async (v) => {
+                      const { error } = await browserClient()
+                        .from("subscriptions")
+                        .update(v)
+                        .eq("id", sid);
+                      if (error) throw error;
+                      setSubs((previous) =>
+                        previous.map((s) =>
+                          s.id === sid ? { ...s, ...v } : s,
+                        ),
+                      );
+                    }}
+                  />
+                  <section id="location-settings" className="panel">
                     <fieldset disabled={!can("settings.manage")}>
                       <h2>
                         {location ? "Location settings" : "Create location"}
@@ -769,7 +778,8 @@ export function Workspace({
           {tab === "users" && shared("users.view") && (
             <Users
               key={sid}
-              subscriptionId={sid} userId={userId}
+              subscriptionId={sid}
+              userId={userId}
               locations={locations}
               manage={shared("users.manage")}
             />

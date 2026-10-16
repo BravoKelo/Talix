@@ -314,6 +314,39 @@ for (const changedPrice of [false, true])
       await expect(
         page.getByRole("link", { name: "Add subscription", exact: true }),
       ).toBeVisible();
+      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      const appearance = page.getByRole("region", {
+        name: "Storefront appearance",
+      });
+      await appearance
+        .getByLabel("Introduction", { exact: true })
+        .fill("A fresh introduction for our customers.");
+      await expect(appearance.locator(".store-preview")).toContainText(
+        "A fresh introduction for our customers.",
+      );
+      await appearance
+        .getByRole("button", { name: "Cancel changes", exact: true })
+        .click();
+      await expect(
+        appearance.getByLabel("Introduction", { exact: true }),
+      ).toHaveValue("");
+      await appearance
+        .getByLabel("Introduction", { exact: true })
+        .fill("A fresh introduction for our customers.");
+      await appearance
+        .getByRole("button", { name: "Save branding", exact: true })
+        .click();
+      await expect(appearance.getByRole("status")).toContainText(
+        "has been saved",
+      );
+      expect(
+        (await gateway.db.query("select description from public.subscriptions"))
+          .rows,
+      ).toEqual([{ description: "A fresh introduction for our customers." }]);
+      await page.screenshot({
+        path: `test-results/appearance-${test.info().project.name}.png`,
+        fullPage: true,
+      });
       await gateway.addAccount("employee@example.invalid");
       await page.getByRole("button", { name: "Users", exact: true }).click();
       await expect(

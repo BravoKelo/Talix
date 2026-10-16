@@ -1,3 +1,4 @@
+import { AccessLayout } from "@/components/access-layout";
 import { Onboarding } from "@/components/onboarding";
 import { configured } from "@/lib/supabase/client";
 import { serverClient } from "@/lib/supabase/server";
@@ -18,5 +19,9 @@ export default async function Page() {
           : "/workspace",
       );
   }
-  return <Onboarding confirmationPending={emailConfirmationPending()} />;
+  return (
+    <AccessLayout>
+      <Onboarding confirmationPending={emailConfirmationPending()} />
+    </AccessLayout>
+  );
 }
