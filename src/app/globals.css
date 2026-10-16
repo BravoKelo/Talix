@@ -1399,3 +1399,16 @@ fieldset:disabled {
 .workspace .tabs .sidebar-future summary {
   color: #c2d2e5;
 }
+@media (min-width: 761px) {
+  .topbar:has(+ .workspace) {
+    position: sticky;
+    top: 0;
+  }
+  .workspace .tabs {
+    position: fixed;
+    top: 80px;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 4;
+  }
+}
