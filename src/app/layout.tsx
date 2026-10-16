@@ -1,12 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import { serverClient } from "@/lib/supabase/server";
+import { configured } from "@/lib/supabase/client";
 export const metadata: Metadata = {
   title: "Talix — Commerce & fulfillment",
   description: "Your business, connected. Online ordering and fulfillment.",
   referrer: "no-referrer",
 };
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const user = configured()
+    ? (await (await serverClient()).auth.getUser()).data.user
+    : null;
   return (
     <html lang="en">
       <body>
@@ -15,14 +24,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             talix<span>•</span>
           </Link>
           <nav>
-            <Link href="/workspace">Business workspace</Link>
-            <span className="badge">Simulated payments</span>
+            {user ? (
+              <Link href="/workspace" prefetch={false}>
+                Business workspace
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">Sign in</Link>
+                <Link href="/signup">Sign up</Link>
+              </>
+            )}
           </nav>
         </header>
         {children}
-        <footer>
-          Talix Core · Business-neutral commerce · No real payments
-        </footer>
+        <footer>Talix · Your business, connected.</footer>
       </body>
     </html>
   );

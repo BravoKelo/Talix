@@ -2,7 +2,7 @@
 
 Business-neutral online ordering and fulfillment. Restaurants are the first audience; industry-specific behavior comes after the shared core.
 
-This branch implements the approved initial core using Next.js, Supabase, and Vercel. Payments and refunds are **simulated**. No card data is collected and no money moves.
+This branch implements the approved shared core and self-service customer signup using Next.js, Supabase, and Vercel. Business types, sample plans and optional Talix products are editable in Talix admin. Payments and refunds are **simulated**. No card data is collected and no money moves.
 
 ## Development
 
@@ -16,7 +16,7 @@ npm run dev
 
 Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to the existing Talix development project. Never use a service-role/secret key in the browser.
 
-See [setup](docs/SETUP.md), [current state](docs/CURRENT-STATE.md), [architecture](docs/ARCHITECTURE.md), and [governance](AGENTS.md). The application shows a configuration notice until Supabase is connected.
+See [setup](docs/SETUP.md), [current state](docs/CURRENT-STATE.md), [architecture](docs/ARCHITECTURE.md), and [governance](AGENTS.md). Customers enter through Sign up, review their sample selection and continue through a pending email-confirmation page before starting a subscription. Actual email delivery/verification is deferred for development and required before live launch. See setup for email delivery and explicit Talix staff access.
 
 ## Checks
 
@@ -29,4 +29,8 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Database tests apply the actual migration to embedded PostgreSQL with minimal Auth/Storage fixtures. Browser tests bridge customer RPCs to that database. They do not claim to verify live Supabase Auth, PostgREST, Storage, or deployment configuration.
+Database tests apply all checked-in migrations to embedded PostgreSQL with minimal Auth/Storage fixtures. Browser tests exercise commerce, signup/resume and admin editing through a test-only Auth/PostgREST gateway backed by the migration SQL/RLS. They do not claim to verify live Supabase Auth, PostgREST, Storage, or deployment configuration.
+
+## Integration checkpoint
+
+Main currently contains only the initial README; this review branch carries the foundation and application. PR #2 and dependent PR #4 remain unmerged. Issue #10 tracks reconciliation/stabilization. The separately approved client-profile migration is applied and verified on Talix development. Read CURRENT-STATE before testing additional subscriptions or proposing a merge; final merge acceptance remains separate.

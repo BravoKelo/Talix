@@ -1,6 +1,10 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+import { Users } from "./users";
+import { type Permission } from "@/lib/permissions";
+import { SubscriptionSummary } from "./subscription-summary";
 import { LocationForm, ProductEditor } from "./product-editor";
 import { browserClient } from "@/lib/supabase/client";
 import {
@@ -26,6 +30,12 @@ export function Workspace({
   userId: string;
   email: string;
 }) {
+  const [adminAccess, setAdminAccess] = useState(false);
+  useEffect(() => {
+    void browserClient()
+      .rpc("talix_admin_access")
+      .then(({ data }) => setAdminAccess(data === true));
+  }, []);
   const [subs, setSubs] = useState<Subscription[]>([]),
     [members, setMembers] = useState<Membership[]>([]),
     [sid, setSid] = useState(""),
@@ -38,12 +48,59 @@ export function Workspace({
     [tab, setTab] = useState("orders"),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
-    [role, setRole] = useState("viewer");
+    [, setRole] = useState("viewer");
+  const [permissionScope, setPermissionScope] = useState<{
+    sid: string;
+    lid: string;
+    local: Permission[];
+    shared: Permission[];
+  }>({ sid: "", lid: "", local: [], shared: [] });
+  const can = (p: Permission) =>
+    owner ||
+    (permissionScope.sid === sid &&
+      permissionScope.lid === lid &&
+      permissionScope.local.includes(p));
+  const shared = (p: Permission) =>
+    owner ||
+    (permissionScope.sid === sid && permissionScope.shared.includes(p));
   const refundRequests = useRef<Record<string, string>>({});
-  const router = useRouter();
   const owner = members.some(
     (m) => m.subscription_id === sid && m.role === "owner",
   );
+  useEffect(() => {
+    let alive = true;
+    if (!sid) return;
+    const refresh = () =>
+      Promise.all([
+        browserClient().rpc("workspace_permissions", {
+          p_subscription: sid,
+          p_location: lid || null,
+        }),
+        browserClient().rpc("workspace_permissions", { p_subscription: sid }),
+      ]).then(([local, global]) => {
+        if (alive) {
+          setPermissionScope({
+            sid,
+            lid,
+            local: local.data ?? [],
+            shared: global.data ?? [],
+          });
+        }
+      });
+    void refresh();
+    const timer = setInterval(() => void refresh(), 10000);
+    return () => {
+      alive = false;
+      clearInterval(timer);
+    };
+  }, [sid, lid]);
+  useEffect(() => {
+    const { data } = browserClient().auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT")
+        setTimeout(() => window.location.replace("/login"), 0);
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
   const sub = subs.find((s) => s.id === sid);
   const location = locations.find((l) => l.id === lid);
   const loadSubscriptions = useCallback(async () => {
@@ -194,41 +251,11 @@ export function Workspace({
   );
   const createForm = (
     <section className="panel">
-      <h2>Create a subscription</h2>
-      <form
-        className="stack"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const f = new FormData(e.currentTarget);
-          void run(async () => {
-            await rpc("create_workspace", {
-              p_name: f.get("name"),
-              p_slug: f.get("slug"),
-              p_location: f.get("location"),
-            });
-            await loadSubscriptions();
-          });
-        }}
-      >
-        <label>
-          Business name
-          <input name="name" required maxLength={100} />
-        </label>
-        <label>
-          Website address
-          <input
-            name="slug"
-            required
-            pattern="[a-z0-9][a-z0-9-]{2,62}"
-            placeholder="your-business"
-          />
-        </label>
-        <label>
-          First location
-          <input name="location" required maxLength={100} />
-        </label>
-        <button disabled={busy}>Create workspace</button>
-      </form>
+      <h2>Add a subscription</h2>
+      <p>Choose a business type, plan and extras for your next business.</p>
+      <Link className="button" href="/onboarding?new=1">
+        Choose a plan →
+      </Link>
     </section>
   );
   return (
@@ -238,13 +265,20 @@ export function Workspace({
           <p className="eyebrow">BUSINESS WORKSPACE</p>
           <h1>{sub?.name || "Your businesses"}</h1>
           <p className="muted">{email}</p>
+          {adminAccess && <Link href="/admin">Talix admin</Link>}
         </div>
         <button
           className="secondary"
           onClick={() =>
             void browserClient()
               .auth.signOut()
-              .then(() => router.replace("/login"))
+              .then(({ error }) => {
+                if (error) {
+                  setMessage("We couldn’t sign you out. Please try again.");
+                  return;
+                }
+                window.location.replace("/login");
+              })
           }
         >
           Sign out
@@ -259,6 +293,7 @@ export function Workspace({
             <label>
               Subscription
               <select
+                aria-label="Subscription"
                 value={sid}
                 disabled={busy}
                 onChange={(e) => {
@@ -282,6 +317,7 @@ export function Workspace({
             <label>
               Location
               <select
+                aria-label="Location"
                 value={lid}
                 disabled={busy}
                 onChange={(e) => {
@@ -299,6 +335,11 @@ export function Workspace({
                 ))}
               </select>
             </label>
+            {members.some((m) => m.role === "owner") && (
+              <Link className="button secondary" href="/onboarding?new=1">
+                Add subscription
+              </Link>
+            )}
             {sub && (
               <a href={`/shop/${sub.slug}`} target="_blank" rel="noreferrer">
                 Open storefront ↗
@@ -307,9 +348,12 @@ export function Workspace({
           </div>
           <nav className="tabs" aria-label="Workspace sections">
             {[
-              "orders",
-              "products",
-              ...(owner ? ["settings", "access"] : []),
+              ...(can("orders.view") ? ["orders"] : []),
+              ...(can("products.view") ? ["products"] : []),
+              ...(shared("settings.view") || can("settings.view")
+                ? ["settings"]
+                : []),
+              ...(shared("users.view") ? ["users"] : []),
             ].map((t) => (
               <button
                 key={t}
@@ -320,7 +364,7 @@ export function Workspace({
               </button>
             ))}
           </nav>
-          {tab === "orders" && (
+          {tab === "orders" && can("orders.view") && (
             <div className="workspace-grid">
               <section className="panel">
                 <div className="row">
@@ -389,7 +433,7 @@ export function Workspace({
                       <strong>Total {money(order.total_cents)}</strong> ·
                       Refunded {money(order.refunded_cents)}
                     </p>
-                    {(owner || role === "fulfillment") &&
+                    {can("orders.fulfill") &&
                       ["paid", "partially_refunded"].includes(
                         order.payment_status,
                       ) &&
@@ -426,7 +470,7 @@ export function Workspace({
                           }
                         </button>
                       )}
-                    {owner &&
+                    {can("orders.refund") &&
                       ["paid", "partially_refunded"].includes(
                         order.payment_status,
                       ) && (
@@ -494,15 +538,18 @@ export function Workspace({
               </section>
             </div>
           )}
-          {tab === "products" && (
+          {tab === "products" && can("products.view") && (
             <section>
               <div className="row">
                 <h2>Products</h2>
               </div>
-              {owner && (
+              {can("products.manage") && (
                 <ProductEditor
                   sid={sid}
-                  locations={locations}
+                  locations={
+                    owner ? locations : locations.filter((l) => l.id === lid)
+                  }
+                  allowGeneral={shared("products.manage")}
                   busy={busy}
                   save={(p) =>
                     run(async () => {
@@ -532,211 +579,200 @@ export function Workspace({
                         {p.location_id ? "Location specific" : "General"} ·{" "}
                         {p.available ? "Available" : "Hidden"}
                       </p>
-                      {owner && (
-                        <>
-                          <button
-                            className="small secondary"
-                            disabled={busy}
-                            onClick={() =>
-                              void run(async () => {
-                                const { error } = await browserClient()
-                                  .from("products")
-                                  .update({ available: !p.available })
-                                  .eq("id", p.id);
-                                if (error) throw error;
-                                setProducts(
-                                  products.map((x) =>
-                                    x.id === p.id
-                                      ? { ...x, available: !x.available }
-                                      : x,
-                                  ),
-                                );
-                              })
-                            }
-                          >
-                            {p.available ? "Hide" : "Make available"}
-                          </button>
-                          <ProductEditor
-                            key={p.id}
-                            sid={sid}
-                            locations={locations}
-                            product={p}
-                            busy={busy}
-                            save={(v) =>
-                              run(async () => {
-                                const { subscription_id: ignored, ...updates } =
-                                  v;
-                                void ignored;
-                                const { error } = await browserClient()
-                                  .from("products")
-                                  .update(updates)
-                                  .eq("id", p.id);
-                                if (error) throw error;
-                                setProducts(
-                                  products.map((x) =>
-                                    x.id === p.id ? { ...x, ...v } : x,
-                                  ),
-                                );
-                              })
-                            }
-                          />
-                        </>
-                      )}
+                      {can("products.manage") &&
+                        (p.location_id !== null ||
+                          shared("products.manage")) && (
+                          <>
+                            <button
+                              className="small secondary"
+                              disabled={busy}
+                              onClick={() =>
+                                void run(async () => {
+                                  const { error } = await browserClient()
+                                    .from("products")
+                                    .update({ available: !p.available })
+                                    .eq("id", p.id);
+                                  if (error) throw error;
+                                  setProducts(
+                                    products.map((x) =>
+                                      x.id === p.id
+                                        ? { ...x, available: !x.available }
+                                        : x,
+                                    ),
+                                  );
+                                })
+                              }
+                            >
+                              {p.available ? "Hide" : "Make available"}
+                            </button>
+                            <ProductEditor
+                              key={p.id}
+                              sid={sid}
+                              locations={
+                                owner
+                                  ? locations
+                                  : locations.filter((l) => l.id === lid)
+                              }
+                              allowGeneral={shared("products.manage")}
+                              product={p}
+                              busy={busy}
+                              save={(v) =>
+                                run(async () => {
+                                  const {
+                                    subscription_id: ignored,
+                                    ...updates
+                                  } = v;
+                                  void ignored;
+                                  const { error } = await browserClient()
+                                    .from("products")
+                                    .update(updates)
+                                    .eq("id", p.id);
+                                  if (error) throw error;
+                                  setProducts(
+                                    products.map((x) =>
+                                      x.id === p.id ? { ...x, ...v } : x,
+                                    ),
+                                  );
+                                })
+                              }
+                            />
+                          </>
+                        )}
                     </article>
                   ))}
               </div>
             </section>
           )}
-          {tab === "settings" && owner && sub && (
-            <div className="workspace-grid">
-              <section className="panel">
-                <details>
-                  <summary>Add another subscription</summary>
-                  {createForm}
-                </details>
-                <h2>Branding</h2>
-                <form
-                  className="stack"
-                  key={sub.id}
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const f = new FormData(e.currentTarget);
-                    void run(async () => {
-                      const v = {
-                        name: String(f.get("name")),
-                        description: String(f.get("description")),
-                        accent: String(f.get("accent")),
-                      };
-                      const { error } = await browserClient()
-                        .from("subscriptions")
-                        .update(v)
-                        .eq("id", sid);
-                      if (error) throw error;
-                      setSubs(
-                        subs.map((s) => (s.id === sid ? { ...s, ...v } : s)),
-                      );
-                    });
-                  }}
-                >
-                  <label>
-                    Business name
-                    <input
-                      name="name"
-                      defaultValue={sub.name}
-                      required
-                      maxLength={100}
-                    />
-                  </label>
-                  <label>
-                    Introduction
-                    <textarea
-                      name="description"
-                      defaultValue={sub.description}
-                      maxLength={1000}
-                    />
-                  </label>
-                  <label>
-                    Brand color
-                    <input
-                      type="color"
-                      name="accent"
-                      defaultValue={sub.accent}
-                    />
-                  </label>
-                  <button disabled={busy}>Save branding</button>
-                </form>
-              </section>
-              <section className="panel">
-                <h2>{location ? "Location settings" : "Create location"}</h2>
-                {location && (
-                  <LocationForm
-                    key={location.id}
-                    location={location}
-                    busy={busy}
-                    save={(v) =>
-                      run(async () => {
-                        const { error } = await browserClient()
-                          .from("locations")
-                          .update(v)
-                          .eq("id", lid);
-                        if (error) throw error;
-                        setLocations(
-                          locations.map((l) =>
-                            l.id === lid ? { ...l, ...v } : l,
-                          ),
-                        );
-                      })
-                    }
-                  />
-                )}
-                <h3>Add a location</h3>
-                <form
-                  className="stack"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const f = new FormData(e.currentTarget);
-                    void run(async () => {
-                      const { data, error } = await browserClient()
-                        .from("locations")
-                        .insert({
-                          subscription_id: sid,
-                          name: String(f.get("name")),
-                        })
-                        .select()
-                        .single();
-                      if (error) throw error;
-                      setLocations([...locations, data]);
-                      setLid(data.id);
-                    });
-                  }}
-                >
-                  <label>
-                    Name
-                    <input name="name" required maxLength={100} />
-                  </label>
-                  <button disabled={busy}>Add location</button>
-                </form>
-              </section>
-            </div>
-          )}
-          {tab === "access" && owner && (
-            <section className="panel">
-              <h2>Employee location access</h2>
-              <p>
-                Create the employee account in Supabase Auth first. Grant access
-                separately for each location. Viewer reads orders and products;
-                fulfillment also advances orders. Owners manage settings,
-                products, access and refunds.
-              </p>
-              <form
-                className="stack"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const f = new FormData(e.currentTarget);
-                  void run(() =>
-                    rpc("grant_location_access", {
-                      p_location: lid,
-                      p_email: f.get("email"),
-                      p_role: f.get("role"),
-                    }),
-                  );
-                }}
-              >
-                <label>
-                  Employee email
-                  <input name="email" type="email" required />
-                </label>
-                <label>
-                  Access at {location?.name}
-                  <select name="role">
-                    <option value="fulfillment">Fulfillment</option>
-                    <option value="viewer">Viewer</option>
-                    <option value="none">Remove location access</option>
-                  </select>
-                </label>
-                <button disabled={busy || !lid}>Save access</button>
-              </form>
-            </section>
+          {tab === "settings" &&
+            (shared("settings.view") || can("settings.view")) &&
+            sub && (
+              <div>
+                {owner && <SubscriptionSummary key={sid} id={sid} />}
+                <div className="workspace-grid">
+                  <section className="panel">
+                    <h2>Branding</h2>
+                    <fieldset disabled={!shared("settings.manage")}>
+                      <form
+                        className="stack"
+                        key={sub.id}
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          const f = new FormData(e.currentTarget);
+                          void run(async () => {
+                            const v = {
+                              name: String(f.get("name")),
+                              description: String(f.get("description")),
+                              accent: String(f.get("accent")),
+                            };
+                            const { error } = await browserClient()
+                              .from("subscriptions")
+                              .update(v)
+                              .eq("id", sid);
+                            if (error) throw error;
+                            setSubs(
+                              subs.map((s) =>
+                                s.id === sid ? { ...s, ...v } : s,
+                              ),
+                            );
+                          });
+                        }}
+                      >
+                        <label>
+                          Business name
+                          <input
+                            name="name"
+                            defaultValue={sub.name}
+                            required
+                            maxLength={100}
+                          />
+                        </label>
+                        <label>
+                          Introduction
+                          <textarea
+                            name="description"
+                            defaultValue={sub.description}
+                            maxLength={1000}
+                          />
+                        </label>
+                        <label>
+                          Brand color
+                          <input
+                            type="color"
+                            name="accent"
+                            defaultValue={sub.accent}
+                          />
+                        </label>
+                        <button disabled={busy}>Save branding</button>
+                      </form>
+                    </fieldset>
+                  </section>
+                  <section className="panel">
+                    <fieldset disabled={!can("settings.manage")}>
+                      <h2>
+                        {location ? "Location settings" : "Create location"}
+                      </h2>
+                      {location && (
+                        <LocationForm
+                          key={location.id}
+                          location={location}
+                          busy={busy}
+                          save={(v) =>
+                            run(async () => {
+                              const { error } = await browserClient()
+                                .from("locations")
+                                .update(v)
+                                .eq("id", lid);
+                              if (error) throw error;
+                              setLocations(
+                                locations.map((l) =>
+                                  l.id === lid ? { ...l, ...v } : l,
+                                ),
+                              );
+                            })
+                          }
+                        />
+                      )}
+                    </fieldset>
+                    <fieldset disabled={!shared("settings.manage")}>
+                      <h3>Add a location</h3>
+                      <form
+                        className="stack"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          const f = new FormData(e.currentTarget);
+                          void run(async () => {
+                            const { data, error } = await browserClient()
+                              .from("locations")
+                              .insert({
+                                subscription_id: sid,
+                                name: String(f.get("name")),
+                              })
+                              .select()
+                              .single();
+                            if (error) throw error;
+                            setLocations([...locations, data]);
+                            setLid(data.id);
+                          });
+                        }}
+                      >
+                        <label>
+                          Name
+                          <input name="name" required maxLength={100} />
+                        </label>
+                        <button disabled={busy}>Add location</button>
+                      </form>
+                    </fieldset>
+                  </section>
+                </div>
+              </div>
+            )}
+          {tab === "users" && shared("users.view") && (
+            <Users
+              key={sid}
+              subscriptionId={sid} userId={userId}
+              locations={locations}
+              manage={shared("users.manage")}
+            />
           )}
         </>
       )}

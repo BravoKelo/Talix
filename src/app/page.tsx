@@ -14,8 +14,11 @@ export default function Home() {
         fulfillment moving.
       </p>
       <div className="actions">
-        <Link className="button" href="/workspace">
-          Open your workspace →
+        <Link className="button" href="/signup">
+          Sign up →
+        </Link>
+        <Link className="button secondary" href="/login">
+          Sign in
         </Link>
       </div>
       <div className="feature-grid">
@@ -46,8 +49,8 @@ export default function Home() {
       </div>
       {!configured() && (
         <aside className="notice">
-          The application is installed. The Talix Supabase connection must be
-          configured before sign-in and ordering are available.
+          Signup and ordering are temporarily unavailable. Please check back
+          soon.
         </aside>
       )}
     </main>

@@ -1,7 +1,13 @@
 name: Core checks
 on:
   push:
-    branches: [main, foundation/project-governance, feature/core-commerce]
+    branches:
+      [
+        main,
+        foundation/project-governance,
+        feature/core-commerce,
+        feature/customer-onboarding,
+      ]
   pull_request:
 permissions:
   contents: read
@@ -13,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
           cache: npm
       - run: npm ci
       - run: npm run lint
