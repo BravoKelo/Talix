@@ -770,7 +770,7 @@ fieldset:disabled {
   order: -1;
 }
 .access-content .signup-steps {
-  font-size: 12px;
+  font-size: 14px;
   gap: 8px;
 }
 .access-content .signup-steps li {
@@ -802,7 +802,7 @@ fieldset:disabled {
 }
 .access-feature .eyebrow {
   color: #efc975;
-  font-size: 11px;
+  font-size: 14px;
   letter-spacing: 2px;
 }
 .access-illustration {
@@ -821,7 +821,7 @@ fieldset:disabled {
 }
 .illustration-card > span {
   display: block;
-  font-size: 9px;
+  font-size: 14px;
   letter-spacing: 2px;
   color: #69809b;
 }
@@ -843,7 +843,7 @@ fieldset:disabled {
 }
 .illustration-order {
   padding: 11px 0;
-  font-size: 12px;
+  font-size: 14px;
   border-top: 1px solid #e3eaf1;
   color: #174b91;
 }
@@ -858,7 +858,7 @@ fieldset:disabled {
   color: #183858;
   padding: 19px 23px;
   border-radius: 50%;
-  font-size: 13px;
+  font-size: 14px;
   transform: rotate(8deg);
   text-align: center;
 }
@@ -876,7 +876,7 @@ fieldset:disabled {
 }
 .coming-soon {
   display: inline-block;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.3px;
   background: #edf2f8;
@@ -893,7 +893,7 @@ fieldset:disabled {
 }
 .access-footnote {
   margin-top: 38px;
-  font-size: 13px;
+  font-size: 14px;
 }
 .access-footnote a {
   color: #efc975;
@@ -911,7 +911,7 @@ fieldset:disabled {
   margin: 0 0 5px;
 }
 .access-notices p {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   margin: 0 0 10px;
 }
@@ -920,7 +920,7 @@ fieldset:disabled {
   color: #ac7b18;
 }
 .future-password {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   display: flex;
   justify-content: space-between;
@@ -946,13 +946,13 @@ fieldset:disabled {
   margin: 0;
 }
 .workspace > .row .eyebrow {
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 1.5px;
   margin: 0 0 8px;
 }
 .workspace > .row .muted {
   margin: 5px 0 0;
-  font-size: 12px;
+  font-size: 14px;
 }
 .workspace .selectors {
   padding: 18px 22px;
@@ -965,12 +965,12 @@ fieldset:disabled {
   box-shadow: 0 3px 12px #1b3b6605;
 }
 .workspace .selectors label {
-  font-size: 11px;
+  font-size: 14px;
   letter-spacing: 0.2px;
   min-width: 160px;
 }
 .workspace .selectors select {
-  font-size: 13px;
+  font-size: 14px;
   min-width: 160px;
   background: #f8fafc;
 }
@@ -1002,7 +1002,7 @@ fieldset:disabled {
 }
 .sidebar-brand small {
   display: block;
-  font-size: 8px;
+  font-size: 14px;
   letter-spacing: 2px;
   font-weight: 500;
   color: #b8cbdf;
@@ -1010,7 +1010,7 @@ fieldset:disabled {
 }
 .sidebar-group {
   color: #9cb3cd;
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 1.6px;
   padding: 4px 12px;
@@ -1023,7 +1023,7 @@ fieldset:disabled {
   border-radius: 7px;
   color: #d9e6f5;
   background: transparent;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
 }
 .workspace .tabs > button:hover {
@@ -1042,7 +1042,7 @@ fieldset:disabled {
 .sidebar-future details {
   padding: 12px;
   color: #c2d2e5;
-  font-size: 12px;
+  font-size: 14px;
 }
 .sidebar-future summary {
   cursor: pointer;
@@ -1086,7 +1086,7 @@ fieldset:disabled {
   margin: 5px 0;
 }
 .section-heading .eyebrow {
-  font-size: 10px;
+  font-size: 14px;
   color: #8c650d;
 }
 .color-control {
@@ -1100,7 +1100,7 @@ fieldset:disabled {
   padding: 4px;
 }
 .color-control code {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
 }
 .appearance-actions {
@@ -1113,7 +1113,7 @@ fieldset:disabled {
   padding: 12px 0;
 }
 .appearance-grid [role="status"] {
-  font-size: 12px;
+  font-size: 14px;
 }
 .store-preview {
   border: 1px solid #ccd9e8;
@@ -1125,7 +1125,7 @@ fieldset:disabled {
 .preview-label {
   padding: 12px 16px;
   background: #e8eef6;
-  font-size: 9px;
+  font-size: 14px;
   letter-spacing: 1.2px;
   font-weight: 700;
   display: flex;
@@ -1146,7 +1146,7 @@ fieldset:disabled {
   font-size: 21px;
 }
 .preview-header p {
-  font-size: 12px;
+  font-size: 14px;
   color: #52647a;
 }
 .preview-monogram {
@@ -1163,7 +1163,7 @@ fieldset:disabled {
   padding: 25px 22px;
 }
 .preview-catalog .eyebrow {
-  font-size: 9px;
+  font-size: 14px;
 }
 .preview-catalog strong {
   font-size: 15px;
@@ -1174,15 +1174,15 @@ fieldset:disabled {
   background: #fff;
   border: 1px solid #dde5ef;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 14px;
   display: flex;
   justify-content: space-between;
 }
 .preview-catalog .muted {
-  font-size: 11px;
+  font-size: 14px;
 }
 .preview-note {
-  font-size: 10px;
+  font-size: 14px;
   color: var(--muted);
   padding: 12px 16px;
   border-top: 1px solid var(--line);
@@ -1203,7 +1203,7 @@ fieldset:disabled {
   border-radius: 8px;
 }
 .future-settings summary {
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
   font-weight: 600;
 }
@@ -1213,7 +1213,7 @@ fieldset:disabled {
   margin: 8px 0 0 15px;
 }
 .future-settings p {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
 }
 @media (min-width: 1500px) {
@@ -1280,7 +1280,7 @@ fieldset:disabled {
   }
   .workspace .tabs > button {
     padding: 10px 14px;
-    font-size: 12px;
+    font-size: 14px;
   }
   .workspace .selectors {
     padding: 15px;
@@ -1301,7 +1301,7 @@ fieldset:disabled {
     min-height: 65px;
   }
   .topbar nav {
-    font-size: 12px;
+    font-size: 14px;
   }
   .topbar nav a:last-child {
     padding: 7px 12px;
@@ -1335,11 +1335,11 @@ fieldset:disabled {
   font-size: 22px;
 }
 .settings-cards strong {
-  font-size: 13px;
+  font-size: 14px;
 }
 .settings-cards small {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 14px;
 }
 .settings-cards > a:hover {
   border-color: #91accd;
@@ -1372,10 +1372,10 @@ fieldset:disabled {
   display: flex;
   gap: 10px;
   align-items: center;
-  font-size: 11px;
+  font-size: 14px;
 }
 .access-links .coming-soon {
-  font-size: 8px;
+  font-size: 14px;
   padding: 3px 6px;
 }
 @media (max-width: 760px) {
@@ -1386,10 +1386,10 @@ fieldset:disabled {
   .access-links > div {
     flex-direction: column;
     gap: 5px;
-    font-size: 10px;
+    font-size: 14px;
   }
   .access-links .coming-soon {
-    font-size: 7px;
+    font-size: 14px;
   }
 }
 .access-content .signup-review > .price-summary {
@@ -1427,7 +1427,7 @@ fieldset:disabled {
 }
 .home-nav a {
   color: #3c526a;
-  font-size: 13px;
+  font-size: 14px;
 }
 .home-hero {
   max-width: 1400px;
@@ -1441,7 +1441,7 @@ fieldset:disabled {
 }
 .talix-home .eyebrow {
   color: #846019;
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.7;
   letter-spacing: 1.8px;
 }
@@ -1473,7 +1473,7 @@ fieldset:disabled {
   padding: 14px 24px;
 }
 .hero-copy .hero-note {
-  font-size: 12px;
+  font-size: 14px;
 }
 .hero-product {
   position: relative;
@@ -1523,7 +1523,7 @@ fieldset:disabled {
   color: #b08025;
 }
 .sample-label {
-  font-size: 8px;
+  font-size: 14px;
   letter-spacing: 1px;
   color: #60768e;
   margin-left: auto;
@@ -1532,7 +1532,7 @@ fieldset:disabled {
   border-radius: 50%;
   padding: 7px;
   background: #eaf1fa;
-  font-size: 9px;
+  font-size: 14px;
 }
 .product-window-body {
   display: grid;
@@ -1546,7 +1546,7 @@ fieldset:disabled {
   flex-direction: column;
   gap: 18px;
   padding: 22px 10px;
-  font-size: 10px;
+  font-size: 14px;
 }
 .product-rail .rail-active {
   background: #eac061;
@@ -1566,7 +1566,7 @@ fieldset:disabled {
   gap: 8px;
 }
 .product-greeting small {
-  font-size: 7px;
+  font-size: 14px;
   letter-spacing: 1px;
   color: #62768d;
 }
@@ -1579,7 +1579,7 @@ fieldset:disabled {
   background: #fff;
   border: 1px solid #dce5ef;
   border-radius: 5px;
-  font-size: 8px;
+  font-size: 14px;
   padding: 7px;
   white-space: nowrap;
 }
@@ -1600,14 +1600,14 @@ fieldset:disabled {
   display: block;
 }
 .sample-stats span {
-  font-size: 8px;
+  font-size: 14px;
   color: #64778d;
 }
 .sample-orders {
   margin-top: 20px;
 }
 .sample-orders > strong {
-  font-size: 11px;
+  font-size: 14px;
 }
 .sample-order {
   display: flex;
@@ -1616,11 +1616,11 @@ fieldset:disabled {
   background: white;
   border-bottom: 1px solid #edf1f6;
   padding: 10px 8px;
-  font-size: 10px;
+  font-size: 14px;
 }
 .sample-order small {
   display: block;
-  font-size: 7px;
+  font-size: 14px;
   color: #718398;
   margin-top: 3px;
 }
@@ -1630,7 +1630,7 @@ fieldset:disabled {
 }
 .order-new,
 .order-progress {
-  font-size: 7px;
+  font-size: 14px;
   margin-left: auto;
   padding: 5px 7px;
   border-radius: 4px;
@@ -1663,24 +1663,24 @@ fieldset:disabled {
   color: #61480f;
 }
 .sample-customer-card small {
-  font-size: 7px;
+  font-size: 14px;
   letter-spacing: 1px;
   color: #62768d;
 }
 .sample-customer-card strong {
   display: block;
-  font-size: 13px;
+  font-size: 14px;
   margin: 6px 0;
 }
 .sample-customer-card > span:last-child {
-  font-size: 8px;
+  font-size: 14px;
   color: #62768d;
 }
 .product-caption {
   position: absolute;
   bottom: -10px;
   left: 0;
-  font-size: 10px;
+  font-size: 14px;
   color: #64778d;
 }
 .home-value-strip {
@@ -1738,7 +1738,7 @@ fieldset:disabled {
   border-radius: 8px;
   padding: 9px 12px;
   color: #235c99;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
 }
 .home-capabilities h3 {
@@ -1791,7 +1791,7 @@ fieldset:disabled {
 }
 .roadmap-label {
   color: #f0c96e;
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 1.8px;
 }
 .home-roadmap h3 {
@@ -1809,17 +1809,17 @@ fieldset:disabled {
   justify-content: space-between;
 }
 .home-roadmap strong {
-  font-size: 13px;
+  font-size: 14px;
 }
 .home-roadmap > div span {
-  font-size: 9px;
+  font-size: 14px;
   color: #f0d999;
   border: 1px solid #f0d99966;
   border-radius: 4px;
   padding: 4px 6px;
 }
 .home-roadmap > p {
-  font-size: 11px;
+  font-size: 14px;
   color: #c7d7e9;
 }
 .home-questions {
@@ -1853,7 +1853,7 @@ fieldset:disabled {
   line-height: 1.8;
 }
 .home-final .home-returning {
-  font-size: 13px;
+  font-size: 14px;
   margin-top: 22px;
 }
 .home-availability {
@@ -1869,7 +1869,7 @@ fieldset:disabled {
     grid-template-columns: 65px 1fr;
   }
   .product-rail {
-    font-size: 8px;
+    font-size: 14px;
   }
   .product-main {
     padding: 18px 10px;
@@ -1878,7 +1878,7 @@ fieldset:disabled {
     display: none;
   }
   .sample-label {
-    font-size: 6px;
+    font-size: 14px;
   }
   .home-direction,
   .home-questions {
@@ -1890,7 +1890,7 @@ fieldset:disabled {
     gap: 12px 22px;
   }
   .home-nav a {
-    font-size: 11px;
+    font-size: 14px;
   }
   .home-hero {
     grid-template-columns: 1fr;
@@ -1963,5 +1963,154 @@ fieldset:disabled {
 @media (prefers-reduced-motion: no-preference) {
   html:has(.talix-home) {
     scroll-behavior: smooth;
+  }
+}
+
+/* Readability across the refreshed customer and business pages. */
+body:has(.talix-home),
+body:has(.access-layout),
+body:has(.workspace) {
+  font-size: 17px;
+  line-height: 1.6;
+}
+.topbar nav a {
+  font-size: 16px;
+}
+body:has(.talix-home) > footer,
+body:has(.access-layout) > footer,
+body:has(.workspace) > footer {
+  font-size: 15px;
+}
+.home-nav a,
+.access-links > div,
+.workspace .tabs > button,
+.sidebar-future details,
+.workspace .selectors label,
+.workspace .selectors select,
+.access-content label,
+.workspace label,
+.settings-cards strong,
+.future-settings summary {
+  font-size: 16px;
+}
+.hero-copy > p,
+.section-heading > p,
+.home-capabilities p,
+.home-workflow li p,
+.home-direction p,
+.home-faq p,
+.home-faq summary,
+.home-value-strip,
+.feature-story p,
+.access-notices p,
+.access-footnote,
+.future-password,
+.settings-cards small,
+.future-settings p,
+.preview-header p,
+.preview-catalog .muted,
+.preview-location,
+.preview-note {
+  font-size: 16px;
+  line-height: 1.7;
+}
+.access-notices h2 {
+  font-size: 18px;
+}
+.access-links {
+  flex-wrap: wrap;
+  gap: 20px 36px;
+}
+.access-links > div {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.access-links .coming-soon,
+.coming-soon {
+  font-size: 14px;
+}
+.workspace .selectors {
+  flex-wrap: wrap;
+}
+.workspace .selectors label {
+  min-width: 0;
+}
+.workspace .selectors select {
+  min-width: 0;
+}
+.preview-label,
+.preview-location {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.future-password {
+  flex-wrap: wrap;
+}
+.product-caption {
+  position: relative;
+  bottom: auto;
+  margin: 28px 0 0;
+  line-height: 1.6;
+}
+.hero-product {
+  padding-bottom: 35px;
+}
+.sample-customer-card {
+  bottom: 84px;
+}
+.product-window-body {
+  grid-template-columns: 105px minmax(0, 1fr);
+}
+.sample-stats > div {
+  min-width: 0;
+}
+.sample-order {
+  flex-wrap: wrap;
+}
+.sample-label {
+  letter-spacing: 0.4px;
+}
+.sample-customer-card {
+  width: 265px;
+}
+@media (max-width: 1000px) {
+  .product-window-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .product-rail {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .home-nav {
+    gap: 12px 20px;
+  }
+  .home-nav a {
+    font-size: 16px;
+  }
+  .access-links > div {
+    flex: 1 1 140px;
+  }
+  .workspace .tabs > button {
+    font-size: 16px;
+  }
+  .access-notices {
+    grid-template-columns: 1fr;
+  }
+  .sample-customer-card {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    margin: -10px 0 0 auto;
+    max-width: 100%;
+  }
+  .sample-customer-card small {
+    font-size: 14px;
+  }
+  .hero-product {
+    padding-bottom: 10px;
+  }
+  .topbar {
+    height: auto;
   }
 }
