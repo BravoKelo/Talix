@@ -1,6 +1,6 @@
 # ADR 0003 — Configurable subscription and location permissions
 
-**Status:** Implemented under the authorized Issue #9 feature scope; specific schema/security boundaries await explicit baseline acceptance.
+**Status:** Integrated in the current early-development baseline under the owner's October 16 explicit merge instruction. Historical separate schema/security approval provenance remains documented below.
 **Date:** 2026-10-08 UTC (2026-10-07 Pacific).
 **Decision owners:** Product owner / engineering.
 
@@ -52,3 +52,8 @@ Eight SQL tests cover role delegation, tenant boundaries, protected accounts, di
 ## Supersession
 
 Supersedes the core-only restriction to Viewer/Fulfillment under the later authorized Issue #9 scope. Does not supersede AGENTS.md or grant merge/deployment approval.
+
+
+## October 16 baseline integration
+
+After reviewing the reconciliation, the owner explicitly directed merging the existing application and continuing testing afterward. The implemented mapping and delegation rules are therefore retained in the integrated development baseline; the earlier separate-acceptance prerequisite is no longer an integration blocker. This records the current merge authorization without inventing prior protected-decision approval. Future changes still require the applicable bounded approval under AGENTS.md.

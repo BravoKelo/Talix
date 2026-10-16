@@ -1,85 +1,42 @@
 # Talix current state
 
-## Recovery checkpoint — 2026-10-16 Pacific / UTC
+## Integrated development baseline — October 16, 2026 (Pacific / UTC)
 
-Repository: BravoKelo/Talix. Active review branch: `feature/customer-onboarding`, draft PR #4 stacked on unmerged core PR #2. Issue #10 authorizes reconciliation/stabilization; development database execution was separately approved and completed; final merge acceptance remains separate. Recover exact branch heads, CI and preview again before continuing; this document cannot contain its own commit SHA.
+Repository: BravoKelo/Talix. Default/development baseline branch: main.
 
-Last verified pre-reconciliation heads:
+The owner explicitly instructed merging the existing work and continuing manual testing afterward, superseding the requirement to finish additional live acceptance before this early-development integration. Do not reimpose that checkpoint. Future material product/architecture/schema/security/infrastructure decisions still follow AGENTS.md; this approval does not authorize payment processing or broader features.
 
-| Branch | Commit | State |
-|---|---|---|
-| main | 133cb2450a422ed550a8d646d3a7626d36c68519 | Initial README only |
-| foundation/project-governance | 4d547496998c50a30ee20afec5ef423b7145381d | Original foundation |
-| feature/core-commerce | e6fc00a56bf3aca5e0955f74a1c18a5131d9ed43 | Foundation plus core, PR #2 |
-| feature/customer-onboarding | 7d7b5584c6c4e76ffed20a2322fe80094caa2c9e | Core plus onboarding/Users before Issue #10 corrections |
+## Confirmed integration
+- PR #2: foundation and business-neutral commerce core; retargeted to main and merged by merge commit 05e6db3040c4fb3b255ff38cf2f2fe87add03c8a.
+- PR #4: customer signup, offerings, subscriptions, Users and reconciliation; retargeted to main and merged by merge commit fce04b7ddc35f0505868c616dd0d3fb257571df8.
+- The final application merge tree is 0ebe54e04d408786bd929b8d73305aa3ad3f5c66, exactly identical to accepted onboarding head 432e7dd59abca5d3db8b847f061dead8c6d3f0f0.
+- Original foundation and feature branches/commits are preserved. No squash, rebase or branch deletion.
+- A documentation-only follow-up records this baseline. Recover the latest main SHA from GitHub; this document cannot contain its own commit SHA.
 
-Ancestry is linear, with 8 foundation, 4 core and 8 onboarding commits before reconciliation. Both PRs are draft and mergeable at assessment. No human GitHub review or merge acceptance exists. Issues #1/#3 remain open; owner closed #5–9. Keep those defect issues closed; their closure does not approve a merge. The accessible local tree is an API-recovered mirror without `.git`; no substantive unpublished source was found at assessment. Publish only intended files, not generated output or environment files.
+## Implemented
+Next.js/Supabase/Vercel business-neutral ordering/fulfillment; multiple subscriptions per client and locations per subscription; general/location products, generic options, images, published catalogs, guest checkout, private order tracking, fulfillment histories and simulated payments/refunds.
 
-## Implemented capabilities
+Landing signup collects structured business/contact/first-location details, offers sample business types/plans/extras, reviews once and uses the owner-approved no-mail confirmation page before workspace entry. Additional subscriptions preserve the shared client profile and keep separate immutable purchase details. Offerings are editable by allowlisted Talix staff.
 
-Business-neutral Next.js/Supabase/Vercel ordering/fulfillment, multiple subscriptions per client, one selected business type per subscription, multiple locations, subscription branding, general/local products with generic extras/images, guest ordering, private order tracking, generic fulfillment and simulated payments/refunds. Restaurant-specific behavior and module frameworks are absent.
+Users lists editable existing accounts, protects Owner, supports predefined/custom permission roles and independent subscription/location assignments. Managers cannot alter themselves/Owner or grant authority/location access they lack. ADR 0003 records the implemented mapping and approval history. Invitations are not implemented; employee Auth accounts must already exist.
 
-Landing signup, structured business/contact/address validation, single selection review, automatic ordering addresses, saved onboarding drafts, changed-price re-review, editable sample Talix offerings and a staff customer summary exist. No card collection or money movement. Purchased terms are immutable; future addon benefits are not implemented by selecting sample offerings.
+## Services and deployment
+Existing Talix development Supabase project: lzepujggusieapablzhn, us-east-1, PostgreSQL 17. Ten recorded migrations through 20261008033814_preserve_client_profile; no replay/rollback or new migration during integration. Application tables have RLS. The profile function body was compared byte-for-byte to its reviewed migration; body/prosrc MD5 84fab1fca6bb9a2e4a51c945a1a2caef and complete-definition MD5 912ec850712b76b19d8a4d641a2dc990. Fixed search path and execution grants remain unchanged.
 
-Current-user server verification and full-navigation signout protect workspace entry. Users begins with configured accounts; Owner is protected. Predefined/custom subscription roles and separate location roles expose allowed/denied permissions. Managers cannot modify Owner, themselves or grant authority/location access they lack. Existing Auth accounts are required; invitations are deferred. ADR 0003 exposes the exact implementation mapping and its separate protected-decision acceptance boundary.
+Vercel project prj_Xmg24E6djhGtCFIJsmP9EblkLDym, team team_eTPaf9j2OvuQWUZGssM8wVjv, Node 24. Production tracks main, but the approved root vercel.json now sets git.deploymentEnabled.main=false on main. Feature previews remain enabled; manual releases are not disabled. Post-merge inspection found only the historical production deployment from 9b0e35ea; no new production deployment. No production database configuration or release was made. The owner's screenshots showed an empty Project production-variable tab; Shared variables were not inspected.
 
-## Issue #10 corrections and approved development application
+Continue testing the protected onboarding preview: https://talix-git-feature-customer-onboarding-bravokelo.vercel.app/ . It uses the existing development service and TALIX_EMAIL_CONFIRMATION_PENDING=true. Production is not configured for this development journey. Main deployment/release configuration can be decided when actually needed.
 
-Browser regression tests reproduced repeat custom-role Save creating a duplicate and denied removal clearing the editor. Corrected UI retains the newly created role ID and resets the user editor only after success. Tests cover repeated Save, failure retention, successful removal and desktop/mobile flows.
+## Validation and honest limits
+- Core head 5c481daa3f03027a06afb4cd481b304cff8b0707 passed push/PR checks 38972419707 and 38972426161.
+- Onboarding implementation/configuration head e75be28b2611a27c88ea404e5bf6003b82d37ae5 passed push/PR checks 38972427075 and 38972431963; matching feature previews are READY.
+- Accepted documentation head 432e7dd59abca5d3db8b847f061dead8c6d3f0f0 passed push/PR checks 38973288019 and 38973293326. Main's merged tree is identical.
+- Automated validation includes lint, TypeScript, 34 unit/SQL tests, production build and six desktop/mobile browser scenarios. Browser suites use an isolated real-SQL/RLS adapter, not the actual Supabase service.
+- Live rolled-back SQL checks confirmed additional-subscription profile preservation, separate snapshots, retry safety, role seeding and cross-user isolation; no fixtures remained.
+- Actual cloud-browser checks reached business form → real Retail plans/extras → canonical review and a $39/month sample total. No account/subscription was created during this latest attempt. A full fresh deployed authenticated signup/Users/order/refund journey remains unverified; the owner chose to continue manual testing after merge. Do not report this as passed or make it a repeated integration gate.
+- Main-trigger CI runs, when present, must be read before reporting their result. Documentation-only follow-up status is recorded in Issue #10.
 
-A database regression reproduced additional subscriptions overwriting shared client details. Migration `20261008033814_preserve_client_profile.sql` replaces only `start_subscription` client upsert with insert-if-absent and existing-client lookup. It preserves transaction locking, quote checks, generated addresses, membership/role seeding, immutable per-subscription details and request replay. No tables, policies, signatures or grants change; original nine migrations are unmodified. **The owner separately approved execution, and this migration is applied to Talix development.** Supabase assigned version 20261008033814; the prepared file was renamed from 20261008030839 to match recorded history without changing its reviewed SQL. Its preparation-time comment remains historical. The correction does not repair historical data or create a client-profile editor.
+## Next work
+The owner resumes testing and reports issues. Record and correct the next authorized batch, using main as the baseline and focused feature branches. Do not restart theoretical POC/discovery or repeat completed reconciliation. No new feature scope is approved.
 
-## Development services
-
-Supabase project `lzepujggusieapablzhn` (Talix), us-east-1, healthy PostgreSQL 17. All 13 public application tables have RLS. Fresh assessment compared all nine remote migration versions and 18 checked authorization/transaction function bodies to the repository; no mismatch. After the approved application, remote history contains these ten versions:
-
-1. 20261007005603 core_commerce
-2. 20261007005736 restrict_platform_trigger_access
-3. 20261007005951 tune_core_access_queries
-4. 20261007015259 customer_onboarding
-5. 20261007015458 streamline_catalog_policies
-6. 20261007041833 validate_signup_details
-7. 20261007043143 generate_ordering_address
-8. 20261008021501 configurable_user_roles
-9. 20261008021928 index_membership_business_roles
-10. 20261008033814 preserve_client_profile
-
-Owner-approved no-mail development confirmation uses Auth automatic confirmation and `TALIX_EMAIL_CONFIRMATION_PENDING=true` on the protected onboarding preview. The confirmation page displays the authenticated email and '(Feature coming soon)'; Continue completes the saved purchase. Automatically confirmed development accounts do not prove mailbox ownership. Before live launch restore mandatory service email verification, disable the application flag and configure delivery/redirects.
-
-Stable review URL: https://talix-git-feature-customer-onboarding-bravokelo.vercel.app/ . Correction commit `c330cf1dbb91bb66fb4f7327f25c07f55df4b37f` is followed by reconciliation commit `0496d46dee120f0a2f742b34c4bc1f99cdce0ec2`. Matching deployment `dpl_5VsbDN4Ppe6NpKCsLamF3ynhmeqX` is READY for 0496d46; protected landing/signup returned HTTP 200, and signed-out workspace resolved to login with private/no-store responses. Documentation checkpoint e1d4abddb4f6b6f38efacd5780e465b317bcfedf also passed both CI runs (37722217624 and 37722221656), with matching READY deployment dpl_8xeiBavmNYHBsfpBwiyHqVYm3Drk. Verify subsequent heads again.
-
-Vercel project `prj_Xmg24E6djhGtCFIJsmP9EblkLDym`, team `team_eTPaf9j2OvuQWUZGssM8wVjv`, Node 24, deployment protection retained. Development and the two feature branches have public Supabase environment values; only onboarding preview has the pending-confirmation flag. No production or generic-preview Supabase environment values are configured. An initial production-labelled deployment from older core commit 9b0e35ea exists from project linking; it is disconnected from Supabase. No production promotion has occurred. The owner supplied Production and Git settings screenshots on October 16. Production tracks `main`, and every commit to main creates a production deployment. Automatic custom-production-domain assignment is enabled, the production domain shown is `talix-seven.vercel.app`, and the Project production-variable tab is empty (the Shared tab was not inspected). Git is connected to BravoKelo/Talix; visible comment/status/event toggles are not a deployment pause. These observations resolve the branch/trigger inspection without browser sign-in. No dashboard setting was changed. Do not assume main inherits feature environment settings or activate intermediate core against the newer live database.
-
-Two synthetic 1×1 image fixtures from historical core tests remain in Storage. They were confirmed present at assessment and are not deleted by Issue #10 preparation. Product-image replacement also retains previous objects. Cleanup requires separately authorized scope. Existing advisor notices include intentional checked RPC/private allowlist warnings, informational unused indexes, and disabled leaked-password protection as a launch-hardening item. No security setting was changed.
-
-## Validation and limits
-
-Fresh local checks for the prepared corrections passed: lint, TypeScript, 34 unit/SQL tests, production build and six desktop/mobile browser scenarios. Browser tests use a test-only Auth/PostgREST gateway backed by real migration SQL/RLS, not the live Supabase service. Regression tests failed against the old behavior before correction. The profile migration was also applied and checked on the actual development service; after aligning its filename, all 34 local unit/SQL tests passed again.
-
-For checkpoint 04d18c93dd9fdaf8f528667c52cb462174a4f6f7, both push run 37724217554 and PR run 37724221641 completed successfully; matching deployment dpl_DMULBs3mtZVsb7pGXSoCoWBJ3Vbz is READY. Its protected landing/signup returned HTTP 200 and signed-out workspace resolved to login with private/no-store. October 16 recovery confirms all branch heads unchanged and these CI conclusions still successful. This update changes documentation only; inspect its own CI and preview before final acceptance.
-
-GitHub push run 37721909541 and PR run 37721913655 completed successfully for 0496d46, including dependency installation, lint, typecheck, unit/SQL tests, production build and browser suite. Core run 37556360833 passed for e6fc00a5. This is exact-commit automated evidence, separate from the limited deployed checks. Future heads still require their own reviewed workflow results.
-
-Actual service evidence: assessment verified Auth automatic confirmation, active public offerings, denied anonymous restricted RPC, migration/function consistency and protected signed-out landing/workspace rendering. Preparation rechecked protected workspace → login with private/no-store response. Historical core tests used browser requests forwarded to the real service through Node; prior onboarding/Users checks used disposable actual accounts and removed associated rows. Those are historical service evidence, not a fresh full Vercel → live Supabase journey for this correction. Full deployed signup/additional subscription/owner/staff/employee isolation/ordering/refunds remains unverified pending controlled live testing. The approved database function changed; no existing owner records or security policies were rewritten.
-
-Actual development SQL verification executed two purchases and an idempotent retry under authenticated user context inside a transaction that rolled back. It confirmed the complete original client profile stayed unchanged, the second purchase retained its own details, two subscriptions and five seeded roles existed, replay produced no duplicate, and another authenticated user could not read those clients/purchases. This is live database/RLS evidence, not browser or Auth-service signup evidence. Fixture accounts and rows were rolled back. The live function matches the reviewed definition (body/prosrc MD5 84fab1fca6bb9a2e4a51c945a1a2caef; full pg_get_functiondef MD5 912ec850712b76b19d8a4d641a2dc990); fixed empty search path, SECURITY DEFINER, denied anonymous execution and allowed authenticated execution remain unchanged. Fresh security advisor findings match the assessed baseline.
-
-## Exact restart and controlled integration
-
-1. Inspect Issue #10, PR #4 head, the complete correction diff, exact CI and matching preview. Read AGENTS and ADRs 0001–0003.
-2. Confirm the ten recorded migrations and matching function definition; do not replay the completed correction. The owner-provided screenshots establish the deployment trigger; no Vercel sign-in is needed for that inspection.
-3. Complete controlled actual deployed acceptance checks. Report browser/service limits honestly; new material boundaries require approval.
-4. Obtain explicit baseline acceptance of the implemented role mapping/protected delegation boundaries and separate merge acceptance for exact PR heads. Plan approval and closed bugs do not substitute.
-5. The owner approved the main-only automatic-deployment hold on October 16; root vercel.json now disables automatic main Git deployments on both implementation branches. Feature previews remain enabled. Verify their exact new heads/checks and matching previews before final acceptance. The setting reaches main only after the accepted merge; main is unchanged now. Once final merge acceptance is obtained, retarget PR #2 to main, review its expanded foundation/core diff, then merge by merge commit without activating incompatible intermediate core. Verify commit/CI and remaining mergeability; retarget/merge accepted PR #4 only after dependency checks. Preserve all branches/commits and do not replay migrations.
-6. Verify final main tree/SHA/checks; record confirmed integration in this file/HISTORY and reconcile #1/#3 completion. No integration milestone is claimed yet.
-
-Deferred: invitations, shared ownership/owner transfer, real billing/payment providers, taxes/shipping/stock deductions, scheduled ordering/hour enforcement, commercial entitlements, industry modules, inventory/BOM/COGS, full CRM/support/reporting, consumer accounts, integrations and transactional/marketing delivery. USD only; hours descriptive; queue limited to latest 100 location orders; detailed visual design remains provisional. Continue owner testing of existing core after stabilization, not new feature expansion.
-
-
-## October 16 actual browser verification checkpoint
-
-Core 5c481daa and onboarding e75be28b passed both push/PR CI runs (38972419707/38972426161 and 38972427075/38972431963). Both matching feature previews are READY. Main/foundation remain unchanged and neither PR is merged. Issue #10 records exact full heads and deployment IDs.
-
-A cloud browser opened the protected e75be28b preview without Vercel account sign-in. Live landing correctly shows Sign in/Sign up; the business form advances to live Retail offerings (Starter $29/month), optional Extra insights adds $10, and review shows $39/month with canonical phone/address details. Test business name: Talix Verification October Sixteen; no account/subscription or other persistent test data has been created. The signup remains at Review & confirm with blank credential fields. Browser authentication rules require manual account creation; the owner is offered handoff to enter an unused test email/password and submit signup, then Continue into the workspace. Do not enter/read credentials through ordinary automation. Continue verification in that browser session only after fresh signed-in evidence.
-
-The existing ten migrations were rechecked. Live start_subscription body was compared byte-for-byte with the reviewed migration and is identical; the earlier unspecific hash label is corrected above to identify body and complete-definition hash scopes. Execution grants/search path are unchanged. No database/schema/policy or existing records changed. Local test-browser transport attempts failed before any account action; successful cloud-browser evidence uses direct browser access, not a mocked adapter. Full authenticated deployed flow is still blocked at account creation, not reported passed.
+Known limits: simulated billing/payments only; no card collection or money movement; real email verification/delivery deferred until launch; predefined role mappings remain the current implemented defaults; USD only; hours descriptive, no stock/tax/shipping/scheduled-order enforcement; latest 100 location orders; no invitations/shared ownership/full CRM/BOM/inventory/industry modules/integrations. Existing advisor notices and two historical synthetic Storage images are unchanged. No owner data was modified or deleted during integration.

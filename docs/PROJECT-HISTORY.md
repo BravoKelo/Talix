@@ -117,3 +117,8 @@ The owner supplied Vercel Production and Git screenshots after explaining their 
 ### Approved main deployment hold — October 16, 2026
 
 The owner approved the specific configuration after clarifying the broader security boundary. Identical root vercel.json files on core and onboarding set git.deploymentEnabled.main=false, preserving automatic feature previews. Main itself remains unchanged until a separately accepted merge. Existing production deployments, payment simulation, database/security permissions and dashboard settings are unchanged. Exact new heads and CI/preview results belong to Issue #10; final baseline/merge acceptance remains separate.
+
+
+## Main development baseline integrated — October 16, 2026
+
+The owner explicitly instructed merging the current work and deferring further manual testing until afterward, removing the outstanding live-acceptance gate for this early-development checkpoint. PR #2 merged foundation/core into main as 05e6db3040c4fb3b255ff38cf2f2fe87add03c8a; PR #4 then merged onboarding/Users/reconciliation as fce04b7ddc35f0505868c616dd0d3fb257571df8. The final merge tree exactly matches accepted onboarding head 432e7dd59abca5d3db8b847f061dead8c6d3f0f0, whose push/PR checks passed. All branches/history remain preserved. The approved main-only Git deployment hold is present; post-merge production listing showed no new release. No migrations, security policies, payment handling or existing business data changed. Further user testing and fixes proceed from this baseline; full fresh deployed authenticated acceptance is not claimed.
