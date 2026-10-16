@@ -6,7 +6,7 @@ The owner approved the exact main-only deployment configuration on October 16 af
 ## Verified trigger and reason
 The owner's October 16 Production screenshot shows main is the production branch, every main commit creates a production deployment, domain auto-assignment is enabled, and the Project production-variable tab is empty. The Git screenshot shows BravoKelo/Talix connected; visible status/comment controls do not pause deployment. The Shared variables tab was not inspected. Browser sign-in is unnecessary for this evidence.
 
-The intended historical sequence merges foundation/core through PR #2 and then onboarding through PR #4. Intermediate core is incompatible with the newer development database. A merge must therefore not automatically activate that intermediate code. No current vercel.json exists in the reviewed onboarding tree.
+The intended historical sequence merges foundation/core through PR #2 and then onboarding through PR #4. Intermediate core is incompatible with the newer development database. A merge must therefore not automatically activate that intermediate code. The pre-hold onboarding tree (04d18c93) had no vercel.json; the approved file is now present on both implementation branches.
 
 ## Approved minimum configuration
 The approved root vercel.json is added on feature/core-commerce and feature/customer-onboarding before either main merge:
