@@ -112,3 +112,8 @@ Vercel settings require sign-in; automatic approval review rejected that prompt 
 ## Deployment-trigger recovery — October 16, 2026 (Pacific / UTC)
 
 The owner supplied Vercel Production and Git screenshots after explaining their GitHub sign-in could not be used in the remote browser. Production tracks main with automatic deployments/domain assignment; the Git repository is BravoKelo/Talix. This resolves settings inspection without sign-in. GitHub recovery confirmed unchanged branch heads and successful exact-head checks for 04d18c93. No dashboard settings, application code, database or merges were changed. INTEGRATION-PLAN records a proposed main-only deployment hold on both implementation branches; that protected configuration change requires explicit execution approval. Full current deployed acceptance and final baseline/merge acceptance remain separate.
+
+
+### Approved main deployment hold — October 16, 2026
+
+The owner approved the specific configuration after clarifying the broader security boundary. Identical root vercel.json files on core and onboarding set git.deploymentEnabled.main=false, preserving automatic feature previews. Main itself remains unchanged until a separately accepted merge. Existing production deployments, payment simulation, database/security permissions and dashboard settings are unchanged. Exact new heads and CI/preview results belong to Issue #10; final baseline/merge acceptance remains separate.

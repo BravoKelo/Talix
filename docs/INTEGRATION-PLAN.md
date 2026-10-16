@@ -1,15 +1,15 @@
-# Controlled baseline integration — proposed October 16, 2026
+# Controlled baseline integration — October 16, 2026
 
 ## Status
-Prepared for owner decision under Issue #10. This document does not authorize or install a deployment hold, merge, production release, or new application feature.
+The owner approved the exact main-only deployment configuration on October 16 after clarifying that payment/security decisions remain separate. The configuration is committed on both implementation branches. It reaches main on the accepted merge; no main merge, production release or payment handling is authorized.
 
 ## Verified trigger and reason
 The owner's October 16 Production screenshot shows main is the production branch, every main commit creates a production deployment, domain auto-assignment is enabled, and the Project production-variable tab is empty. The Git screenshot shows BravoKelo/Talix connected; visible status/comment controls do not pause deployment. The Shared variables tab was not inspected. Browser sign-in is unnecessary for this evidence.
 
 The intended historical sequence merges foundation/core through PR #2 and then onboarding through PR #4. Intermediate core is incompatible with the newer development database. A merge must therefore not automatically activate that intermediate code. No current vercel.json exists in the reviewed onboarding tree.
 
-## Proposed minimum change — execution approval required
-Add this root vercel.json on feature/core-commerce and feature/customer-onboarding before either main merge:
+## Approved minimum configuration
+The approved root vercel.json is added on feature/core-commerce and feature/customer-onboarding before either main merge:
 
 ```json
 {
@@ -26,10 +26,10 @@ Vercel documents branch-specific deployment disabling and defaults unspecified b
 
 This blocks automatic Git deployments from main, while preserving feature-branch previews. Both merge results must include the file. It does not delete or disable an already running deployment, disconnect GitHub, block manual CLI releases, configure production database credentials, change deployment protection, or implement release automation. Production remains on its previously deployed code. Re-enabling main automatic deployment requires a separate release/configuration decision after production readiness.
 
-Proposed preparation is restricted to this exact configuration and necessary durable-record updates on the existing feature branches. Do not change the production tracked branch or dashboard settings. Do not overwrite migrations or rebase/squash/delete history. Do not merge core into onboarding merely to copy the identical configuration; applying the identical file preserves the existing stack for the eventual main integrations.
+Approved preparation is restricted to this exact configuration and necessary durable-record updates on the existing feature branches. Do not change the production tracked branch or dashboard settings. Do not overwrite migrations or rebase/squash/delete history. Do not merge core into onboarding merely to copy the identical configuration; applying the identical file preserves the existing stack for the eventual main integrations.
 
 ## Verification and integration sequence
-1. Obtain owner approval for the exact hold above. Add it on both branches, review incremental diffs, run their CI, and verify matching protected previews. Record exact new branch heads.
+1. Owner approval obtained. Verify the identical file on both branches, review incremental diffs, inspect their CI and matching protected previews, and record exact new heads.
 2. Complete controlled actual deployed acceptance for the current application. Isolated SQL/browser suites and historical live-service checks remain separate evidence. No full deployed signup/ordering/refund/Users journey is newly claimed here.
 3. Present the complete remaining diffs, exact validated heads, current limitations, and ADR 0003 role/delegation mapping for explicit final baseline and merge acceptance. The present proceed instruction authorizes preparation, not that final acceptance.
 4. After acceptance, retarget PR #2 to main and recheck its expanded foundation/core diff and mergeability. Its merge result must contain main:false. Merge by merge commit and verify no main deployment was created; if unexpected deployment appears, stop before further integration.
