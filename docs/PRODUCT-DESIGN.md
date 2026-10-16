@@ -107,3 +107,8 @@ Implemented for review: sign-in/signup use a white form column and blue feature/
 The storefront editor exposes existing subscription-wide business name/introduction/brand color with an adjacent layout preview, unsaved/saved feedback, cancel and persisted save. Logo/header uploads, navigation editing, detailed element colors and slideshow remain clearly labeled placeholders. Preview is a non-interactive layout representation, not a full checkout or website builder. No schema, policies, migrations, authentication methods or new integrations are introduced.
 
 All seven appearance screenshots were reviewed. Observed references include settings discovery, header/contact/mode choices, logo upload, editable/reorderable links, grouped color controls with preview and Save/Cancel; slideshow contents were not supplied. Only existing Talix settings work in this first design slice; other controls are placeholders rather than inferred implementation. Talix application colors do not restrict an owner's saved storefront brand color.
+
+
+## Public homepage extension — October 16, 2026
+
+The owner authorized extending Issue #11/PR #14 to redesign the public landing page, using resnexus.com as structural inspiration only. The original Talix blue/white/gold page introduces ordering and fulfillment, an explicitly illustrative workspace visual, core capabilities, the customer-to-team workflow, a clearly planned capabilities section, FAQs and signup/signin links. No competitor assets, copy, testimonials, metrics or certifications are reused or invented. Sample plans and simulated payments are disclosed before signup; industry tools and integrations are described as future capabilities. Existing onboarding and global authentication navigation are preserved.
