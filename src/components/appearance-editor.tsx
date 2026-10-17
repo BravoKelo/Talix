@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { ImagePicker } from "./image-picker";
 import { useImageDraft } from "@/lib/image-draft";
 import { useState } from "react";
 import type { Subscription } from "@/lib/types";
@@ -74,26 +75,19 @@ export function AppearanceEditor({
           }}
         >
           <fieldset disabled={!allowed || busy} className="stack">
-            <label>
-              Business logo
-              <input
-                disabled={!("logo_url" in subscription)}
-                type="file"
-                value=""
-                accept="image/png,image/jpeg,image/webp"
-                key={image.preview ? "logo" : "empty"}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  try {
-                    image.choose(file);
-                    setMessage("Logo selected. Save branding to upload it.");
-                  } catch (e) {
-                    setMessage((e as Error).message);
-                  }
-                }}
-              />
-            </label>
+            <ImagePicker
+              label="Business logo"
+              filename={image.filename}
+              disabled={!("logo_url" in subscription)}
+              choose={(file) => {
+                try {
+                  image.choose(file);
+                  setMessage("Logo selected. Save branding to upload it.");
+                } catch (e) {
+                  setMessage((e as Error).message);
+                }
+              }}
+            />
             <p className="muted">
               {"logo_url" in subscription
                 ? "JPEG, PNG or WebP, up to 5 MB. Your logo is public."

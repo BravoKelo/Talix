@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { imageObjectName, savedImageName } from "./image-name";
 import { browserClient } from "./supabase/client";
 export type ImageBucket = "product-images" | "business-logos";
 export async function deleteStoredImage(
@@ -65,7 +66,7 @@ export function useImageDraft(
       uploaded.current = null;
     }
     const db = browserClient(),
-      path = `${sid}/${crypto.randomUUID()}`;
+      path = `${sid}/${imageObjectName(crypto.randomUUID(), file.name)}`;
     const { error } = await db.storage
       .from(bucket)
       .upload(path, file, { contentType: file.type });
@@ -99,6 +100,7 @@ export function useImageDraft(
   }
   return {
     preview: removed ? null : file ? localPreview : saved,
+    filename: removed ? null : (file?.name ?? savedImageName(saved)),
     dirty: !!file || removed,
     choose,
     prepare,
