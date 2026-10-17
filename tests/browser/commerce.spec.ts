@@ -78,6 +78,9 @@ test("location → catalog → decline → retry → fulfillment → refund", as
       page.getByText("Choose a location to view its products."),
     ).toBeVisible();
     await page.getByLabel("Choose a location").selectOption(lid);
+    await page
+      .getByRole("button", { name: "View Notebook", exact: true })
+      .click();
     await page.getByLabel("Gift wrap").check();
     await page.getByRole("button", { name: "Add to cart" }).click();
     await page.getByLabel("Your name").fill("Alex");

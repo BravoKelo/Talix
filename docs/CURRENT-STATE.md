@@ -1,5 +1,18 @@
 # Talix current state
 
+## Active storefront development — Issue #32, October 17, 2026
+
+Owner authorized the bounded visual storefront scope and continuation on `feature/core-storefront-visual-shopping`. Started with a clean feature branch at `39af71d5a4e7d7c9bf63ab68e56ea3027967a806`; remote main and feature branch were also verified at that baseline during this session. Earlier “no new feature scope” restart wording below is superseded by #32.
+
+Prepared for review: image-forward uniform product cards, full product details/options in the existing keyboard-accessible native dialog, location-scoped product search, welcome/product/cart navigation, explicit location/contact/hours and missing-image/loading/empty/error states. Existing cart payloads, guest checkout, simulated payments, private tracking, subscription branding and database permissions remain. PRODUCT-DESIGN owns the detailed design; STOREFRONT-ROADMAP assesses both website adoption paths and the separately bounded primary-website proposal. No industry workflows or new entitlement structures were introduced.
+
+Local verification: dependency installation, lint, TypeScript, 48 unit/SQL tests, production build and all 10 desktop/mobile browser scenarios pass. Four new browser cases cover product details/keyboard/options/cart variants/location reset/search/images and loading/empty/error states. Screenshots are generated for visual review. Browser validation uses isolated fixtures and real migration SQL/RLS, not live Supabase or a deployed customer journey. The standard browser download was unavailable locally; a temporary Chromium 153 runtime outside the repository completed the suite. An older fallback runtime failed two desktop onboarding checks and was replaced; no Auth/permission application change was required. Repository dependencies/tooling are unchanged.
+
+Publication boundary: #32 explicitly excludes automatic deployment, while the accepted `vercel.json` disables only main deployment and the existing feature-preview automation remains enabled. No branch ref has been moved remotely, PR opened, deployment requested or service setting changed for this slice. Prepare the tested commit for review without advancing the remote branch; obtain narrow owner approval for the existing preview automation before publishing this branch/opening the PR. Do not silently change Vercel configuration to bypass the boundary. Main remains unchanged, no migrations or live data were touched, and no merge is authorized.
+
+Resume: inspect this commit and the current remote branch, obtain that publication decision, then fast-forward the existing feature branch and open the prepared review PR against main. Read its actual CI results before claiming CI success; obtain separate owner visual/merge acceptance. Do not treat the storefront foundation as a complete primary-business-website service.
+
+
 ## Repository history cleanup — October 16, 2026 Pacific / October 17 UTC
 
 Owner explicitly authorized rewriting the repository history and force-pushing without further interaction. Nineteen affected commits were replaced with cleaned versions; all five branch histories were audited and no tags exist. Only historical documentation text changed; application files, migrations, dependencies and merge topology were preserved. The cleaned branch tip before this handoff is d8e860a922b95ca6b2ed7039184130188727a884. The accepted application tree is unchanged. Use the latest main branch for all future work; do not merge old design history back into it. Commit timestamps for reconstructed commits reflect the cleanup operation. Historical checkpoint IDs below refer to equivalent cleaned commits; linked CI runs originally validated the corresponding pre-rewrite source trees.

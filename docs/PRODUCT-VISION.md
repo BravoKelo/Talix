@@ -176,3 +176,9 @@ The discovery record alone did not authorize implementation. Subsequent owner ap
 ## Approved reconciliation amendment — October 7, 2026 (Pacific; October 8 UTC)
 
 Issue #10 authorizes stabilizing the existing implementation and reconciling its durable records before controlled integration. Adding another subscription must preserve the existing shared client profile while storing that subscription's own business/contact/location details in its purchase record. This does not authorize a new client-profile editor, ownership model or CRM redesign. The database-function correction received separate development execution approval; operational evidence belongs in CURRENT-STATE.
+
+## Storefront adoption and subscription evolution — Issue #32
+
+Owner clarification on October 17, 2026 confirms two supported product paths: retain an existing website and link to Talix commerce, or use Talix as the business's primary customer-facing website. Both share a coherent business identity, location selection and shopping journey. This supersedes any reading of the earlier website section that requires every business to bring a separate website. A full website builder, custom domains and infrastructure changes are not authorized by this requirement. The current storefront is a foundation; `docs/STOREFRONT-ROADMAP.md` records gaps and a separately bounded proposal.
+
+General-purpose storefront capabilities belong in the shared core. Industry-specific capabilities require the relevant future industry subscription; future tiers within an industry must remain possible. No new tier, entitlement structure or industry behavior is authorized in #32. Conceptual tier names are not implemented feature promises.

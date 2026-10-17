@@ -59,3 +59,9 @@ The owner approved preserving the existing client profile when purchasing anothe
 ## Decision provenance
 
 ADRs 0001–0003 record implemented boundaries. Explicit stack, core-first and simulation approvals are established. The Users feature was authorized in Issue #9, but separate prior approval of each specific schema/security choice is not established by the durable evidence. Issue #10 authorizes reconciliation and stabilization, not retrospective blanket architecture/security acceptance. The owner subsequently explicitly directed merging the existing implementation on October 16 and continuing testing afterward. ADR 0003 records that integration authorization without inventing earlier approval; future changes remain governed by AGENTS.md.
+
+## Visual storefront presentation — Issue #32
+
+The shared `/shop/<slug>` client continues to consume the existing `public_catalog` RPC, filter general/location products by explicit selected location and submit the unchanged `checkout_simulated` payload. Product images/cards and the existing native task dialog provide a presentation layer for full descriptions and generic options. Search is local to the already returned location-scoped catalog; it adds no endpoint or data model. Cart/customer state stays in component memory; authoritative pricing and availability remain in PostgreSQL.
+
+An ordinary hosted storefront URL is the initial existing-website entry strategy. The same business introduction/catalog is the foundation for Talix-as-primary-website, subject to the gaps/proposal in STOREFRONT-ROADMAP. No industry dispatch, entitlement framework, new persistence, public permission or deployment change is introduced. Subscription-wide branding and independent location authorization remain unchanged.

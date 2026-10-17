@@ -3,63 +3,125 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/client";
+import { TaskDialog } from "@/components/order-dialog";
 import { money, type Catalog, type CartLine, type Product } from "@/lib/types";
 type Line = CartLine & { name: string; unit: number; optionNames: string[] };
+function ProductImage({ product }: { product: Product }) {
+  const [failed, setFailed] = useState(false);
+  return product.image_url && !failed ? (
+    <Image
+      width={720}
+      height={540}
+      unoptimized
+      className="shop-product-image"
+      src={product.image_url}
+      alt={product.name}
+      onError={() => setFailed(true)}
+    />
+  ) : (
+    <div
+      className="shop-product-image shop-image-placeholder"
+      role="img"
+      aria-label={`No image available for ${product.name}`}
+    >
+      <span aria-hidden="true">◇</span>
+      <span>No image available</span>
+    </div>
+  );
+}
 function ProductCard({
   product,
+  open,
+}: {
+  product: Product;
+  open: () => void;
+}) {
+  return (
+    <article className="shop-product-card">
+      <ProductImage key={product.image_url} product={product} />
+      <div className="shop-card-copy">
+        <h3>{product.name}</h3>
+        <p className="muted shop-product-summary">
+          {product.description || "View this product for details."}
+        </p>
+        <strong>{money(product.price_cents)}</strong>
+        <button
+          className="secondary"
+          onClick={open}
+          aria-label={`View ${product.name}`}
+        >
+          View product
+        </button>
+      </div>
+    </article>
+  );
+}
+function ProductDetails({
+  product,
+  close,
   onAdd,
 }: {
   product: Product;
+  close: () => void;
   onAdd: (p: Product, ids: string[]) => void;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
+  const total =
+    product.price_cents +
+    product.options
+      .filter((o) => selected.includes(o.id))
+      .reduce((sum, o) => sum + o.price_cents, 0);
   return (
-    <article className="panel">
-      {product.image_url ? (
-        <Image
-          width={600}
-          height={400}
-          unoptimized
-          className="product-image"
-          src={product.image_url}
-          alt={product.name}
-        />
-      ) : (
-        <div className="product-image" aria-hidden="true" />
-      )}
-      <h2>{product.name}</h2>
-      <p className="muted">{product.description}</p>
-      <p>
-        <strong>{money(product.price_cents)}</strong>
-      </p>
-      {product.options.map((o) => (
-        <label key={o.id}>
-          <input
-            type="checkbox"
-            checked={selected.includes(o.id)}
-            onChange={(e) =>
-              setSelected(
-                e.target.checked
-                  ? [...selected, o.id]
-                  : selected.filter((id) => id !== o.id),
-              )
-            }
-          />
-          {o.name} {o.price_cents > 0 && `(+${money(o.price_cents)})`}
-        </label>
-      ))}
-      <button
-        className="small"
-        style={{ marginTop: 16 }}
-        onClick={() => onAdd(product, selected)}
-      >
-        Add to cart
-      </button>
-    </article>
+    <TaskDialog title={product.name} close={close} closeLabel="Close product">
+      <div className="shop-product-details">
+        <ProductImage key={product.image_url} product={product} />
+        <h2>{product.name}</h2>
+        <p className="shop-full-description">
+          {product.description || "No additional description is available."}
+        </p>
+        <p>
+          <strong>{money(product.price_cents)}</strong>
+        </p>
+        {product.options.length > 0 && (
+          <fieldset>
+            <legend>Optional extras</legend>
+            {product.options.map((o) => (
+              <label className="shop-option" key={o.id}>
+                <input
+                  type="checkbox"
+                  checked={selected.includes(o.id)}
+                  onChange={(e) =>
+                    setSelected(
+                      e.target.checked
+                        ? [...selected, o.id]
+                        : selected.filter((id) => id !== o.id),
+                    )
+                  }
+                />
+                <span>
+                  {o.name} {o.price_cents > 0 && `(+${money(o.price_cents)})`}
+                </span>
+              </label>
+            ))}
+          </fieldset>
+        )}
+        <button
+          onClick={() => {
+            onAdd(product, selected);
+            close();
+          }}
+        >
+          Add to cart · {money(total)}
+        </button>
+      </div>
+    </TaskDialog>
   );
 }
 export function Storefront({ slug }: { slug: string }) {
   const router = useRouter();
+  const [query, setQuery] = useState("");
+  const [activeProduct, setActiveProduct] = useState<Product | null>(null);
+  const [cartNotice, setCartNotice] = useState("");
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [location, setLocation] = useState("");
   const [cart, setCart] = useState<Line[]>([]);
@@ -90,6 +152,7 @@ export function Storefront({ slug }: { slug: string }) {
   }, [slug]);
   function add(p: Product, ids: string[]) {
     setMessage("");
+    setCartNotice(`${p.name} added to your cart.`);
     setRequestId(null);
     const key = [...ids].sort().join(",");
     setCart((old) => {
@@ -161,70 +224,152 @@ export function Storefront({ slug }: { slug: string }) {
   const products = catalog.products.filter(
     (p) => p.location_id === null || p.location_id === location,
   );
+  const visibleProducts = products.filter((p) =>
+    `${p.name} ${p.description}`
+      .toLocaleLowerCase()
+      .includes(query.trim().toLocaleLowerCase()),
+  );
+  const selectedLocation = catalog.locations.find((l) => l.id === location);
+  const itemCount = cart.reduce((sum, line) => sum + line.quantity, 0);
   return (
     <main
-      className="store"
+      className="store visual-store"
       style={{ "--accent": catalog.subscription.accent } as React.CSSProperties}
     >
-      <section className="store-hero">
-        <p className="eyebrow">WELCOME</p>
-        {catalog.subscription.logo_url && (
-          <Image
-            width={150}
-            height={84}
-            unoptimized
-            className="business-logo"
-            src={catalog.subscription.logo_url}
-            alt={`${catalog.subscription.name} logo`}
-          />
-        )}
-        <h1>{catalog.subscription.name}</h1>
-        <p className="lead">
-          {catalog.subscription.description ||
-            "Explore our products and place your order online."}
-        </p>
-        <label style={{ maxWidth: 450 }}>
-          Choose a location
-          <select
-            value={location}
-            onChange={(e) => {
-              setLocation(e.target.value);
-              setCart([]);
-              setRequestId(null);
-              setMessage("");
-            }}
-          >
-            <option value="">Select a location</option>
-            {catalog.locations.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name} — {l.address}
-              </option>
-            ))}
-          </select>
-        </label>
-        {location && (
-          <p className="muted">
-            {catalog.locations.find((l) => l.id === location)?.hours}
+      <a className="shop-skip" href="#shop-location">
+        Skip to location selection
+      </a>
+      <nav className="shop-nav" aria-label="Storefront">
+        <a href="#shop-welcome">Welcome</a>
+        <a href={location ? "#shop-products" : "#shop-location"}>Products</a>
+        {location && <a href="#shop-cart">Your cart ({itemCount})</a>}
+      </nav>
+      <section className="store-hero" id="shop-welcome">
+        <div className="shop-introduction">
+          <p className="eyebrow">WELCOME</p>
+          {catalog.subscription.logo_url && (
+            <Image
+              width={150}
+              height={84}
+              unoptimized
+              className="business-logo"
+              src={catalog.subscription.logo_url}
+              alt={`${catalog.subscription.name} logo`}
+            />
+          )}
+          <h1>{catalog.subscription.name}</h1>
+          <p className="lead">
+            {catalog.subscription.description ||
+              "Explore our products and place your order online."}
           </p>
-        )}
+          <a
+            className="button secondary"
+            href={location ? "#shop-products" : "#shop-location"}
+          >
+            Explore products
+          </a>
+        </div>
+        <div className="shop-location-panel" id="shop-location">
+          <h2>Shop your location</h2>
+          <p className="muted">
+            Choose where you’re ordering from to see available products.
+            Changing location clears your cart.
+          </p>
+          <label>
+            Choose a location
+            <select
+              value={location}
+              onChange={(e) => {
+                setLocation(e.target.value);
+                setCart([]);
+                setQuery("");
+                setActiveProduct(null);
+                setCartNotice("");
+                setRequestId(null);
+                setMessage("");
+              }}
+            >
+              <option value="">Select a location</option>
+              {catalog.locations.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name} — {l.address}
+                </option>
+              ))}
+            </select>
+          </label>
+          {selectedLocation && (
+            <div className="shop-location-details">
+              <p>{selectedLocation.address}</p>
+              {selectedLocation.phone && <p>Phone: {selectedLocation.phone}</p>}
+              {selectedLocation.hours && <p>Hours: {selectedLocation.hours}</p>}
+            </div>
+          )}
+        </div>
       </section>
       {!location ? (
-        <div className="empty">Choose a location to view its products.</div>
+        <div className="empty">
+          {catalog.locations.length
+            ? "Choose a location to view its products."
+            : "No locations are currently available for online ordering."}
+        </div>
       ) : (
         <div className="store-layout">
-          <section className="catalog" aria-label="Products">
-            {products.length ? (
-              products.map((p) => (
-                <ProductCard key={p.id} product={p} onAdd={add} />
-              ))
-            ) : (
+          <section
+            id="shop-products"
+            className="shop-discovery"
+            aria-label="Products"
+          >
+            <div className="shop-catalog-heading">
+              <p className="eyebrow">DISCOVER</p>
+              <h2>Explore our products</h2>
+              <p className="muted">Shopping at {selectedLocation?.name}</p>
+            </div>
+            <label className="shop-search">
+              Search products
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by name or description"
+              />
+            </label>
+            <p className="muted" role="status">
+              {visibleProducts.length}{" "}
+              {visibleProducts.length === 1 ? "product" : "products"}
+            </p>
+            <div className="catalog">
+              {visibleProducts.map((p) => (
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  open={() => setActiveProduct(p)}
+                />
+              ))}
+            </div>
+            {!products.length ? (
               <div className="empty">
                 No products are available at this location.
               </div>
+            ) : (
+              !visibleProducts.length && (
+                <div className="empty">
+                  <p>No products match your search.</p>
+                  <button className="secondary" onClick={() => setQuery("")}>
+                    Clear search
+                  </button>
+                </div>
+              )
             )}
           </section>
-          <aside className="panel cart">
+          <aside className="panel cart" id="shop-cart" aria-label="Your cart">
             <h2>Your cart</h2>
+            <p className="muted">
+              {selectedLocation?.name} · {itemCount}{" "}
+              {itemCount === 1 ? "item" : "items"}
+            </p>
+            <p role="status" className="shop-cart-notice">
+              {cartNotice}
+            </p>
             {!cart.length ? (
               <p className="muted">Add a product to get started.</p>
             ) : (
@@ -241,6 +386,7 @@ export function Storefront({ slug }: { slug: string }) {
                     className="small secondary"
                     onClick={() => {
                       setCart(cart.filter((_, j) => j !== i));
+                      setCartNotice(`${l.name} removed from your cart.`);
                       setRequestId(null);
                     }}
                   >
@@ -327,6 +473,14 @@ export function Storefront({ slug }: { slug: string }) {
             </form>
           </aside>
         </div>
+      )}
+      {activeProduct && (
+        <ProductDetails
+          key={activeProduct.id}
+          product={activeProduct}
+          close={() => setActiveProduct(null)}
+          onAdd={add}
+        />
       )}
     </main>
   );
