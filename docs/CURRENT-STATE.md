@@ -1,5 +1,16 @@
 # Talix current state
 
+## Accepted baseline — October 16, 2026 Pacific / October 17 UTC
+
+Owner reviewed the final preview and said “Looks good. lets proceed.” PR #14 was merged with a merge commit cf7195f09bb944e320e49fa3dca4c7ad8562534b, preserving reviewed head b87a22c62e751ce44d7596af04c4d9a2739799ba and its exact application tree b51c7a0ce33e36ac9ab56978f29e97a886a6884a. Issues #11–13 and #15–30 are accepted/completed. This section supersedes historical pending-review/unapplied statements below.
+
+Final GitHub workflow 39006918021 completed successfully: lint, TypeScript, 48 unit/SQL tests, production build and six desktop/mobile browser scenarios. Local browser suite also passed all six. Browser automation uses isolated Auth/PostgREST/Storage fixtures with actual SQL/RLS. Owner reported actual image deletion works and accepted the final filename correction.
+
+Development has thirteen applied migrations, including approved business logos, numbering/cancellation and product/image deletion. No migration was replayed during merge. Numbers start at 100001 per location, Date/time is adjacent, cancellation is separate from refunds, order snapshots survive product deletion, image changes are staged until Save, and empty/selected/saved image filenames are accurate. Legacy uploads retain only their stored filename.
+
+Continue testing the accepted READY preview https://talix-74bcwbdmh-bravokelo.vercel.app/ . Preserve feature/talix-design-refresh while that review URL remains in use; remove it once replaced, per the owner's cleanup preference. main remains the development baseline. Automatic main deployment is disabled by vercel.json; no production release, payment processing or email-delivery activation is part of this acceptance. Next work requires a new owner request; do not reopen completed review gates.
+
+
 ## Integrated development baseline — October 16, 2026 (Pacific / UTC)
 
 Repository: BravoKelo/Talix. Default/development baseline branch: main.

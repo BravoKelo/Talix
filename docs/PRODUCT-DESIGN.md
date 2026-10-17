@@ -136,3 +136,12 @@ The owner authorized this testing batch and requested a final review before merg
 - Users has internal Users, Add/Edit user and Permissions tabs. Tabs have keyboard navigation and clear selected state; user/role drafts survive internal tab changes. Existing protected Owner, custom roles and delegation rules remain enforced.
 
 Business-logo upload/save is implemented against a prepared additive migration, not yet applied to development. The nullable logo URL and public business-logos bucket use existing settings.manage authority; public images are limited to JPEG/PNG/WebP up to 5 MB, uploaded under the subscription's folder without overwrites. No logo means a business initial, not another Talix logo. Public catalog output adds only the logo URL. Until database activation, logo input is disabled and existing branding can still save. Storage/image URLs and retained uploads follow the existing product-image approach; orphan cleanup is not part of this batch.
+
+
+## Accepted design baseline — PR #14, October 16, 2026 Pacific
+
+Owner accepted the final reviewed design and authorized merging PR #14 at b87a22c62e751ce44d7596af04c4d9a2739799ba. This supersedes earlier provisional/pending descriptions and initial unsupported-logo placeholders above.
+
+Final behavior: visible horizontally scrollable mobile navigation; consistent workspace header/context; business-logo identity; ledger orders with modal details; searchable Settings tiles; internal Users tabs; compact uniform resting tiles; shared Add/Edit product modal; explicit Cancel actions where applicable. Order numbers start at 100001 per location with Date/time beside them. Order cancellation requires fulfillment authority and does not refund automatically. Confirmed product deletion preserves historical snapshots.
+
+Product images and business logos support staged deletion and local selection until Save; Cancel restores saved content. Saved references protect shared images and failed cleanup offers retry. Both pickers show the active selected/saved filename; No file chosen appears only with no image. New uploads retain original filenames, while older uploads show their stored name. Future header templates, links, independent element colors and slideshow remain labeled placeholders. Permissions and simulated payments remain in place.

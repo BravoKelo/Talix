@@ -135,3 +135,12 @@ The owner subsequently extended the same design batch to the public homepage. Or
 ## Owner testing corrections #15–21 — October 16, 2026
 
 Owner testing requested a return-to-top control, an alternative to mobile dropdown navigation, business logo identity, a consistent shortcut/context header, compact orders with an interactive popup, searchable settings tiles with planned-feature navigation, and reusable internal Users tabs. The owner authorized implementing this batch and reserved final merge acceptance. The same design branch contains these revisions. A minimal business-logo migration is prepared and tested, with actual development execution held for protected-boundary approval; no live database change or merge is claimed. Other UI changes retain existing workflows and permissions.
+
+
+## Design and owner-review acceptance — October 16, 2026 Pacific / October 17 UTC
+
+Owner accepted the final preview (“Looks good. lets proceed.”). PR #14 merged as cf7195f09bb944e320e49fa3dca4c7ad8562534b, preserving reviewed head b87a22c62e751ce44d7596af04c4d9a2739799ba, completing Issues #11–13 and #15–30. Final workflow 39006918021 passed lint, TypeScript, 48 unit/SQL tests, build and six desktop/mobile browser scenarios. Owner reported image deletion works and accepted filename display across image pickers.
+
+Separately approved development activations are recorded as 20261017032355_business_logos, 20261017050812_readable_order_numbers_and_cancellation and 20261017050814_product_and_image_deletion. Thirteen migrations are applied; none replayed at merge. Live rolled-back SQL verification passed numbering, cancellation/payment separation, scoped product/image permissions, saved-reference protection and historical snapshots. Those checks do not claim automated live file-byte deletion.
+
+No production release was performed; automatic main deployment remains disabled, no-mail development mode and simulated payments remain. Retain the design feature branch while the accepted testing preview depends on it; delete after replacement per owner preference. This supersedes the historical pending acceptance/execution statuses.
