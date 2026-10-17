@@ -18,7 +18,7 @@ export default async function Layout({
     : null;
   return (
     <html lang="en">
-      <body>
+      <body id="page-top">
         <header className="topbar">
           <Link href="/" className="wordmark">
             talix<span>•</span>

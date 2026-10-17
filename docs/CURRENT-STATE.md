@@ -40,3 +40,68 @@ Continue testing the protected onboarding preview: https://talix-git-feature-cus
 The owner resumes testing and reports issues. Record and correct the next authorized batch, using main as the baseline and focused feature branches. Do not restart theoretical POC/discovery or repeat completed reconciliation. No new feature scope is approved.
 
 Known limits: simulated billing/payments only; no card collection or money movement; real email verification/delivery deferred until launch; predefined role mappings remain the current implemented defaults; USD only; hours descriptive, no stock/tax/shipping/scheduled-order enforcement; latest 100 location orders; no invitations/shared ownership/full CRM/BOM/inventory/industry modules/integrations. Existing advisor notices and two historical synthetic Storage images are unchanged. No owner data was modified or deleted during integration.
+
+
+## Active design review — Issues #11–13
+
+Branch feature/talix-design-refresh starts from main 0616ae15. The owner supplied all three requests and screenshots, authorizing this batch: original blue/white/gold sign-in/signup and workspace redesign, plus a preview-based editor for existing subscription appearance fields and coming-soon placeholders for unsupported controls. No database/security/provider changes. Local lint/typecheck, 34 unit/SQL tests, build and six desktop/mobile browser scenarios passed, including preview/cancel/persisted-save checks. A final CSS correction keeps signup account fields before its confirmation action; exact CI validates the published head. Browser tests use the isolated SQL/Auth adapter, not fresh real-service signup. A stale local generated cache was moved outside the repository; it is not published. New preview uses the same branch-scoped development public configuration/no-mail flag as the existing review environment. Production and automatic-main-deployment hold are unchanged.
+
+No merge is authorized by this design request. Review exact PR/head and preview before acceptance. After an accepted merge, remove this new feature branch once its preview is replaced, per the owner's tidy-branch preference. Do not delete older branches while an active testing URL depends on them.
+
+
+### Public landing page added to the same design review
+
+The owner requested a redesigned Talix homepage after seeing the unchanged old landing page. Issue #11/PR #14 now include an original responsive marketing homepage using established capabilities and the Talix palette, with explicit sample-content illustration, future-feature labels and simulated-payment disclosure. No backend or schema changes. Review the preview root URL, not only /login. Existing browser scenarios now also check the homepage heading, payment FAQ, signup entry and horizontal fit on desktop/mobile. Exact-head CI and deployment evidence belong in PR #14; owner acceptance/merge remain outstanding.
+
+
+### Mobile/touch design correction
+
+Owner approved replacing wrapped mobile navigation with compact disclosure menus and increasing touch targets. Same feature/talix-design-refresh branch/PR #14 now includes responsive public/workspace menus, deliberate single-column mobile controls and 48px touch targets. Tests exercise mobile menu opening before navigation. Review the latest matching preview/head in PR #14; no merge is implied. Cloud-browser preview access was previously declined and has not been retried; local browser screenshots and automated checks remain the visual/functional evidence.
+
+
+## Latest authorized review batch — Issues #15–21
+
+The owner finished intake and authorized these corrections, requesting a final review before merge. Work stays on feature/talix-design-refresh / PR #14. Implemented: back-to-top, visible mobile horizontal navigation (supersedes dropdown menus), consistent workspace header and top-right subscription/location context, business identity fallback, planned-feature navigation, ledger orders with an interactive modal, searchable settings tiles and internal Users tabs preserving drafts. Existing permissions and payment simulation are retained.
+
+Business-logo configuration adds a prepared migration 20261017010613_business_logos.sql (nullable logo_url, constrained public bucket, existing settings permission checks and a catalog logo field). It is locally tested but NOT applied to development. AGENTS.md requires protected schema/security approval before development execution; obtain that specific approval after presenting the prepared result. The preview remains compatible with the current ten-migration database: logo uploads stay disabled until activation, while existing branding fields can save. No owner data, policies or storage have been modified on the actual service in this batch. Main deployment hold and no-mail development mode remain unchanged.
+
+Local logo SQL tests verify shared settings managers can save/upload without product permissions, outsiders/viewers cannot, unsafe logo addresses are rejected, and public catalog adds no client identity. Browser suites use isolated SQL/Auth fixtures, not actual service account creation. Exact published head/checks/deployment and final test outcomes are recorded in PR #14. Review before merge; issues remain open until owner acceptance. No additional branches were created; retain existing previews until replaced.
+
+
+### Logo activation — October 17, 2026 UTC
+
+Supersedes the pending-execution boundary above: the owner explicitly approved applying the prepared logo-storage migration to Talix development. Applied successfully to project lzepujggusieapablzhn as 20261017032355_business_logos; repository filename aligned with the recorded service version, with unchanged SQL. Eleven migrations are now recorded. Verified nullable logo_url, public JPEG/PNG/WebP bucket with 5 MB limit, existing settings-based insert/select policies and public catalog logo field. Live transaction checks passed authorized owner upload metadata/save, unsafe URL rejection, foreign-folder rejection, and outsider upload/save denial. All synthetic Auth/workspace/storage metadata was rolled back. No existing business records or image files were changed. This is database/RLS verification, not a real browser binary-upload acceptance claim. Existing preview detects logo_url automatically and enables uploads after reloading the workspace. Security advisors still report established public/authenticated RPC notices, private admin deny-all RLS, and disabled leaked-password protection; no new functions or broader permissions were added. Final owner UI review and merge acceptance remain pending; no merge or production deployment authorized.
+
+
+### Owner testing corrections #22–25 — October 16, 2026 Pacific
+
+Owner authorized this batch on the existing feature/talix-design-refresh / PR #14; final review still precedes merge. Prepared: remove generic Saved text and the workspace footer, retain action errors, compact Products into readable touch-friendly tiles, replace code-like order references with permanent numeric numbers, and provide confirmed order cancellation separate from refunds.
+
+The proposed migration 20261017035355_readable_order_numbers_and_cancellation.sql is NOT APPLIED to development. It backfills location-specific order numbers chronologically starting at 1001, enforces location/number uniqueness, allocates new numbers under a location row lock, and exposes only the number through existing order visibility/private-token tracking. UUIDs, tracking links, checkout idempotency and histories remain intact. It extends the existing checked advance_order RPC to cancel paid/partially-refunded received/in-progress/ready orders under existing orders.fulfill permission, records the event once, and leaves payment/refund amounts unchanged. Completed/cancelled orders cannot be reopened. No new public RPC or permission role is added.
+
+Until separately approved development execution, the preview uses a readable received-date reference for existing orders and shows cancellation as awaiting availability. This is a compatibility fallback, not a permanent unique order number; final numeric numbering/cancellation activation requires the prepared migration. No database changes in this batch are authorized by implementation approval alone under AGENTS.md. Exact validation and preview evidence belong in PR #14. Keep issues open for owner review.
+
+
+### Latest owner corrections — Issues #23–24 and #26–29
+
+Owner approved this batch after rejecting the date/time order-reference fallback. It supersedes the previous 1001 proposal: permanent numbers start at 100001 per location; Date / time is immediately beside Order number, then Customer. Until activation the Order number cell explicitly says Pending number, never a timestamp or fabricated sequence.
+
+Product add/edit now share a modal with Cancel/Escape and focus return; resting tiles remain equal in width and height with aligned actions and bounded descriptions. Full text is editable in the modal. Uniform grid rows also apply to Settings, storefront products, plan cards and homepage tile groups. Product deletion has its own confirmation and Cancel deletion; historical order snapshots remain intact. Applicable Users, Settings, admin, signup/add-subscription and checkout workflows have explicit cancellation. Cancellation discards unsaved input and returns to its originating view; it does not undo completed operations.
+
+Product images and business logos offer Delete image, staged until Save so Cancel retains saved content. File selection stays local until Save; failed saves retain the editor and the pending upload for retry/discard. Replaced/deleted saved images are removed through the Storage API after their references are saved. Referenced files (including saved uses hidden by caller RLS) are protected. Failed image cleanup has a visible retry action rather than being reported as successful deletion. External image sources can only be detached, not deleted from their external service. No sweep of historical orphan uploads is included.
+
+Prepared migrations remain UNAPPLIED: revised 20261017035355_readable_order_numbers_and_cancellation.sql, and 20261017042159_product_and_image_deletion.sql. The latter grants product deletion under existing products.manage scope, plus Storage API deletion for unreferenced business images under existing settings/products authority. A private, explicitly authorized reference-check helper inspects saved uses without tenant RLS hiding them; it is not a public RPC. No role, payment, deployment or service configuration change. Specific development execution approval and final merge acceptance remain separate. Local unit/SQL suite now has 46 passing tests; full browser and exact-head CI evidence belongs in PR #14. Nothing merged or applied in this correction batch.
+
+
+### Approved development activation — October 16, 2026 Pacific / October 17 UTC
+
+Owner explicitly approved both prepared migrations. Applied unchanged SQL to Talix development lzepujggusieapablzhn as 20261017050812_readable_order_numbers_and_cancellation and 20261017050814_product_and_image_deletion. Repository filenames and the backfill-test reference are aligned with recorded service versions. Thirteen migrations are now recorded; the previous unapplied status is superseded. Existing two orders have permanent numbers, no missing values, and numbering starts at 100001 per location. UUIDs, private links and existing snapshots remain intact.
+
+Live transaction checks passed 100001/100002 allocation, checkout retry safety, idempotent cancellation with unchanged paid/refund state, product/image authorization and outsider denial, referenced-versus-unreferenced image checks, authorized product deletion and preserved order tracking snapshots. All temporary Auth/workspace/product/order records were rolled back. No stored image files were uploaded/deleted during live verification, and no existing product/order state was changed except the approved numeric backfill. Real-service file-byte deletion remains for owner testing; do not report SQL policy checks as end-to-end Storage API verification. Security advisor categories/counts remain unchanged; the new helper stays private and anonymous execution is denied.
+
+Implementation head 5621726f1a1109e3ebb291c014251035318f9079 passed GitHub workflow 39003044749, including all 46 unit/SQL tests and six browser scenarios. Existing READY preview https://talix-ccie2zt3q-bravokelo.vercel.app/ now uses the activated database behavior after reload. This checkpoint changes filenames/test reference/documentation only. Main and production deployment hold remain unchanged. Final owner review/merge acceptance is still pending; keep PR #14 and review issues open.
+
+
+### Final image picker correction — Issue #30
+
+Owner reports image deletion works and authorized the final filename correction across product images and business logos. Both now share an accessible Choose image control with a filename derived from the active draft/saved URL. No file chosen appears only for an empty draft. New uploads retain original filenames in URL-safe object keys beneath the same business folder, without schema/security changes; older uploads show their stored filename because their original local name was never retained. Save, Cancel, validation and staged deletion remain unchanged. PR #14 stays open for final owner review; no merge is authorized.

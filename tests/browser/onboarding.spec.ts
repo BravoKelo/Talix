@@ -6,7 +6,7 @@ for (const changedPrice of [false, true])
     page,
     browser,
   }) => {
-    test.setTimeout(120000);
+    test.setTimeout(180000);
     const gateway = await onboardingGateway();
     async function connect(context: import("@playwright/test").BrowserContext) {
       await context.route("http://127.0.0.1:3290/**", async (route) => {
@@ -26,6 +26,8 @@ for (const changedPrice of [false, true])
       });
     }
     await connect(page.context());
+    if (test.info().project.name === "mobile" && !changedPrice)
+      await page.setViewportSize({ width: 320, height: 780 });
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     try {
@@ -42,6 +44,51 @@ for (const changedPrice of [false, true])
         page.getByRole("button", { name: "Resend confirmation email" }),
       ).toHaveCount(0);
       await page.goto("/");
+      await expect(
+        page.getByRole("heading", {
+          name: "Your next order. Your next opportunity.",
+        }),
+      ).toBeVisible();
+      await page.getByRole("link", { name: "Questions", exact: true }).click();
+      await page
+        .getByText("Will I be charged when I try Talix?", { exact: true })
+        .click();
+      await expect(
+        page.getByText(/Payments are simulated; no money is collected/),
+      ).toBeVisible();
+      const fit = await page.evaluate(() => ({
+        width: window.innerWidth,
+        pageWidth: document.documentElement.scrollWidth,
+        overflowing: [...document.querySelectorAll("body *")]
+          .filter(
+            (el) => el.getBoundingClientRect().right > window.innerWidth + 1,
+          )
+          .slice(0, 12)
+          .map((el) => ({
+            tag: el.tagName,
+            class: el.className,
+            right: el.getBoundingClientRect().right,
+            text: el.textContent?.slice(0, 70),
+          })),
+      }));
+      expect(fit.pageWidth, JSON.stringify(fit)).toBeLessThanOrEqual(fit.width);
+      await page
+        .getByRole("link", { name: "Back to top", exact: true })
+        .click();
+      await expect
+        .poll(() => page.evaluate(() => window.scrollY))
+        .toBeLessThan(4);
+      const navigationRows = await page
+        .locator(".home-nav a")
+        .evaluateAll((links) =>
+          links.map((link) => Math.round(link.getBoundingClientRect().top)),
+        );
+      expect(new Set(navigationRows).size).toBe(1);
+      await page.goto("/");
+      await page.screenshot({
+        path: `test-results/landing-${test.info().project.name}.png`,
+        fullPage: true,
+      });
       await page.getByRole("link", { name: "Sign up →", exact: true }).click();
       await page
         .getByLabel("Business name", { exact: true })
@@ -314,14 +361,435 @@ for (const changedPrice of [false, true])
       await expect(
         page.getByRole("link", { name: "Add subscription", exact: true }),
       ).toBeVisible();
-      await gateway.addAccount("employee@example.invalid");
-      await page.getByRole("button", { name: "Users", exact: true }).click();
+      const fixture = (
+        await gateway.db.query<{ sid: string; lid: string }>(
+          "select subscription_id as sid,id as lid from public.locations limit 1",
+        )
+      ).rows[0];
+      await gateway.db.query(
+        "update public.locations set published=true where id=$1",
+        [fixture.lid],
+      );
+      const product = (
+        await gateway.db.query<{ id: string }>(
+          "insert into public.products(subscription_id,name,price_cents) values($1,'Notebook',1000) returning id",
+          [fixture.sid],
+        )
+      ).rows[0].id;
+      await gateway.db.query(
+        "select public.checkout_simulated($1,$2,$3,$4,'approved')",
+        [
+          fixture.lid,
+          crypto.randomUUID(),
+          JSON.stringify({
+            name: "Ledger Customer",
+            email: "ledger@example.invalid",
+            phone: "5551234567",
+          }),
+          JSON.stringify([
+            { product_id: product, quantity: 1, option_ids: [] },
+          ]),
+        ],
+      );
+      await page.getByRole("button", { name: "Refresh", exact: true }).click();
+      expect(
+        await page.locator(".order-ledger-table th").allTextContents(),
+      ).toEqual([
+        "Order number",
+        "Date / time",
+        "Customer",
+        "Fulfillment",
+        "Payment",
+        "Total",
+      ]);
       await expect(
-        page.getByRole("table", { name: "Configured users" }),
+        page.getByRole("button", {
+          name: "Open order 100001 for Ledger Customer",
+          exact: true,
+        }),
+      ).toBeVisible();
+      await page
+        .getByRole("button", { name: /Open order .* for Ledger Customer/ })
+        .click();
+      const orderDialog = page.getByRole("dialog", { name: "Order details" });
+      await expect(
+        orderDialog.getByRole("heading", { name: "Ledger Customer" }),
+      ).toBeVisible();
+      await orderDialog
+        .getByRole("button", { name: "Mark in progress", exact: true })
+        .click();
+      await expect(
+        orderDialog.getByRole("button", { name: "Mark ready", exact: true }),
+      ).toBeVisible();
+      await page.screenshot({
+        path: `test-results/order-dialog-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+      await expect(
+        orderDialog.getByText("Order 100001", { exact: true }),
+      ).toBeVisible();
+      await orderDialog.getByText("Cancel order", { exact: true }).click();
+      await expect(
+        orderDialog.getByText(/Payment is unchanged; record a separate refund/),
+      ).toBeVisible();
+      await orderDialog
+        .getByRole("button", { name: "Confirm cancellation", exact: true })
+        .click();
+      await expect(
+        orderDialog.getByText(/Order cancelled. Payment is unchanged/),
+      ).toBeVisible();
+      expect(
+        (
+          await gateway.db.query(
+            "select status,payment_status,refunded_cents from public.orders",
+          )
+        ).rows,
+      ).toEqual([
+        { status: "cancelled", payment_status: "paid", refunded_cents: 0 },
+      ]);
+      await page.keyboard.press("Escape");
+      await expect(orderDialog).toHaveCount(0);
+      await expect(
+        page.getByRole("button", { name: /Open order .* for Ledger Customer/ }),
+      ).toBeFocused();
+      await expect(page.getByText("Saved.", { exact: true })).toHaveCount(0);
+      await expect(page.locator("body > footer")).toBeHidden();
+      await gateway.db.query(
+        "insert into public.products(subscription_id,name,description,price_cents) values($1,'Longer product name to compare uniform tiles','A much longer description with enough words to take several lines without changing the size of the tile or moving its actions.',2000)",
+        [fixture.sid],
+      );
+      await page.reload();
+      await page
+        .getByRole("navigation", { name: "Workspace shortcuts" })
+        .getByRole("button", { name: "Products", exact: true })
+        .click();
+      const tile = page
+        .locator(".product-tile")
+        .filter({ hasText: "Notebook" });
+      await expect(tile).toBeVisible();
+      const bounds = await tile.boundingBox();
+      expect(bounds!.width).toBeLessThanOrEqual(
+        test.info().project.name === "desktop" ? 342 : 390,
+      );
+      const sizes = await page.locator(".product-tile").evaluateAll((tiles) =>
+        tiles.map((tile) => ({
+          width: tile.getBoundingClientRect().width,
+          height: tile.getBoundingClientRect().height,
+        })),
+      );
+      expect(new Set(sizes.map((x) => x.width)).size).toBe(1);
+      expect(new Set(sizes.map((x) => x.height)).size).toBe(1);
+      const png = {
+        name: "test.png",
+        mimeType: "image/png",
+        buffer: Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+          "base64",
+        ),
+      };
+      await page
+        .getByRole("button", { name: "Add product", exact: true })
+        .click();
+      const adding = page.getByRole("dialog", {
+        name: "Add product",
+        exact: true,
+      });
+      await expect(adding.locator(".image-picker-name")).toHaveText(
+        "No file chosen",
+      );
+      await adding
+        .getByLabel("Name", { exact: true })
+        .fill("Discarded product");
+      await adding
+        .getByLabel("Product image", { exact: true })
+        .setInputFiles(png);
+      await expect(page.locator(".image-picker-name:visible")).toHaveText(
+        "test.png",
+      );
+      await adding
+        .getByRole("button", { name: "Cancel", exact: true })
+        .last()
+        .click();
+      await expect(adding).toHaveCount(0);
+      expect(gateway.imageUploads).toBe(0);
+      await expect(page.locator(".product-tile")).toHaveCount(2);
+      await tile
+        .getByRole("button", { name: "Edit Notebook", exact: true })
+        .click();
+      const editing = page.getByRole("dialog", {
+        name: "Edit product",
+        exact: true,
+      });
+      await editing
+        .getByLabel("Name", { exact: true })
+        .fill("Unsaved notebook");
+      await editing
+        .getByRole("button", { name: "Cancel", exact: true })
+        .last()
+        .click();
+      await expect(editing).toHaveCount(0);
+      await expect(
+        tile.getByRole("heading", { name: "Notebook", exact: true }),
+      ).toBeVisible();
+      await page.screenshot({
+        path: `test-results/products-uniform-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+      await page
+        .getByRole("button", { name: "Add product", exact: true })
+        .click();
+      await adding
+        .getByLabel("Name", { exact: true })
+        .fill("Disposable product");
+      await adding.getByLabel("Price (USD)").fill("5.00");
+      await adding
+        .getByLabel("Product image", { exact: true })
+        .setInputFiles(png);
+      await expect(page.locator(".image-picker-name:visible")).toHaveText(
+        "test.png",
+      );
+      await adding
+        .getByRole("button", { name: "Save product", exact: true })
+        .click();
+      await expect(adding).toHaveCount(0);
+      expect(gateway.imageUploads).toBe(1);
+      const disposable = page
+        .locator(".product-tile")
+        .filter({ hasText: "Disposable product" });
+      await disposable
+        .getByRole("button", { name: "Edit Disposable product", exact: true })
+        .click();
+      await expect(editing.locator(".image-picker-name")).toHaveText(
+        "test.png",
+      );
+      await editing
+        .getByRole("button", { name: "Delete image", exact: true })
+        .click();
+      await editing
+        .getByRole("button", { name: "Cancel", exact: true })
+        .last()
+        .click();
+      expect(
+        (
+          await gateway.db.query<{ image_url: string | null }>(
+            "select image_url from public.products where name='Disposable product'",
+          )
+        ).rows[0].image_url,
+      ).toBeTruthy();
+      await disposable
+        .getByRole("button", { name: "Edit Disposable product", exact: true })
+        .click();
+      await editing
+        .getByRole("button", { name: "Delete image", exact: true })
+        .click();
+      const storageDelete =
+        "http://127.0.0.1:3290/storage/v1/object/product-images";
+      await page.route(storageDelete, async (route) => {
+        if (route.request().method() === "DELETE")
+          await route.fulfill({
+            status: 500,
+            contentType: "application/json",
+            body: JSON.stringify({
+              message: "Temporary image deletion failure",
+            }),
+          });
+        else await route.fallback();
+      });
+      await editing
+        .getByRole("button", { name: "Save product", exact: true })
+        .click();
+      await expect(editing).toHaveCount(0);
+      await expect(
+        page.getByRole("region", { name: "Image deletion needs attention" }),
+      ).toBeVisible();
+      await page.unroute(storageDelete);
+      await page
+        .getByRole("button", { name: "Retry image deletion", exact: true })
+        .click();
+      await expect(
+        page.getByRole("region", { name: "Image deletion needs attention" }),
+      ).toHaveCount(0);
+      expect(
+        (
+          await gateway.db.query(
+            "select * from storage.objects where bucket_id='product-images'",
+          )
+        ).rows,
+      ).toHaveLength(0);
+      await disposable
+        .getByRole("button", { name: "Edit Disposable product", exact: true })
+        .click();
+      await editing
+        .getByRole("button", { name: "Delete product", exact: true })
+        .click();
+      await editing
+        .getByRole("button", { name: "Cancel deletion", exact: true })
+        .click();
+      await expect(editing.getByLabel("Name", { exact: true })).toHaveValue(
+        "Disposable product",
+      );
+      await editing
+        .getByRole("button", { name: "Delete product", exact: true })
+        .click();
+      await editing
+        .getByRole("button", { name: "Delete product", exact: true })
+        .click();
+      await expect(editing).toHaveCount(0);
+      await expect(disposable).toHaveCount(0);
+      await expect(page.getByText("Saved.", { exact: true })).toHaveCount(0);
+      await page
+        .getByRole("navigation", { name: "Workspace shortcuts" })
+        .getByRole("button", { name: "Settings", exact: true })
+        .click();
+      await page.screenshot({
+        path: `test-results/settings-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+      await page
+        .getByLabel("Search settings", { exact: true })
+        .fill("nothing-matches");
+      await expect(
+        page.getByText("No settings match your search. Try another word."),
+      ).toBeVisible();
+      await page.getByLabel("Search settings", { exact: true }).fill("logo");
+      await page
+        .getByRole("button", { name: /Storefront appearance Business logo/ })
+        .click();
+      const appearance = page.getByRole("region", {
+        name: "Storefront appearance",
+      });
+      await appearance
+        .getByLabel("Introduction", { exact: true })
+        .fill("A fresh introduction for our customers.");
+      await expect(appearance.locator(".store-preview")).toContainText(
+        "A fresh introduction for our customers.",
+      );
+      await appearance
+        .getByRole("button", { name: "Cancel changes", exact: true })
+        .click();
+      await expect(appearance).toBeHidden();
+      await page
+        .getByRole("button", { name: /Storefront appearance Business logo/ })
+        .click();
+      await expect(
+        appearance.getByLabel("Introduction", { exact: true }),
+      ).toHaveValue("");
+      await appearance
+        .getByLabel("Introduction", { exact: true })
+        .fill("A fresh introduction for our customers.");
+      await appearance
+        .getByRole("button", { name: "Save branding", exact: true })
+        .click();
+      await expect(appearance.getByRole("status")).toContainText(
+        "has been saved",
+      );
+      await expect(appearance.locator(".image-picker-name")).toHaveText(
+        "No file chosen",
+      );
+      expect(
+        (await gateway.db.query("select description from public.subscriptions"))
+          .rows,
+      ).toEqual([{ description: "A fresh introduction for our customers." }]);
+      await page.screenshot({
+        path: `test-results/appearance-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+      await appearance
+        .getByLabel("Business logo", { exact: true })
+        .setInputFiles(png);
+      await expect(page.locator(".image-picker-name:visible")).toHaveText(
+        "test.png",
+      );
+      await appearance
+        .getByRole("button", { name: "Cancel changes", exact: true })
+        .click();
+      await expect(appearance).toBeHidden();
+      expect(gateway.imageUploads).toBe(1);
+      await page
+        .getByRole("button", { name: /Storefront appearance Business logo/ })
+        .click();
+      await appearance
+        .getByLabel("Business logo", { exact: true })
+        .setInputFiles(png);
+      await expect(page.locator(".image-picker-name:visible")).toHaveText(
+        "test.png",
+      );
+      await appearance
+        .getByRole("button", { name: "Save branding", exact: true })
+        .click();
+      await expect(appearance.getByRole("status")).toContainText(
+        "has been saved",
+      );
+      await expect(appearance.locator(".image-picker-name")).toHaveText(
+        "test.png",
+      );
+      expect(
+        (
+          await gateway.db.query(
+            "select * from storage.objects where bucket_id='business-logos'",
+          )
+        ).rows,
+      ).toHaveLength(1);
+      await appearance
+        .getByRole("button", { name: "Delete image", exact: true })
+        .click();
+      await appearance
+        .getByRole("button", { name: "Cancel changes", exact: true })
+        .click();
+      await expect(appearance).toBeHidden();
+      expect(
+        (
+          await gateway.db.query<{ logo_url: string | null }>(
+            "select logo_url from public.subscriptions",
+          )
+        ).rows[0].logo_url,
+      ).toBeTruthy();
+      await page
+        .getByRole("button", { name: /Storefront appearance Business logo/ })
+        .click();
+      await appearance
+        .getByRole("button", { name: "Delete image", exact: true })
+        .click();
+      await appearance
+        .getByRole("button", { name: "Save branding", exact: true })
+        .click();
+      await expect(appearance.getByRole("status")).toContainText(
+        "has been saved",
+      );
+      await expect(appearance.locator(".image-picker-name")).toHaveText(
+        "No file chosen",
+      );
+      expect(
+        (
+          await gateway.db.query(
+            "select * from storage.objects where bucket_id='business-logos'",
+          )
+        ).rows,
+      ).toHaveLength(0);
+      await gateway.addAccount("employee@example.invalid");
+      await page
+        .getByRole("navigation", { name: "Workspace shortcuts" })
+        .getByRole("button", { name: "Users", exact: true })
+        .click();
+      await expect(
+        page.getByRole("table", {
+          name: "Configured users",
+          includeHidden: true,
+        }),
       ).toContainText("Owner");
+      await page.getByRole("tab", { name: "Permissions", exact: true }).click();
       await page
         .getByLabel("Role name", { exact: true })
         .fill("Order observer");
+      await page.getByRole("tab", { name: "Add user", exact: true }).click();
+      await page.getByRole("tab", { name: "Permissions", exact: true }).click();
+      await expect(page.getByLabel("Role name", { exact: true })).toHaveValue(
+        "Order observer",
+      );
+      await page.screenshot({
+        path: `test-results/users-tabs-${test.info().project.name}.png`,
+        fullPage: true,
+      });
       await page.getByRole("checkbox", { name: /View orders/ }).check();
       await page
         .getByRole("button", { name: "Save custom role", exact: true })
@@ -343,6 +811,7 @@ for (const changedPrice of [false, true])
           )
         ).rows,
       ).toHaveLength(1);
+      await page.getByRole("tab", { name: "Add user", exact: true }).click();
       await page
         .getByLabel("User email", { exact: true })
         .fill("employee@example.invalid");
@@ -356,8 +825,12 @@ for (const changedPrice of [false, true])
         .getByRole("button", { name: "Save user", exact: true })
         .click();
       await expect(
-        page.getByRole("table", { name: "Configured users" }),
+        page.getByRole("table", {
+          name: "Configured users",
+          includeHidden: true,
+        }),
       ).toContainText("employee@example.invalid");
+      await page.getByRole("tab", { name: "Users", exact: true }).click();
       await page
         .getByRole("button", {
           name: "Edit employee@example.invalid",
@@ -371,7 +844,10 @@ for (const changedPrice of [false, true])
         .getByRole("button", { name: "Save user", exact: true })
         .click();
       await expect(
-        page.getByRole("table", { name: "Configured users" }),
+        page.getByRole("table", {
+          name: "Configured users",
+          includeHidden: true,
+        }),
       ).toContainText("Lead");
       // A denied removal must retain the selected user and all typed choices.
       const removalEndpoint =
@@ -411,7 +887,10 @@ for (const changedPrice of [false, true])
         page.getByRole("heading", { name: "Add a user", exact: true }),
       ).toBeVisible();
       await expect(
-        page.getByRole("table", { name: "Configured users" }),
+        page.getByRole("table", {
+          name: "Configured users",
+          includeHidden: true,
+        }),
       ).not.toContainText("employee@example.invalid");
       if (!changedPrice) {
         const clientBefore = (

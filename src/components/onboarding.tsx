@@ -339,6 +339,9 @@ export function Onboarding({
     );
   return (
     <main className="onboarding">
+      <Link className="button secondary" href={email ? "/workspace" : "/"}>
+        Cancel
+      </Link>
       <div className="signup-heading">
         <p className="eyebrow">YOUR BUSINESS, CONNECTED</p>
         <h1>

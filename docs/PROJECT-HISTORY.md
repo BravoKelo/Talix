@@ -122,3 +122,16 @@ The owner approved the specific configuration after clarifying the broader secur
 ## Main development baseline integrated — October 16, 2026
 
 The owner explicitly instructed merging the current work and deferring further manual testing until afterward, removing the outstanding live-acceptance gate for this early-development checkpoint. PR #2 merged foundation/core into main as 05e6db3040c4fb3b255ff38cf2f2fe87add03c8a; PR #4 then merged onboarding/Users/reconciliation as fce04b7ddc35f0505868c616dd0d3fb257571df8. The final merge tree exactly matches accepted onboarding head 432e7dd59abca5d3db8b847f061dead8c6d3f0f0, whose push/PR checks passed. All branches/history remain preserved. The approved main-only Git deployment hold is present; post-merge production listing showed no new release. No migrations, security policies, payment handling or existing business data changed. Further user testing and fixes proceed from this baseline; full fresh deployed authenticated acceptance is not claimed.
+
+
+## Talix visual design batch — October 16, 2026
+
+After testing the integrated core, the owner requested three original Talix design updates: blue/white/gold sign-in/signup; general workspace layout/navigation; storefront appearance editing. Issues #11–13 capture each request. Seven screenshots supplied the appearance workflow when video playback was unavailable. Implementation on one focused feature branch preserves existing behavior and permissions, with working previews for existing branding fields and labeled placeholders for unsupported capabilities. No new database/backend capability or merge is implied. The owner also requested routine cleanup of merged feature branches once their testing previews are replaced.
+
+
+The owner subsequently extended the same design batch to the public homepage. Original Talix content and illustrations replace the old minimal landing page; current capabilities, future plans and sample billing are distinguished. This stays within Issue #11/PR #14 and changes no authentication, payments, persistence or infrastructure.
+
+
+## Owner testing corrections #15–21 — October 16, 2026
+
+Owner testing requested a return-to-top control, an alternative to mobile dropdown navigation, business logo identity, a consistent shortcut/context header, compact orders with an interactive popup, searchable settings tiles with planned-feature navigation, and reusable internal Users tabs. The owner authorized implementing this batch and reserved final merge acceptance. The same design branch contains these revisions. A minimal business-logo migration is prepared and tested, with actual development execution held for protected-boundary approval; no live database change or merge is claimed. Other UI changes retain existing workflows and permissions.

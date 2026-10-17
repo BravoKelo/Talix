@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/client";
 import { money, type Catalog, type CartLine, type Product } from "@/lib/types";
@@ -168,6 +168,16 @@ export function Storefront({ slug }: { slug: string }) {
     >
       <section className="store-hero">
         <p className="eyebrow">WELCOME</p>
+        {catalog.subscription.logo_url && (
+          <Image
+            width={150}
+            height={84}
+            unoptimized
+            className="business-logo"
+            src={catalog.subscription.logo_url}
+            alt={`${catalog.subscription.name} logo`}
+          />
+        )}
         <h1>{catalog.subscription.name}</h1>
         <p className="lead">
           {catalog.subscription.description ||
@@ -297,6 +307,21 @@ export function Storefront({ slug }: { slug: string }) {
               </div>
               <button disabled={busy || !cart.length}>
                 {busy ? "Placing order…" : "Place order with simulated payment"}
+              </button>
+              <button
+                type="button"
+                className="secondary"
+                disabled={busy}
+                onClick={(e) => {
+                  e.currentTarget.form?.reset();
+                  setRequestId(null);
+                  setMessage("");
+                  document
+                    .querySelector(".catalog")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                Cancel checkout
               </button>
               <p role="status">{message}</p>
             </form>

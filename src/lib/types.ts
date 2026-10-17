@@ -25,6 +25,7 @@ export type Subscription = {
   name: string;
   slug: string;
   accent: string;
+  logo_url?: string | null;
   description: string;
 };
 export type CartLine = {
@@ -33,6 +34,7 @@ export type CartLine = {
   option_ids: string[];
 };
 export type Order = {
+  order_number?: number;
   id: string;
   location_id: string;
   subscription_id: string;
@@ -54,6 +56,7 @@ export type Order = {
 export type PublicOrder = Pick<
   Order,
   | "id"
+  | "order_number"
   | "total_cents"
   | "payment_status"
   | "refunded_cents"
@@ -79,4 +82,8 @@ export function cents(value: string) {
   if (!Number.isSafeInteger(n) || n > 100000000)
     throw new Error("Amount is too large.");
   return n;
+}
+
+export function orderReference(order: { order_number?: number }) {
+  return order.order_number ? String(order.order_number) : "Pending number";
 }

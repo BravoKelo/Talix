@@ -20,6 +20,7 @@ export async function onboardingGateway() {
   let signupBody: Record<string, unknown> | undefined;
   let autoconfirm = true;
   let mailRequests = 0;
+  let imageUploads = 0;
   async function user(email: string, confirmed = true, admin = false) {
     const value: User = {
       id: crypto.randomUUID(),
@@ -74,9 +75,14 @@ export async function onboardingGateway() {
     const url = new URL(req.url!, "http://127.0.0.1:3290");
     const chunks: Buffer[] = [];
     for await (const chunk of req) chunks.push(Buffer.from(chunk));
-    const input = chunks.length
-      ? JSON.parse(Buffer.concat(chunks).toString())
-      : {};
+    const isUpload =
+      req.method === "POST" &&
+      url.pathname.startsWith("/storage/v1/object/") &&
+      !url.pathname.includes("/list/");
+    const input =
+      chunks.length && !isUpload
+        ? JSON.parse(Buffer.concat(chunks).toString())
+        : {};
     let current: User | undefined;
     try {
       const jwt = req.headers.authorization?.split(" ")[1];
@@ -85,6 +91,67 @@ export async function onboardingGateway() {
           Buffer.from(jwt.split(".")[1], "base64url").toString(),
         ).sub;
         current = users.get(id);
+      }
+      if (url.pathname.startsWith("/storage/v1/")) {
+        const segments = url.pathname.split("/").filter(Boolean);
+        if (segments[3] === "public") {
+          res.setHeader("Content-Type", "image/png");
+          res.end(
+            Buffer.from(
+              "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+              "base64",
+            ),
+          );
+          return;
+        }
+        const bucket = segments[3] === "list" ? segments[4] : segments[3];
+        const result = await db.transaction(async (tx) => {
+          await tx.query("select set_config('request.jwt.claim.sub',$1,true)", [
+            current?.id ?? "",
+          ]);
+          await tx.exec(
+            "set local role " + (current ? "authenticated" : "anon"),
+          );
+          if (isUpload) {
+            const path = segments.slice(4).map(decodeURIComponent).join("/");
+            await tx.query(
+              "insert into storage.objects(bucket_id,name) values($1,$2)",
+              [bucket, path],
+            );
+            imageUploads++;
+            return { Key: `${bucket}/${path}`, Id: crypto.randomUUID() };
+          }
+          if (req.method === "DELETE") {
+            const result = [];
+            for (const path of input.prefixes ?? [])
+              result.push(
+                ...(
+                  await tx.query(
+                    "delete from storage.objects where bucket_id=$1 and name=$2 returning id,name",
+                    [bucket, path],
+                  )
+                ).rows,
+              );
+            return result;
+          }
+          const rows = (
+            await tx.query<{ id: string; name: string }>(
+              "select id,name from storage.objects where bucket_id=$1",
+              [bucket],
+            )
+          ).rows;
+          const prefix = input.prefix ? input.prefix + "/" : "";
+          return rows
+            .filter(
+              (row) =>
+                row.name.startsWith(prefix) &&
+                (!input.search ||
+                  row.name.slice(prefix.length).includes(input.search)),
+            )
+            .map((row) => ({ ...row, name: row.name.slice(prefix.length) }));
+        });
+        res.end(JSON.stringify(result));
+        return;
       }
       if (url.pathname.includes("/auth/v1/")) {
         if (url.pathname.endsWith("/settings")) {
@@ -181,6 +248,20 @@ export async function onboardingGateway() {
         res.end("{}");
         return;
       }
+      // Test gateway is HTTP; stored image URLs still obey production HTTPS constraints.
+      // Translate only our own fixture Storage origin at this transport boundary.
+      for (const field of ["image_url", "logo_url"]) {
+        if (
+          typeof input[field] === "string" &&
+          input[field].startsWith(
+            "http://127.0.0.1:3290/storage/v1/object/public/",
+          )
+        )
+          input[field] = input[field].replace(
+            "http://127.0.0.1:3290/",
+            "https://127.0.0.1:3290/",
+          );
+      }
       const resource = url.pathname.split("/").pop()!;
       const allowedTables = [
         "business_roles",
@@ -197,6 +278,8 @@ export async function onboardingGateway() {
         "payment_events",
       ];
       const functions: Record<string, string[]> = {
+        advance_order: ["p_order", "p_status"],
+        refund_simulated: ["p_order", "p_request", "p_amount", "p_reason"],
         subscription_quote: ["p_type", "p_plan", "p_addons"],
         start_subscription: [
           "p_request",
@@ -270,6 +353,8 @@ export async function onboardingGateway() {
             req.method === "POST"
               ? `insert into public.${resource}(${fields.join(",")}) values(${fields.map((_, i) => "$" + (i + initial + 1)).join(",")}) returning ${select}`
               : `update public.${resource} set ${fields.map((f, i) => f + "=$" + (i + initial + 1)).join(",")}${suffix} returning ${select}`;
+        } else if (req.method === "DELETE") {
+          sql = `delete from public.${resource}${suffix} returning ${select}`;
         } else {
           let order = "";
           if (url.searchParams.has("order")) {
@@ -292,7 +377,12 @@ export async function onboardingGateway() {
         }
         return rows;
       });
-      res.end(JSON.stringify(output));
+      res.end(
+        JSON.stringify(output).replaceAll(
+          "https://127.0.0.1:3290/storage/v1/object/public/",
+          "http://127.0.0.1:3290/storage/v1/object/public/",
+        ),
+      );
     } catch (e) {
       const error = e as { message: string; code?: string };
       res.statusCode = 400;
@@ -315,6 +405,9 @@ export async function onboardingGateway() {
     users,
     setAutoconfirm(value: boolean) {
       autoconfirm = value;
+    },
+    get imageUploads() {
+      return imageUploads;
     },
     get mailRequests() {
       return mailRequests;

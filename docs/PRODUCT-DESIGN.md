@@ -2,7 +2,7 @@
 
 ## Status
 
-**Design status:** Confirmed product-level workflows; no approved detailed UI or visual design.
+**Design status:** Confirmed workflows and owner-approved October 16 visual direction; implementation remains for review.
 
 ## Purpose
 
@@ -21,7 +21,7 @@ Customer-facing elements should be classified as one of:
 
 ## Current Approved Design
 
-No detailed customer-facing design has yet been approved in the current Talix repository.
+The owner approved the October 16 design direction below. Existing detailed layouts remain reviewable implementations, not authority to change unrelated workflows.
 
 The product vision establishes that Talix is intended to include:
 
@@ -96,3 +96,43 @@ Users starts with configured users, protected Owner, subscription roles and sepa
 ## Reconciliation checkpoint — October 7, 2026 (Pacific; October 8 UTC)
 
 The owner closed Issues #5–9 after review. Preserve those corrected workflows; closure does not approve merging or the complete visual design. Issue #10 authorizes focused stabilization: successful custom-role creation keeps that role selected for later saves; a failed removal retains the selected user's editor and location choices, while successful removal returns to Add a user. Adding a subscription preserves the shared client profile and retains its own purchase details. This profile correction is applied and verified on development after separate execution approval.
+
+
+## October 16 design batch — Issues #11–13
+
+The owner requested an original Talix design using blue, white and gold. Preserve current core behavior and use original branding, assets and text. Missing applicable capabilities must say Feature coming soon.
+
+Implemented for review: sign-in/signup use a white form column and blue feature/resource column, gold accents, public-resource placeholders and honest support/announcement/recovery placeholders. Existing signup/review/account/confirmation logic remains intact. The business workspace uses a grouped blue sidebar with gold active navigation, subscription/location selectors, settings category cards and responsive navigation. Access visibility continues to use the existing permission model.
+
+The storefront editor exposes existing subscription-wide business name/introduction/brand color with an adjacent layout preview, unsaved/saved feedback, cancel and persisted save. Logo/header uploads, navigation editing, detailed element colors and slideshow remain clearly labeled placeholders. Preview is a non-interactive layout representation, not a full checkout or website builder. No schema, policies, migrations, authentication methods or new integrations are introduced.
+
+All seven appearance screenshots were reviewed. Observed references include settings discovery, header/contact/mode choices, logo upload, editable/reorderable links, grouped color controls with preview and Save/Cancel; slideshow contents were not supplied. Only existing Talix settings work in this first design slice; other controls are placeholders rather than inferred implementation. Talix application colors do not restrict an owner's saved storefront brand color.
+
+
+## Public homepage extension — October 16, 2026
+
+The owner authorized extending Issue #11/PR #14 to redesign the public landing page. The original Talix blue/white/gold page introduces ordering and fulfillment, an explicitly illustrative workspace visual, core capabilities, the customer-to-team workflow, a clearly planned capabilities section, FAQs and signup/signin links. Use original assets and copy; do not invent testimonials, metrics or certifications. Sample plans and simulated payments are disclosed before signup; industry tools and integrations are described as future capabilities. Existing onboarding and global authentication navigation are preserved.
+
+
+### Readability revision — October 16, 2026
+
+Owner review requested larger navigation and descriptive text across every refreshed page. Navigation and descriptions now use 16px text, general copy uses a 17px base, and supporting labels have a 14px minimum, including mobile. Line spacing and wrapping are increased; forms, resource links, sidebar navigation, settings and appearance previews retain their workflows. Illustrative product content also uses larger labels rather than the previous 7–12px sizes. This correction remains within Issue #11/PR #14.
+
+
+### Mobile navigation and touch revision — October 16, 2026
+
+The owner rejected wrapping mobile navigation/controls and approved compact navigation menus and touch-friendly controls. Public and workspace sections now use accessible mobile disclosure menus with single-column choices; desktop navigation remains visible. Mobile actions, subscription/location selectors, resource placeholders and signup steps have deliberate single-column layouts rather than wrapped rows. Controls keep readable type and single-line labels. Buttons, primary navigation, selects and disclosure summaries have at least 48px targets; checkbox/radio labels provide larger activation areas. Paragraph text still wraps naturally. This supersedes the earlier control-wrapping approach and remains within Issue #11/PR #14.
+
+
+## Review corrections #15–21 — October 16, 2026
+
+The owner authorized this testing batch and requested a final review before merge. These changes supersede the earlier mobile dropdown and long settings-page approach:
+
+- Homepage has a touch-friendly fixed Back to top link. Mobile public/workspace navigation remains visible in a single horizontally scrollable row, without dropdowns, line wrapping or reduced type.
+- Workspace uses a consistent header with permission-aware Orders, Products, Settings and Users shortcuts; storefront/add-subscription actions remain available. Current subscription/location dropdowns occupy the top-right on desktop and dedicated full-width controls on mobile. The duplicate Business workspace entry button and old page-level selector panel are removed inside the workspace.
+- Sidebar identity uses the selected business logo or a business-name initial fallback. Planned CRM, inventory/materials, financial reporting, employee scheduling/time, marketing, communications, integrations, website-builder, industry and support areas are explicitly labeled Feature coming soon; menu presence does not implement them.
+- Orders use compact ledger rows. Selecting a row opens a modal with the existing detail, fulfillment and simulated-refund actions. Escape/Close return to the list; keyboard focus returns to the order control.
+- Settings has searchable tiles with names/descriptions and no-match feedback. Selecting a tile opens one tool instead of all settings in a long page. Hidden tool panels retain drafts.
+- Users has internal Users, Add/Edit user and Permissions tabs. Tabs have keyboard navigation and clear selected state; user/role drafts survive internal tab changes. Existing protected Owner, custom roles and delegation rules remain enforced.
+
+Business-logo upload/save is implemented against a prepared additive migration, not yet applied to development. The nullable logo URL and public business-logos bucket use existing settings.manage authority; public images are limited to JPEG/PNG/WebP up to 5 MB, uploaded under the subscription's folder without overwrites. No logo means a business initial, not another Talix logo. Public catalog output adds only the logo URL. Until database activation, logo input is disabled and existing branding can still save. Storage/image URLs and retained uploads follow the existing product-image approach; orphan cleanup is not part of this batch.
