@@ -1,9 +1,11 @@
 "use client";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ResponsiveNavigation } from "@/components/responsive-navigation";
 
 import { AppearanceEditor } from "./appearance-editor";
+import { OrderDialog } from "./order-dialog";
 import { Users } from "./users";
 import { type Permission } from "@/lib/permissions";
 import { SubscriptionSummary } from "./subscription-summary";
@@ -17,6 +19,63 @@ import {
   type Product,
   type Order,
 } from "@/lib/types";
+const plannedFeatures = [
+  {
+    id: "customers",
+    label: "Customers & CRM",
+    description: "Customer relationships and history across your business.",
+  },
+  {
+    id: "inventory",
+    label: "Inventory",
+    description: "Materials, finished products and inventory adjustments.",
+  },
+  {
+    id: "materials",
+    label: "Materials & BOM",
+    description: "Materials used to make each product and their costs.",
+  },
+  {
+    id: "reports",
+    label: "Reports & finances",
+    description: "Business performance, costs and financial tracking.",
+  },
+  {
+    id: "employees",
+    label: "Scheduling & time",
+    description: "Staff schedules, time tracking and payroll exports.",
+  },
+  {
+    id: "marketing",
+    label: "Marketing",
+    description: "Campaigns and promotions for your customers.",
+  },
+  {
+    id: "communications",
+    label: "Communications",
+    description: "Business messages, email and text updates.",
+  },
+  {
+    id: "integrations",
+    label: "Integrations",
+    description: "Connect the other tools your business uses.",
+  },
+  {
+    id: "website",
+    label: "Website builder",
+    description: "Tools to create and manage your business website.",
+  },
+  {
+    id: "industry",
+    label: "Industry tools",
+    description: "Business-specific ordering and fulfillment workflows.",
+  },
+  {
+    id: "support",
+    label: "Support & training",
+    description: "Help, guides and learning resources.",
+  },
+];
 type Membership = { subscription_id: string; role: string };
 type Event = {
   id: string;
@@ -32,6 +91,8 @@ export function Workspace({
   userId: string;
   email: string;
 }) {
+  const [settingsArea, setSettingsArea] = useState("");
+  const [settingsSearch, setSettingsSearch] = useState("");
   const [adminAccess, setAdminAccess] = useState(false);
   useEffect(() => {
     void browserClient()
@@ -251,6 +312,76 @@ export function Workspace({
       o.status !== "completed" &&
       o.status !== "cancelled",
   );
+  const sections = [
+    ...(can("orders.view") ? ["orders"] : []),
+    ...(can("products.view") ? ["products"] : []),
+    ...(shared("settings.view") || can("settings.view") ? ["settings"] : []),
+    ...(shared("users.view") ? ["users"] : []),
+  ];
+  const settingTiles = [
+    ...(shared("settings.view")
+      ? [
+          {
+            id: "appearance",
+            title: "Storefront appearance",
+            description: "Business logo, name, introduction and color",
+            icon: "◈",
+            available: true,
+          },
+        ]
+      : []),
+    ...(can("settings.view")
+      ? [
+          {
+            id: "location",
+            title: "Locations & ordering",
+            description: "Location details, hours and online availability",
+            icon: "⌖",
+            available: true,
+          },
+        ]
+      : []),
+    ...(owner
+      ? [
+          {
+            id: "subscription",
+            title: "Your subscription",
+            description: "Current plan, products and subscription details",
+            icon: "◇",
+            available: true,
+          },
+        ]
+      : []),
+    ...(shared("users.view")
+      ? [
+          {
+            id: "users",
+            title: "Users & permissions",
+            description: "Team access, users and custom roles",
+            icon: "◎",
+            available: true,
+          },
+        ]
+      : []),
+    ...plannedFeatures.map((f) => ({
+      id: f.id,
+      title: f.label,
+      description: f.description,
+      icon: "○",
+      available: false,
+    })),
+    {
+      id: "security",
+      title: "Account security",
+      description: "Password recovery and additional account protection",
+      icon: "◇",
+      available: false,
+    },
+  ].filter((f) =>
+    `${f.title} ${f.description}`
+      .toLowerCase()
+      .includes(settingsSearch.trim().toLowerCase()),
+  );
   const createForm = (
     <section className="panel">
       <h2>Add a subscription</h2>
@@ -262,136 +393,185 @@ export function Workspace({
   );
   return (
     <main className="workspace">
-      <div className="row">
-        <div>
-          <p className="eyebrow">BUSINESS WORKSPACE</p>
-          <h1>{sub?.name || "Your businesses"}</h1>
-          <p className="muted">{email}</p>
-          {adminAccess && <Link href="/admin">Talix admin</Link>}
+      <header
+        className="workspace-header"
+        aria-label="Business workspace header"
+      >
+        <Link href="/" className="wordmark">
+          talix<span>•</span>
+        </Link>
+        <nav className="workspace-shortcuts" aria-label="Workspace shortcuts">
+          {sections.map((section) => (
+            <button
+              key={section}
+              type="button"
+              className={tab === section ? "active" : "secondary"}
+              onClick={() => {
+                setTab(section);
+                setSettingsArea("");
+                setSelected("");
+              }}
+            >
+              {section[0].toUpperCase() + section.slice(1)}
+            </button>
+          ))}
+          {sub && (
+            <a
+              className="button secondary"
+              href={`/shop/${sub.slug}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open storefront ↗
+            </a>
+          )}
+          {members.some((m) => m.role === "owner") && (
+            <Link className="button secondary" href="/onboarding?new=1">
+              Add subscription
+            </Link>
+          )}
+          {adminAccess && (
+            <Link className="button secondary" href="/admin">
+              Talix admin
+            </Link>
+          )}
+        </nav>
+        <div className="workspace-context">
+          {" "}
+          <label>
+            Subscription
+            <select
+              aria-label="Subscription"
+              value={sid}
+              disabled={busy || !subs.length}
+              onChange={(e) => {
+                setSid(e.target.value);
+                setLid("");
+                setLocations([]);
+                setProducts([]);
+                setOrders([]);
+                setEvents([]);
+                setTab("orders");
+                setSettingsArea("");
+                setSettingsSearch("");
+                setSelected("");
+              }}
+            >
+              {subs.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Location
+            <select
+              aria-label="Location"
+              value={lid}
+              disabled={busy}
+              onChange={(e) => {
+                setLid(e.target.value);
+                setOrders([]);
+                setSelected("");
+                setEvents([]);
+                setRole("viewer");
+              }}
+            >
+              {locations.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
-        <button
-          className="secondary"
-          onClick={() =>
-            void browserClient()
-              .auth.signOut()
-              .then(({ error }) => {
-                if (error) {
-                  setMessage("We couldn’t sign you out. Please try again.");
-                  return;
-                }
-                window.location.replace("/login");
-              })
-          }
-        >
-          Sign out
-        </button>
+        <div className="workspace-account">
+          <span>{email}</span>{" "}
+          <button
+            className="secondary"
+            onClick={() =>
+              void browserClient()
+                .auth.signOut()
+                .then(({ error }) => {
+                  if (error) {
+                    setMessage("We couldn’t sign you out. Please try again.");
+                    return;
+                  }
+                  window.location.replace("/login");
+                })
+            }
+          >
+            Sign out
+          </button>
+        </div>
+      </header>
+      <div className="workspace-heading">
+        <p className="eyebrow">BUSINESS WORKSPACE</p>
+        <h1>{sub?.name || "Your businesses"}</h1>
       </div>
       <p role="status">{message}</p>
       {!subs.length ? (
         createForm
       ) : (
         <>
-          <div className="selectors">
-            <label>
-              Subscription
-              <select
-                aria-label="Subscription"
-                value={sid}
-                disabled={busy}
-                onChange={(e) => {
-                  setSid(e.target.value);
-                  setLid("");
-                  setLocations([]);
-                  setProducts([]);
-                  setOrders([]);
-                  setEvents([]);
-                  setTab("orders");
-                  setSelected("");
-                }}
-              >
-                {subs.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Location
-              <select
-                aria-label="Location"
-                value={lid}
-                disabled={busy}
-                onChange={(e) => {
-                  setLid(e.target.value);
-                  setOrders([]);
-                  setSelected("");
-                  setEvents([]);
-                  setRole("viewer");
-                }}
-              >
-                {locations.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {members.some((m) => m.role === "owner") && (
-              <Link className="button secondary" href="/onboarding?new=1">
-                Add subscription
-              </Link>
-            )}
-            {sub && (
-              <a href={`/shop/${sub.slug}`} target="_blank" rel="noreferrer">
-                Open storefront ↗
-              </a>
-            )}
-          </div>
           <ResponsiveNavigation label="Workspace menu">
             {" "}
             <nav className="tabs" aria-label="Workspace sections">
               <div className="sidebar-brand">
-                talix<span>•</span>
+                {sub?.logo_url ? (
+                  <Image
+                    width={150}
+                    height={84}
+                    unoptimized
+                    src={sub.logo_url}
+                    alt={`${sub.name} logo`}
+                    className="business-logo"
+                  />
+                ) : (
+                  <span className="business-initial" aria-hidden="true">
+                    {sub?.name.slice(0, 1).toUpperCase()}
+                  </span>
+                )}
+                <strong>{sub?.name}</strong>
                 <small>BUSINESS WORKSPACE</small>
               </div>
               <p className="sidebar-group">MANAGE YOUR BUSINESS</p>
-              {[
-                ...(can("orders.view") ? ["orders"] : []),
-                ...(can("products.view") ? ["products"] : []),
-                ...(shared("settings.view") || can("settings.view")
-                  ? ["settings"]
-                  : []),
-                ...(shared("users.view") ? ["users"] : []),
-              ].map((t) => (
+              {sections.map((t) => (
                 <button
                   key={t}
                   className={tab === t ? "active" : "secondary"}
                   aria-current={tab === t ? "page" : undefined}
-                  onClick={() => setTab(t)}
+                  onClick={() => {
+                    setTab(t);
+                    setSelected("");
+                    setSettingsArea("");
+                  }}
                 >
                   {t[0].toUpperCase() + t.slice(1)}
                 </button>
               ))}
               <div className="sidebar-future">
                 <p className="sidebar-group">GROW & CONNECT</p>
-                <details>
-                  <summary>Reports</summary>
-                  <span className="coming-soon">Feature coming soon</span>
-                </details>
-                <details>
-                  <summary>Communications</summary>
-                  <span className="coming-soon">Feature coming soon</span>
-                </details>
-                <details>
-                  <summary>Support & training</summary>
-                  <span className="coming-soon">Feature coming soon</span>
-                </details>
+                {plannedFeatures.map((feature) => (
+                  <button
+                    key={feature.id}
+                    type="button"
+                    className={tab === feature.id ? "active" : "secondary"}
+                    onClick={() => {
+                      setTab(feature.id);
+                      setSelected("");
+                    }}
+                  >
+                    <span>{feature.label}</span>
+                    <small>Feature coming soon</small>
+                  </button>
+                ))}
               </div>
             </nav>
           </ResponsiveNavigation>
           {tab === "orders" && can("orders.view") && (
-            <div className="workspace-grid">
+            <div className="orders-ledger">
               <section className="panel">
                 <div className="row">
                   <h2>Orders</h2>
@@ -409,33 +589,46 @@ export function Workspace({
                 {!orders.length ? (
                   <div className="empty">No orders yet.</div>
                 ) : (
-                  orders.map((o) => (
-                    <button
-                      className="order-row secondary"
-                      key={o.id}
-                      onClick={() => setSelected(o.id)}
-                    >
-                      <span>
-                        <strong>{o.customer_name}</strong>
-                        <small>{new Date(o.created_at).toLocaleString()}</small>
-                      </span>
-                      <span>
-                        {money(o.total_cents)}
-                        <small>
-                          {o.status.replace("_", " ")} ·{" "}
-                          {o.payment_status.replace("_", " ")}
-                        </small>
-                      </span>
-                    </button>
-                  ))
+                  <div className="table-scroll">
+                    <table className="order-ledger-table">
+                      <caption>Orders at this location</caption>
+                      <thead>
+                        <tr>
+                          <th>Order</th>
+                          <th>Customer</th>
+                          <th>Received</th>
+                          <th>Fulfillment</th>
+                          <th>Payment</th>
+                          <th>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {orders.map((o) => (
+                          <tr key={o.id} onClick={() => setSelected(o.id)}>
+                            <td>
+                              <button
+                                className="secondary ledger-open"
+                                onClick={() => setSelected(o.id)}
+                                aria-label={`Open order ${o.id.slice(0, 8)} for ${o.customer_name}`}
+                              >
+                                {o.id.slice(0, 8)}
+                              </button>
+                            </td>
+                            <td>{o.customer_name}</td>
+                            <td>{new Date(o.created_at).toLocaleString()}</td>
+                            <td>{o.status.replaceAll("_", " ")}</td>
+                            <td>{o.payment_status.replaceAll("_", " ")}</td>
+                            <td>{money(o.total_cents)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </section>
-              <section className="panel">
-                {!order ? (
-                  <div className="empty">
-                    Select an order to view its details.
-                  </div>
-                ) : (
+              {order && (
+                <OrderDialog close={() => setSelected("")}>
+                  <p role="status">{message}</p>
                   <>
                     <h2>{order.customer_name}</h2>
                     <p>
@@ -560,8 +753,8 @@ export function Workspace({
                       </p>
                     ))}
                   </>
-                )}
-              </section>
+                </OrderDialog>
+              )}
             </div>
           )}
           {tab === "products" && can("products.view") && (
@@ -673,53 +866,125 @@ export function Workspace({
             (shared("settings.view") || can("settings.view")) &&
             sub && (
               <div>
-                <section className="settings-directory panel">
+                <section
+                  className="settings-directory panel"
+                  hidden={!!settingsArea}
+                >
                   <div className="section-heading">
                     <p className="eyebrow">YOUR BUSINESS, YOUR WAY</p>
                     <h2>Settings</h2>
                     <p className="muted">Choose an area to manage.</p>
                   </div>
+                  <label>
+                    Search settings
+                    <input
+                      type="search"
+                      placeholder="Find a setting…"
+                      value={settingsSearch}
+                      onChange={(e) => {
+                        setSettingsSearch(e.target.value);
+                        setSettingsArea("");
+                      }}
+                    />
+                  </label>
+                  <p role="status">{settingTiles.length} settings found</p>
                   <div className="settings-cards">
-                    <a href="#storefront-appearance">
-                      <span aria-hidden="true">◈</span>
-                      <strong>Storefront appearance</strong>
-                      <small>Brand name, introduction and color</small>
-                    </a>
-                    <a href="#location-settings">
-                      <span aria-hidden="true">⌖</span>
-                      <strong>Locations & ordering</strong>
-                      <small>Location details and online availability</small>
-                    </a>
-                    <div>
-                      <strong>Support & training</strong>
-                      <span className="coming-soon">Feature coming soon</span>
-                    </div>
-                    <div>
-                      <strong>Account security</strong>
-                      <span className="coming-soon">Feature coming soon</span>
-                    </div>
+                    {settingTiles.map((tile) => (
+                      <button
+                        key={tile.id}
+                        type="button"
+                        className="setting-tile secondary"
+                        onClick={() => {
+                          if (!tile.available) {
+                            setSettingsArea(tile.id);
+                          } else if (tile.id === "users") {
+                            setTab("users");
+                          } else setSettingsArea(tile.id);
+                        }}
+                      >
+                        <span aria-hidden="true">{tile.icon}</span>
+                        <strong>{tile.title}</strong>
+                        <small>{tile.description}</small>
+                        {!tile.available && (
+                          <span className="coming-soon">
+                            Feature coming soon
+                          </span>
+                        )}
+                      </button>
+                    ))}
                   </div>
+                  {!settingTiles.length && (
+                    <p>No settings match your search. Try another word.</p>
+                  )}
                 </section>
-                {owner && <SubscriptionSummary key={sid} id={sid} />}
-                <div className="workspace-grid">
-                  <AppearanceEditor
-                    key={sub.id}
-                    subscription={sub}
-                    allowed={shared("settings.manage")}
-                    save={async (v) => {
-                      const { error } = await browserClient()
-                        .from("subscriptions")
-                        .update(v)
-                        .eq("id", sid);
-                      if (error) throw error;
-                      setSubs((previous) =>
-                        previous.map((s) =>
-                          s.id === sid ? { ...s, ...v } : s,
-                        ),
-                      );
+                {settingsArea && (
+                  <button
+                    type="button"
+                    className="secondary settings-back"
+                    onClick={() => {
+                      setSettingsArea("");
+                      setSettingsSearch("");
                     }}
-                  />
-                  <section id="location-settings" className="panel">
+                  >
+                    ← All settings
+                  </button>
+                )}
+                {settingsArea &&
+                  !["appearance", "location", "subscription"].includes(
+                    settingsArea,
+                  ) && (
+                    <section className="panel">
+                      <h2>
+                        {settingTiles.find((t) => t.id === settingsArea)?.title}
+                      </h2>
+                      <p>Feature coming soon.</p>
+                    </section>
+                  )}
+                <div hidden={settingsArea !== "subscription"}>
+                  {owner && <SubscriptionSummary key={sid} id={sid} />}
+                </div>
+                <div className="settings-tools">
+                  <div
+                    hidden={
+                      settingsArea !== "appearance" || !shared("settings.view")
+                    }
+                  >
+                    <AppearanceEditor
+                      key={sub.id}
+                      subscription={sub}
+                      allowed={shared("settings.manage")}
+                      save={async (v) => {
+                        const { error } = await browserClient()
+                          .from("subscriptions")
+                          .update(v)
+                          .eq("id", sid);
+                        if (error) throw error;
+                        setSubs((previous) =>
+                          previous.map((s) =>
+                            s.id === sid
+                              ? {
+                                  ...s,
+                                  ...("logo_url" in s
+                                    ? v
+                                    : {
+                                        name: v.name,
+                                        description: v.description,
+                                        accent: v.accent,
+                                      }),
+                                }
+                              : s,
+                          ),
+                        );
+                      }}
+                    />
+                  </div>
+                  <section
+                    id="location-settings"
+                    className="panel"
+                    hidden={
+                      settingsArea !== "location" || !can("settings.view")
+                    }
+                  >
                     <fieldset disabled={!can("settings.manage")}>
                       <h2>
                         {location ? "Location settings" : "Create location"}
@@ -779,6 +1044,14 @@ export function Workspace({
                 </div>
               </div>
             )}
+          {plannedFeatures.some((f) => f.id === tab) && (
+            <section className="panel">
+              <p className="eyebrow">GROW & CONNECT</p>
+              <h2>{plannedFeatures.find((f) => f.id === tab)?.label}</h2>
+              <p>{plannedFeatures.find((f) => f.id === tab)?.description}</p>
+              <p className="coming-soon">Feature coming soon</p>
+            </section>
+          )}
           {tab === "users" && shared("users.view") && (
             <Users
               key={sid}

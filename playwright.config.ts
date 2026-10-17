@@ -14,7 +14,7 @@ export default defineConfig({
       : undefined,
   },
   webServer: {
-    command: "npm run dev -- --hostname 127.0.0.1 --port 3100",
+    command: "npm run dev -- --webpack --hostname 127.0.0.1 --port 3100",
     url: "http://127.0.0.1:3100",
     reuseExistingServer: false,
     env: {
@@ -31,3 +31,4 @@ export default defineConfig({
     },
   ],
 });
+

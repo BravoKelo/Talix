@@ -130,3 +130,8 @@ After testing the integrated core, the owner requested three original design upd
 
 
 The owner subsequently extended the same design batch to the public homepage using resnexus.com as an example. Original Talix content and illustrations replace the old minimal landing page; current capabilities, future plans and sample billing are distinguished. This stays within Issue #11/PR #14 and changes no authentication, payments, persistence or infrastructure.
+
+
+## Owner testing corrections #15–21 — October 16, 2026
+
+Owner testing requested a return-to-top control, an alternative to mobile dropdown navigation, business logo identity, a consistent shortcut/context header, compact orders with an interactive popup, searchable settings tiles with planned-feature navigation, and reusable internal Users tabs. The owner authorized implementing this batch and reserved final merge acceptance. The same design branch contains these revisions. A minimal business-logo migration is prepared and tested, with actual development execution held for protected-boundary approval; no live database change or merge is claimed. Other UI changes retain existing workflows and permissions.

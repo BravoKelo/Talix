@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
+import { PageTabs } from "./page-tabs";
 import { browserClient } from "@/lib/supabase/client";
 import {
   permissions,
@@ -25,6 +26,7 @@ export function Users({
   locations: Location[];
   manage: boolean;
 }) {
+  const [userTab, setUserTab] = useState("list");
   const [users, setUsers] = useState<BusinessUser[]>([]),
     [roles, setRoles] = useState<BusinessRole[]>([]),
     [message, setMessage] = useState(""),
@@ -99,6 +101,7 @@ export function Users({
     }
   }
   function edit(u: BusinessUser | null) {
+    setUserTab("add");
     setEditing(u);
     setEmail(u?.email ?? "");
     setRoleId(u?.role_id ?? roles.find((r) => r.name === "Viewer")?.id ?? "");
@@ -126,272 +129,313 @@ export function Users({
         full access.
       </p>
       <p role="status">{message}</p>
-      {loading ? (
-        <p>Loading users…</p>
-      ) : (
-        <div className="table-scroll">
-          <table>
-            <caption>Configured users</caption>
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Subscription role</th>
-                <th>Location access</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.email}</td>
-                  <td>
-                    {u.owner
-                      ? "Owner"
-                      : (roles.find((r) => r.id === u.role_id)?.name ??
-                        "Legacy employee")}
-                  </td>
-                  <td>
-                    {u.owner
-                      ? "All locations"
-                      : u.locations
-                          .map(
-                            (a) =>
-                              (locations.find((l) => l.id === a.id)?.name ??
-                                "Location") +
-                              " — " +
-                              (roles.find((r) => r.id === a.role_id)?.name ??
-                                "No role"),
-                          )
-                          .join(", ") || "No locations"}
-                  </td>
-                  <td>
-                    {manage && !u.owner && u.id !== userId ? (
-                      <button
-                        className="secondary"
-                        disabled={busy}
-                        onClick={() => edit(u)}
-                      >
-                        Edit {u.email}
-                      </button>
-                    ) : u.owner ? (
-                      "Protected owner account"
-                    ) : (
-                      "View only"
-                    )}
-                  </td>
+      <PageTabs
+        id="users"
+        label="User management"
+        active={userTab}
+        onChange={setUserTab}
+        items={[
+          { id: "list", label: "Users" },
+          ...(manage
+            ? [{ id: "add", label: editing ? "Edit user" : "Add user" }]
+            : []),
+          { id: "permissions", label: "Permissions" },
+        ]}
+      />
+      <div
+        role="tabpanel"
+        id="users-panel-list"
+        aria-labelledby="users-tab-list"
+        hidden={userTab !== "list"}
+      >
+        {loading ? (
+          <p>Loading users…</p>
+        ) : (
+          <div className="table-scroll">
+            <table>
+              <caption>Configured users</caption>
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Subscription role</th>
+                  <th>Location access</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      <details open>
-        <summary>Role access — allowed and denied</summary>
-        <div className="table-scroll">
-          <table>
-            <caption>Permissions by role</caption>
-            <thead>
-              <tr>
-                <th>Permission</th>
-                <th>Owner</th>
-                {roles.map((r) => (
-                  <th key={r.id}>{r.name}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {permissions.map(([p, label]) => (
-                <tr key={p}>
-                  <th>{label}</th>
-                  <td>Allowed</td>
-                  {roles.map((r) => (
-                    <td key={r.id}>
-                      {r.permissions.includes(p) ? "Allowed" : "Denied"}
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id}>
+                    <td>{u.email}</td>
+                    <td>
+                      {u.owner
+                        ? "Owner"
+                        : (roles.find((r) => r.id === u.role_id)?.name ??
+                          "Legacy employee")}
                     </td>
+                    <td>
+                      {u.owner
+                        ? "All locations"
+                        : u.locations
+                            .map(
+                              (a) =>
+                                (locations.find((l) => l.id === a.id)?.name ??
+                                  "Location") +
+                                " — " +
+                                (roles.find((r) => r.id === a.role_id)?.name ??
+                                  "No role"),
+                            )
+                            .join(", ") || "No locations"}
+                    </td>
+                    <td>
+                      {manage && !u.owner && u.id !== userId ? (
+                        <button
+                          className="secondary"
+                          disabled={busy}
+                          onClick={() => edit(u)}
+                        >
+                          Edit {u.email}
+                        </button>
+                      ) : u.owner ? (
+                        "Protected owner account"
+                      ) : (
+                        "View only"
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+      <div
+        role="tabpanel"
+        id="users-panel-permissions"
+        aria-labelledby="users-tab-permissions"
+        hidden={userTab !== "permissions"}
+      >
+        <details open>
+          <summary>Role access — allowed and denied</summary>
+          <div className="table-scroll">
+            <table>
+              <caption>Permissions by role</caption>
+              <thead>
+                <tr>
+                  <th>Permission</th>
+                  <th>Owner</th>
+                  {roles.map((r) => (
+                    <th key={r.id}>{r.name}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
-      {manage && (
-        <>
-          <h3>{editing ? "Edit user" : "Add a user"}</h3>
-          <form
-            className="stack"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void save(() =>
-                browserClient().rpc("save_business_user", {
-                  p_subscription: subscriptionId,
-                  p_email: email,
-                  p_role: roleId,
-                  p_locations: Object.entries(assignments)
-                    .filter(([, r]) => r)
-                    .map(([id, role_id]) => ({ id, role_id })),
-                }),
-              );
-            }}
-          >
-            <p>
-              New team members need an existing Talix account. No invitation
-              email is sent yet.
-            </p>
-            <label>
-              User email
-              <input
-                type="email"
-                required
-                value={email}
-                readOnly={!!editing}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </label>
-            <label>
-              Subscription role
-              <select
-                required
-                aria-label="Subscription role"
-                value={roleId}
-                onChange={(e) => setRoleId(e.target.value)}
-              >
-                <option value="">Choose a role</option>
-                {roles.map((r) => (
-                  <option value={r.id} key={r.id}>
-                    {r.name}
-                  </option>
+              </thead>
+              <tbody>
+                {permissions.map(([p, label]) => (
+                  <tr key={p}>
+                    <th>{label}</th>
+                    <td>Allowed</td>
+                    {roles.map((r) => (
+                      <td key={r.id}>
+                        {r.permissions.includes(p) ? "Allowed" : "Denied"}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+        {manage && (
+          <>
+            <h3>Custom roles</h3>
+            <label>
+              Choose a custom role
+              <select
+                aria-label="Choose a custom role"
+                value={customId}
+                onChange={(e) => {
+                  const r = roles.find((r) => r.id === e.target.value);
+                  setCustomId(r?.id ?? "");
+                  setCustomName(r?.name ?? "");
+                  setCustomPermissions(r?.permissions ?? []);
+                }}
+              >
+                <option value="">Create a custom role</option>
+                {roles
+                  .filter((r) => !r.predefined)
+                  .map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
+                  ))}
               </select>
             </label>
-            <fieldset>
-              <legend>Location access</legend>
-              {locations.map((l) => (
-                <label key={l.id}>
-                  {l.name}
-                  <select
-                    aria-label={"Role at " + l.name}
-                    value={assignments[l.id] ?? ""}
-                    onChange={(e) =>
-                      setAssignments({ ...assignments, [l.id]: e.target.value })
-                    }
-                  >
-                    <option value="">No access</option>
-                    {roles.map((r) => (
-                      <option key={r.id} value={r.id}>
-                        {r.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              ))}
-            </fieldset>
-            <div className="actions">
-              <button disabled={busy}>Save user</button>
-              {editing && (
-                <>
-                  <button
-                    type="button"
-                    className="secondary"
-                    disabled={busy}
-                    onClick={() => {
-                      void save(() =>
-                        browserClient().rpc("save_business_user", {
-                          p_subscription: subscriptionId,
-                          p_email: email,
-                          p_role: roleId,
-                          p_locations: [],
-                          p_remove: true,
-                        }),
-                      ).then((saved) => {
-                        if (saved) edit(null);
-                      });
-                    }}
-                  >
-                    Remove user access
-                  </button>
-                  <button
-                    type="button"
-                    className="secondary"
-                    onClick={() => edit(null)}
-                  >
-                    Add another user
-                  </button>
-                </>
-              )}
-            </div>
-          </form>
-          <h3>Custom roles</h3>
-          <label>
-            Choose a custom role
-            <select
-              aria-label="Choose a custom role"
-              value={customId}
-              onChange={(e) => {
-                const r = roles.find((r) => r.id === e.target.value);
-                setCustomId(r?.id ?? "");
-                setCustomName(r?.name ?? "");
-                setCustomPermissions(r?.permissions ?? []);
+            <form
+              className="stack"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void save<string>(
+                  () =>
+                    browserClient().rpc("save_business_role", {
+                      p_subscription: subscriptionId,
+                      p_id: customId || null,
+                      p_name: customName,
+                      p_permissions: customPermissions,
+                    }),
+                  (id) => {
+                    if (id) setCustomId(id);
+                  },
+                );
               }}
             >
-              <option value="">Create a custom role</option>
-              {roles
-                .filter((r) => !r.predefined)
-                .map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name}
-                  </option>
+              <label>
+                Role name
+                <input
+                  required
+                  minLength={2}
+                  maxLength={60}
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                />
+              </label>
+              <fieldset>
+                <legend>
+                  Permissions — checked allows access; unchecked denies it
+                </legend>
+                {permissions.map(([p, label]) => (
+                  <label className="permission-option" key={p}>
+                    <input
+                      type="checkbox"
+                      checked={customPermissions.includes(p)}
+                      onChange={(e) => toggle(p, e.target.checked)}
+                    />
+                    {label} —{" "}
+                    {customPermissions.includes(p) ? "Allowed" : "Denied"}
+                  </label>
                 ))}
-            </select>
-          </label>
-          <form
-            className="stack"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void save<string>(
-                () =>
-                  browserClient().rpc("save_business_role", {
+              </fieldset>
+              <button disabled={busy}>Save custom role</button>
+            </form>
+          </>
+        )}
+      </div>
+      <div
+        role="tabpanel"
+        id="users-panel-add"
+        aria-labelledby="users-tab-add"
+        hidden={userTab !== "add"}
+      >
+        {manage && (
+          <>
+            <h3>{editing ? "Edit user" : "Add a user"}</h3>
+            <form
+              className="stack"
+              onSubmit={(e) => {
+                e.preventDefault();
+                void save(() =>
+                  browserClient().rpc("save_business_user", {
                     p_subscription: subscriptionId,
-                    p_id: customId || null,
-                    p_name: customName,
-                    p_permissions: customPermissions,
+                    p_email: email,
+                    p_role: roleId,
+                    p_locations: Object.entries(assignments)
+                      .filter(([, r]) => r)
+                      .map(([id, role_id]) => ({ id, role_id })),
                   }),
-                (id) => {
-                  if (id) setCustomId(id);
-                },
-              );
-            }}
-          >
-            <label>
-              Role name
-              <input
-                required
-                minLength={2}
-                maxLength={60}
-                value={customName}
-                onChange={(e) => setCustomName(e.target.value)}
-              />
-            </label>
-            <fieldset>
-              <legend>
-                Permissions — checked allows access; unchecked denies it
-              </legend>
-              {permissions.map(([p, label]) => (
-                <label className="permission-option" key={p}>
-                  <input
-                    type="checkbox"
-                    checked={customPermissions.includes(p)}
-                    onChange={(e) => toggle(p, e.target.checked)}
-                  />
-                  {label} —{" "}
-                  {customPermissions.includes(p) ? "Allowed" : "Denied"}
-                </label>
-              ))}
-            </fieldset>
-            <button disabled={busy}>Save custom role</button>
-          </form>
-        </>
-      )}
+                );
+              }}
+            >
+              <p>
+                New team members need an existing Talix account. No invitation
+                email is sent yet.
+              </p>
+              <label>
+                User email
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  readOnly={!!editing}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </label>
+              <label>
+                Subscription role
+                <select
+                  required
+                  aria-label="Subscription role"
+                  value={roleId}
+                  onChange={(e) => setRoleId(e.target.value)}
+                >
+                  <option value="">Choose a role</option>
+                  {roles.map((r) => (
+                    <option value={r.id} key={r.id}>
+                      {r.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <fieldset>
+                <legend>Location access</legend>
+                {locations.map((l) => (
+                  <label key={l.id}>
+                    {l.name}
+                    <select
+                      aria-label={"Role at " + l.name}
+                      value={assignments[l.id] ?? ""}
+                      onChange={(e) =>
+                        setAssignments({
+                          ...assignments,
+                          [l.id]: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">No access</option>
+                      {roles.map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ))}
+              </fieldset>
+              <div className="actions">
+                <button disabled={busy}>Save user</button>
+                {editing && (
+                  <>
+                    <button
+                      type="button"
+                      className="secondary"
+                      disabled={busy}
+                      onClick={() => {
+                        void save(() =>
+                          browserClient().rpc("save_business_user", {
+                            p_subscription: subscriptionId,
+                            p_email: email,
+                            p_role: roleId,
+                            p_locations: [],
+                            p_remove: true,
+                          }),
+                        ).then((saved) => {
+                          if (saved) edit(null);
+                        });
+                      }}
+                    >
+                      Remove user access
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary"
+                      onClick={() => edit(null)}
+                    >
+                      Add another user
+                    </button>
+                  </>
+                )}
+              </div>
+            </form>
+          </>
+        )}
+      </div>
     </section>
   );
 }

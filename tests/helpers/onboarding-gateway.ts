@@ -197,6 +197,8 @@ export async function onboardingGateway() {
         "payment_events",
       ];
       const functions: Record<string, string[]> = {
+        advance_order: ["p_order", "p_status"],
+        refund_simulated: ["p_order", "p_request", "p_amount", "p_reason"],
         subscription_quote: ["p_type", "p_plan", "p_addons"],
         start_subscription: [
           "p_request",

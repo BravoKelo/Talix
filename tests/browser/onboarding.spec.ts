@@ -26,6 +26,8 @@ for (const changedPrice of [false, true])
       });
     }
     await connect(page.context());
+    if (test.info().project.name === "mobile" && !changedPrice)
+      await page.setViewportSize({ width: 320, height: 780 });
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     try {
@@ -47,10 +49,6 @@ for (const changedPrice of [false, true])
           name: "Your next order. Your next opportunity.",
         }),
       ).toBeVisible();
-      const publicMenu = page.getByRole("button", {
-        name: "Explore Talix menu",
-      });
-      if (await publicMenu.isVisible()) await publicMenu.click();
       await page.getByRole("link", { name: "Questions", exact: true }).click();
       await page
         .getByText("Will I be charged when I try Talix?", { exact: true })
@@ -63,6 +61,18 @@ for (const changedPrice of [false, true])
           () => document.documentElement.scrollWidth <= window.innerWidth,
         ),
       ).toBe(true);
+      await page
+        .getByRole("link", { name: "Back to top", exact: true })
+        .click();
+      await expect
+        .poll(() => page.evaluate(() => window.scrollY))
+        .toBeLessThan(4);
+      const navigationRows = await page
+        .locator(".home-nav a")
+        .evaluateAll((links) =>
+          links.map((link) => Math.round(link.getBoundingClientRect().top)),
+        );
+      expect(new Set(navigationRows).size).toBe(1);
       await page.goto("/");
       await page.screenshot({
         path: `test-results/landing-${test.info().project.name}.png`,
@@ -340,12 +350,77 @@ for (const changedPrice of [false, true])
       await expect(
         page.getByRole("link", { name: "Add subscription", exact: true }),
       ).toBeVisible();
-      if (
-        await page.getByRole("button", { name: "Workspace menu" }).isVisible()
-      ) {
-        await page.getByRole("button", { name: "Workspace menu" }).click();
-      }
-      await page.getByRole("button", { name: "Settings", exact: true }).click();
+      const fixture = (
+        await gateway.db.query<{ sid: string; lid: string }>(
+          "select subscription_id as sid,id as lid from public.locations limit 1",
+        )
+      ).rows[0];
+      await gateway.db.query(
+        "update public.locations set published=true where id=$1",
+        [fixture.lid],
+      );
+      const product = (
+        await gateway.db.query<{ id: string }>(
+          "insert into public.products(subscription_id,name,price_cents) values($1,'Notebook',1000) returning id",
+          [fixture.sid],
+        )
+      ).rows[0].id;
+      await gateway.db.query(
+        "select public.checkout_simulated($1,$2,$3,$4,'approved')",
+        [
+          fixture.lid,
+          crypto.randomUUID(),
+          JSON.stringify({
+            name: "Ledger Customer",
+            email: "ledger@example.invalid",
+            phone: "5551234567",
+          }),
+          JSON.stringify([
+            { product_id: product, quantity: 1, option_ids: [] },
+          ]),
+        ],
+      );
+      await page.getByRole("button", { name: "Refresh", exact: true }).click();
+      await page
+        .getByRole("button", { name: /Open order .* for Ledger Customer/ })
+        .click();
+      const orderDialog = page.getByRole("dialog", { name: "Order details" });
+      await expect(
+        orderDialog.getByRole("heading", { name: "Ledger Customer" }),
+      ).toBeVisible();
+      await orderDialog
+        .getByRole("button", { name: "Mark in progress", exact: true })
+        .click();
+      await expect(
+        orderDialog.getByRole("button", { name: "Mark ready", exact: true }),
+      ).toBeVisible();
+      await page.screenshot({
+        path: `test-results/order-dialog-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+      await page.keyboard.press("Escape");
+      await expect(orderDialog).toHaveCount(0);
+      await expect(
+        page.getByRole("button", { name: /Open order .* for Ledger Customer/ }),
+      ).toBeFocused();
+      await page
+        .getByRole("navigation", { name: "Workspace shortcuts" })
+        .getByRole("button", { name: "Settings", exact: true })
+        .click();
+      await page.screenshot({
+        path: `test-results/settings-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+      await page
+        .getByLabel("Search settings", { exact: true })
+        .fill("nothing-matches");
+      await expect(
+        page.getByText("No settings match your search. Try another word."),
+      ).toBeVisible();
+      await page.getByLabel("Search settings", { exact: true }).fill("logo");
+      await page
+        .getByRole("button", { name: /Storefront appearance Business logo/ })
+        .click();
       const appearance = page.getByRole("region", {
         name: "Storefront appearance",
       });
@@ -379,18 +454,29 @@ for (const changedPrice of [false, true])
         fullPage: true,
       });
       await gateway.addAccount("employee@example.invalid");
-      if (
-        await page.getByRole("button", { name: "Workspace menu" }).isVisible()
-      ) {
-        await page.getByRole("button", { name: "Workspace menu" }).click();
-      }
-      await page.getByRole("button", { name: "Users", exact: true }).click();
+      await page
+        .getByRole("navigation", { name: "Workspace shortcuts" })
+        .getByRole("button", { name: "Users", exact: true })
+        .click();
       await expect(
-        page.getByRole("table", { name: "Configured users" }),
+        page.getByRole("table", {
+          name: "Configured users",
+          includeHidden: true,
+        }),
       ).toContainText("Owner");
+      await page.getByRole("tab", { name: "Permissions", exact: true }).click();
       await page
         .getByLabel("Role name", { exact: true })
         .fill("Order observer");
+      await page.getByRole("tab", { name: "Add user", exact: true }).click();
+      await page.getByRole("tab", { name: "Permissions", exact: true }).click();
+      await expect(page.getByLabel("Role name", { exact: true })).toHaveValue(
+        "Order observer",
+      );
+      await page.screenshot({
+        path: `test-results/users-tabs-${test.info().project.name}.png`,
+        fullPage: true,
+      });
       await page.getByRole("checkbox", { name: /View orders/ }).check();
       await page
         .getByRole("button", { name: "Save custom role", exact: true })
@@ -412,6 +498,7 @@ for (const changedPrice of [false, true])
           )
         ).rows,
       ).toHaveLength(1);
+      await page.getByRole("tab", { name: "Add user", exact: true }).click();
       await page
         .getByLabel("User email", { exact: true })
         .fill("employee@example.invalid");
@@ -425,8 +512,12 @@ for (const changedPrice of [false, true])
         .getByRole("button", { name: "Save user", exact: true })
         .click();
       await expect(
-        page.getByRole("table", { name: "Configured users" }),
+        page.getByRole("table", {
+          name: "Configured users",
+          includeHidden: true,
+        }),
       ).toContainText("employee@example.invalid");
+      await page.getByRole("tab", { name: "Users", exact: true }).click();
       await page
         .getByRole("button", {
           name: "Edit employee@example.invalid",
@@ -440,7 +531,10 @@ for (const changedPrice of [false, true])
         .getByRole("button", { name: "Save user", exact: true })
         .click();
       await expect(
-        page.getByRole("table", { name: "Configured users" }),
+        page.getByRole("table", {
+          name: "Configured users",
+          includeHidden: true,
+        }),
       ).toContainText("Lead");
       // A denied removal must retain the selected user and all typed choices.
       const removalEndpoint =
@@ -480,7 +574,10 @@ for (const changedPrice of [false, true])
         page.getByRole("heading", { name: "Add a user", exact: true }),
       ).toBeVisible();
       await expect(
-        page.getByRole("table", { name: "Configured users" }),
+        page.getByRole("table", {
+          name: "Configured users",
+          includeHidden: true,
+        }),
       ).not.toContainText("employee@example.invalid");
       if (!changedPrice) {
         const clientBefore = (

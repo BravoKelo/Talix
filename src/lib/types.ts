@@ -25,6 +25,7 @@ export type Subscription = {
   name: string;
   slug: string;
   accent: string;
+  logo_url?: string | null;
   description: string;
 };
 export type CartLine = {

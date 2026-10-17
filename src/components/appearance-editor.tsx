@@ -1,8 +1,13 @@
 "use client";
+import Image from "next/image";
+import { browserClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import type { Subscription } from "@/lib/types";
 
-type Branding = Pick<Subscription, "name" | "description" | "accent">;
+type Branding = Pick<
+  Subscription,
+  "name" | "description" | "accent" | "logo_url"
+>;
 export function AppearanceEditor({
   subscription,
   allowed,
@@ -16,6 +21,7 @@ export function AppearanceEditor({
     name: subscription.name,
     description: subscription.description,
     accent: subscription.accent,
+    logo_url: subscription.logo_url ?? null,
   };
   const [draft, setDraft] = useState<Branding>(original);
   const [saved, setSaved] = useState<Branding>(original);
@@ -54,6 +60,65 @@ export function AppearanceEditor({
           }}
         >
           <fieldset disabled={!allowed || busy} className="stack">
+            <label>
+              Business logo
+              <input
+                disabled={!("logo_url" in subscription)}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (
+                    file.size > 5242880 ||
+                    !["image/png", "image/jpeg", "image/webp"].includes(
+                      file.type,
+                    )
+                  ) {
+                    setMessage("Choose a JPEG, PNG or WebP image under 5 MB.");
+                    e.target.value = "";
+                    return;
+                  }
+                  setBusy(true);
+                  setMessage("");
+                  try {
+                    const db = browserClient();
+                    const path = `${subscription.id}/${crypto.randomUUID()}`;
+                    const { error } = await db.storage
+                      .from("business-logos")
+                      .upload(path, file, { contentType: file.type });
+                    if (error) throw error;
+                    setDraft((previous) => ({
+                      ...previous,
+                      logo_url: db.storage
+                        .from("business-logos")
+                        .getPublicUrl(path).data.publicUrl,
+                    }));
+                    setMessage("Logo uploaded. Save branding to apply it.");
+                  } catch {
+                    setMessage(
+                      "We couldn’t upload your logo. Please try again.",
+                    );
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+              />
+            </label>
+            <p className="muted">
+              {"logo_url" in subscription
+                ? "JPEG, PNG or WebP, up to 5 MB. Your logo is public."
+                : "Business logo uploads are awaiting activation."}
+            </p>
+            {draft.logo_url && (
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => setDraft({ ...draft, logo_url: null })}
+              >
+                Remove logo
+              </button>
+            )}
             <label>
               Business name
               <input
@@ -125,13 +190,24 @@ export function AppearanceEditor({
             className="preview-header"
             style={{ borderTopColor: draft.accent }}
           >
-            <div
-              className="preview-monogram"
-              style={{ color: draft.accent }}
-              aria-hidden="true"
-            >
-              {draft.name.slice(0, 1).toUpperCase() || "T"}
-            </div>
+            {draft.logo_url ? (
+              <Image
+                width={150}
+                height={84}
+                unoptimized
+                className="business-logo"
+                src={draft.logo_url}
+                alt={`${draft.name} logo`}
+              />
+            ) : (
+              <div
+                className="preview-monogram"
+                style={{ color: draft.accent }}
+                aria-hidden="true"
+              >
+                {draft.name.slice(0, 1).toUpperCase() || "T"}
+              </div>
+            )}
             <h3>{draft.name || "Your business"}</h3>
             <p>
               {draft.description ||
@@ -156,12 +232,12 @@ export function AppearanceEditor({
       <div className="future-settings">
         <details>
           <summary>
-            Logo & header{" "}
+            Header layout{" "}
             <span className="coming-soon">Feature coming soon</span>
           </summary>
           <p>
-            Logo uploads, header templates and optional contact details will be
-            available here.
+            Header templates and optional contact details will be available
+            here.
           </p>
         </details>
         <details>
