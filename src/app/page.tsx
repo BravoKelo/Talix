@@ -310,7 +310,7 @@ export default function Home() {
           together.
         </p>
         <Link className="button home-primary" href="/signup">
-          Create your Talix account →
+          Create your account →
         </Link>
         <p className="home-returning">
           Already with us? <Link href="/login">Sign in</Link>

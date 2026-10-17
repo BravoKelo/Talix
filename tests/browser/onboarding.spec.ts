@@ -56,11 +56,22 @@ for (const changedPrice of [false, true])
       await expect(
         page.getByText(/Payments are simulated; no money is collected/),
       ).toBeVisible();
-      expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= window.innerWidth,
-        ),
-      ).toBe(true);
+      const fit = await page.evaluate(() => ({
+        width: window.innerWidth,
+        pageWidth: document.documentElement.scrollWidth,
+        overflowing: [...document.querySelectorAll("body *")]
+          .filter(
+            (el) => el.getBoundingClientRect().right > window.innerWidth + 1,
+          )
+          .slice(0, 12)
+          .map((el) => ({
+            tag: el.tagName,
+            class: el.className,
+            right: el.getBoundingClientRect().right,
+            text: el.textContent?.slice(0, 70),
+          })),
+      }));
+      expect(fit.pageWidth, JSON.stringify(fit)).toBeLessThanOrEqual(fit.width);
       await page
         .getByRole("link", { name: "Back to top", exact: true })
         .click();
