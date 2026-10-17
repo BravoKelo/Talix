@@ -2662,3 +2662,10 @@ body:has(.workspace) > .topbar {
     padding-inline: 14px;
   }
 }
+
+@media (max-width: 760px) {
+  .workspace .tabs .sidebar-brand,
+  .workspace .tabs > .sidebar-group {
+    display: none;
+  }
+}
