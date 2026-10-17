@@ -32,25 +32,31 @@ function ProductImage({ product }: { product: Product }) {
 function ProductCard({
   product,
   open,
+  onAdd,
 }: {
   product: Product;
   open: () => void;
+  onAdd: () => void;
 }) {
   return (
     <article className="shop-product-card">
-      <ProductImage key={product.image_url} product={product} />
-      <div className="shop-card-copy">
-        <h3>{product.name}</h3>
-        <p className="muted shop-product-summary">
-          {product.description || "View this product for details."}
-        </p>
+      <button
+        className="shop-tile-open secondary"
+        onClick={open}
+        aria-label={`View ${product.name}`}
+      >
+        <ProductImage key={product.image_url} product={product} />
+        <span className="shop-card-copy">
+          <span className="shop-product-name">{product.name}</span>
+          <span className="muted shop-product-summary">
+            {product.description || "View this product for details."}
+          </span>
+        </span>
+      </button>
+      <div className="shop-card-actions">
         <strong>{money(product.price_cents)}</strong>
-        <button
-          className="secondary"
-          onClick={open}
-          aria-label={`View ${product.name}`}
-        >
-          View product
+        <button onClick={onAdd} aria-label={`Add ${product.name} to cart`}>
+          Add to cart
         </button>
       </div>
     </article>
@@ -119,6 +125,13 @@ function ProductDetails({
 }
 export function Storefront({ slug }: { slug: string }) {
   const router = useRouter();
+  const [compactHeader, setCompactHeader] = useState(false);
+  useEffect(() => {
+    const update = () => setCompactHeader(window.scrollY > 48);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
   const [query, setQuery] = useState("");
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
   const [cartNotice, setCartNotice] = useState("");
@@ -239,40 +252,59 @@ export function Storefront({ slug }: { slug: string }) {
       <a className="shop-skip" href="#shop-location">
         Skip to location selection
       </a>
-      <nav className="shop-nav" aria-label="Storefront">
-        <a href="#shop-welcome">Welcome</a>
-        <a href={location ? "#shop-products" : "#shop-location"}>Products</a>
-        {location && <a href="#shop-cart">Your cart ({itemCount})</a>}
-      </nav>
-      <section className="store-hero" id="shop-welcome">
-        <div className="shop-introduction">
-          <p className="eyebrow">WELCOME</p>
-          {catalog.subscription.logo_url && (
-            <Image
-              width={150}
-              height={84}
-              unoptimized
-              className="business-logo"
-              src={catalog.subscription.logo_url}
-              alt={`${catalog.subscription.name} logo`}
-            />
-          )}
-          <h1>{catalog.subscription.name}</h1>
-          <p className="lead">
-            {catalog.subscription.description ||
-              "Explore our products and place your order online."}
-          </p>
-          <a
-            className="button secondary"
-            href={location ? "#shop-products" : "#shop-location"}
-          >
-            Explore products
+      <header
+        className={`shop-header${compactHeader ? " is-compact" : ""}`}
+        id="shop-welcome"
+      >
+        <nav className="shop-nav" aria-label="Storefront">
+          <a className="shop-brand" href="#shop-products">
+            {catalog.subscription.logo_url && (
+              <Image
+                width={72}
+                height={48}
+                unoptimized
+                className="business-logo"
+                src={catalog.subscription.logo_url}
+                alt={`${catalog.subscription.name} logo`}
+              />
+            )}
+            <h1>{catalog.subscription.name}</h1>
           </a>
-        </div>
+          <a
+            className="shop-cart-link"
+            href={location ? "#shop-cart" : "#shop-location"}
+            aria-label={`Your cart (${itemCount})`}
+          >
+            <svg
+              aria-hidden="true"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            >
+              <path d="M2 3h3l2 12h12l3-9H6" />
+              <circle cx="9" cy="20" r="1" />
+              <circle cx="18" cy="20" r="1" />
+            </svg>
+            <span>Cart ({itemCount})</span>
+            <strong>
+              {money(
+                cart.reduce((sum, line) => sum + line.unit * line.quantity, 0),
+              )}
+            </strong>
+          </a>
+        </nav>
+        {catalog.subscription.description && (
+          <p className="shop-header-description">
+            {catalog.subscription.description}
+          </p>
+        )}
+      </header>
+      <section className="shop-location-bar" aria-label="Shopping location">
         <div className="shop-location-panel" id="shop-location">
-          <h2>Shop your location</h2>
-          <p className="muted">
-            Choose where you’re ordering from to see available products.
+          <p className="shop-location-hint">
             Changing location clears your cart.
           </p>
           <label>
@@ -320,9 +352,7 @@ export function Storefront({ slug }: { slug: string }) {
             aria-label="Products"
           >
             <div className="shop-catalog-heading">
-              <p className="eyebrow">DISCOVER</p>
-              <h2>Explore our products</h2>
-              <p className="muted">Shopping at {selectedLocation?.name}</p>
+              <h2>Products</h2>
             </div>
             <label className="shop-search">
               Search products
@@ -343,6 +373,7 @@ export function Storefront({ slug }: { slug: string }) {
                   key={p.id}
                   product={p}
                   open={() => setActiveProduct(p)}
+                  onAdd={() => add(p, [])}
                 />
               ))}
             </div>

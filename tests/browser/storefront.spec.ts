@@ -75,9 +75,6 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
   await expect(
     page.getByRole("region", { name: "Products", exact: true }),
   ).toHaveCount(0);
-  await page
-    .getByRole("link", { name: "Explore products", exact: true })
-    .click();
   await page.getByLabel("Choose a location").selectOption("North");
   await expect(
     page.getByRole("button", { name: "View Desk organizer" }),
@@ -88,6 +85,18 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
   await expect(
     page.getByRole("img", { name: "Everyday notebook", exact: true }),
   ).toBeVisible();
+  const firstTile = page.locator(".shop-product-card").first();
+  const secondTile = page.locator(".shop-product-card").nth(1);
+  const firstBounds = await firstTile.boundingBox();
+  const secondBounds = await secondTile.boundingBox();
+  expect(firstBounds).not.toBeNull();
+  expect(secondBounds).not.toBeNull();
+  expect(firstBounds!.y).toBeLessThan(page.viewportSize()!.height - 120);
+  expect(Math.abs(firstBounds!.y - secondBounds!.y)).toBeLessThan(2);
+  await page.screenshot({
+    path: `test-results/storefront-grid-${test.info().project.name}.png`,
+    fullPage: true,
+  });
   await page.getByLabel("Search products").fill("CANVAS");
   await expect(
     page.getByRole("button", { name: "View Everyday notebook" }),
@@ -133,11 +142,10 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
       .click();
     await expect(opener).toBeFocused();
   }
-  await opener.click();
-  await expect(dialog.getByLabel("Gift wrap")).not.toBeChecked();
-  await dialog
-    .getByRole("button", { name: "Add to cart · $10.00", exact: true })
+  await page
+    .getByRole("button", { name: "Add Everyday notebook to cart", exact: true })
     .click();
+  await expect(dialog).not.toBeVisible();
   const cart = page.getByRole("complementary", { name: "Your cart" });
   await expect(
     cart.getByText("Everyday notebook × 2", { exact: true }),
@@ -148,6 +156,10 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
     .getByRole("link", { name: "Your cart (3)" })
     .click();
   await expect(cart).toBeInViewport();
+  await expect(page.locator(".shop-header")).toHaveClass(/is-compact/);
+  await expect(
+    page.getByRole("link", { name: "Your cart (3)" }),
+  ).toBeInViewport();
   await cart
     .getByRole("button", { name: "Remove", exact: true })
     .last()

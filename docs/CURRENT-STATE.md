@@ -1,5 +1,12 @@
 # Talix current state
 
+## Storefront owner review corrections — October 17, 2026
+
+Owner authorized compact image-led quick-add tiles, tile-click product dialogs and a collapsing sticky business header with the cart at top right. Presentation changes are prepared on the existing storefront branch. The configurable initial location is pending the explicit schema/catalog boundary decision described in PRODUCT-DESIGN; no default-location schema or live database change has been made.
+
+Publication of review commit 0bd391a and PR #33 was explicitly approved, including existing automatic feature previews. Owner then authorized copying the existing development preview settings to this branch and rebuilding; deployment dpl_71wgSMCpgdG68VzCUutkgSKnhXMa reached READY at that commit. Owner confirmed sign-in works. The automated deployed-page fetch was blocked by Vercel Authentication, so no automated deployed sign-in claim is made. No merge is authorized.
+
+
 ## Active storefront development — Issue #32, October 17, 2026
 
 Owner authorized the bounded visual storefront scope and continuation on `feature/core-storefront-visual-shopping`. Started with a clean feature branch at `39af71d5a4e7d7c9bf63ab68e56ea3027967a806`; remote main and feature branch were also verified at that baseline during this session. Earlier “no new feature scope” restart wording below is superseded by #32.
