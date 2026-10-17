@@ -47,6 +47,10 @@ for (const changedPrice of [false, true])
           name: "Your next order. Your next opportunity.",
         }),
       ).toBeVisible();
+      const publicMenu = page.getByRole("button", {
+        name: "Explore Talix menu",
+      });
+      if (await publicMenu.isVisible()) await publicMenu.click();
       await page.getByRole("link", { name: "Questions", exact: true }).click();
       await page
         .getByText("Will I be charged when I try Talix?", { exact: true })
@@ -336,6 +340,11 @@ for (const changedPrice of [false, true])
       await expect(
         page.getByRole("link", { name: "Add subscription", exact: true }),
       ).toBeVisible();
+      if (
+        await page.getByRole("button", { name: "Workspace menu" }).isVisible()
+      ) {
+        await page.getByRole("button", { name: "Workspace menu" }).click();
+      }
       await page.getByRole("button", { name: "Settings", exact: true }).click();
       const appearance = page.getByRole("region", {
         name: "Storefront appearance",
@@ -370,6 +379,11 @@ for (const changedPrice of [false, true])
         fullPage: true,
       });
       await gateway.addAccount("employee@example.invalid");
+      if (
+        await page.getByRole("button", { name: "Workspace menu" }).isVisible()
+      ) {
+        await page.getByRole("button", { name: "Workspace menu" }).click();
+      }
       await page.getByRole("button", { name: "Users", exact: true }).click();
       await expect(
         page.getByRole("table", { name: "Configured users" }),

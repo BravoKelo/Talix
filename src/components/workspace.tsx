@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { ResponsiveNavigation } from "@/components/responsive-navigation";
 
 import { AppearanceEditor } from "./appearance-editor";
 import { Users } from "./users";
@@ -347,45 +348,48 @@ export function Workspace({
               </a>
             )}
           </div>
-          <nav className="tabs" aria-label="Workspace sections">
-            <div className="sidebar-brand">
-              talix<span>•</span>
-              <small>BUSINESS WORKSPACE</small>
-            </div>
-            <p className="sidebar-group">MANAGE YOUR BUSINESS</p>
-            {[
-              ...(can("orders.view") ? ["orders"] : []),
-              ...(can("products.view") ? ["products"] : []),
-              ...(shared("settings.view") || can("settings.view")
-                ? ["settings"]
-                : []),
-              ...(shared("users.view") ? ["users"] : []),
-            ].map((t) => (
-              <button
-                key={t}
-                className={tab === t ? "active" : "secondary"}
-                aria-current={tab === t ? "page" : undefined}
-                onClick={() => setTab(t)}
-              >
-                {t[0].toUpperCase() + t.slice(1)}
-              </button>
-            ))}
-            <div className="sidebar-future">
-              <p className="sidebar-group">GROW & CONNECT</p>
-              <details>
-                <summary>Reports</summary>
-                <span className="coming-soon">Feature coming soon</span>
-              </details>
-              <details>
-                <summary>Communications</summary>
-                <span className="coming-soon">Feature coming soon</span>
-              </details>
-              <details>
-                <summary>Support & training</summary>
-                <span className="coming-soon">Feature coming soon</span>
-              </details>
-            </div>
-          </nav>
+          <ResponsiveNavigation label="Workspace menu">
+            {" "}
+            <nav className="tabs" aria-label="Workspace sections">
+              <div className="sidebar-brand">
+                talix<span>•</span>
+                <small>BUSINESS WORKSPACE</small>
+              </div>
+              <p className="sidebar-group">MANAGE YOUR BUSINESS</p>
+              {[
+                ...(can("orders.view") ? ["orders"] : []),
+                ...(can("products.view") ? ["products"] : []),
+                ...(shared("settings.view") || can("settings.view")
+                  ? ["settings"]
+                  : []),
+                ...(shared("users.view") ? ["users"] : []),
+              ].map((t) => (
+                <button
+                  key={t}
+                  className={tab === t ? "active" : "secondary"}
+                  aria-current={tab === t ? "page" : undefined}
+                  onClick={() => setTab(t)}
+                >
+                  {t[0].toUpperCase() + t.slice(1)}
+                </button>
+              ))}
+              <div className="sidebar-future">
+                <p className="sidebar-group">GROW & CONNECT</p>
+                <details>
+                  <summary>Reports</summary>
+                  <span className="coming-soon">Feature coming soon</span>
+                </details>
+                <details>
+                  <summary>Communications</summary>
+                  <span className="coming-soon">Feature coming soon</span>
+                </details>
+                <details>
+                  <summary>Support & training</summary>
+                  <span className="coming-soon">Feature coming soon</span>
+                </details>
+              </div>
+            </nav>
+          </ResponsiveNavigation>
           {tab === "orders" && can("orders.view") && (
             <div className="workspace-grid">
               <section className="panel">

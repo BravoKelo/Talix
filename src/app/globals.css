@@ -2114,3 +2114,164 @@ body:has(.workspace) > footer {
     height: auto;
   }
 }
+
+/* Deliberate mobile navigation and touch targets, without wrapping controls. */
+.mobile-navigation-toggle {
+  display: none;
+}
+.responsive-navigation-content {
+  display: contents;
+}
+:is(.talix-home, .access-layout, .workspace)
+  :is(button, .button, select, summary),
+.topbar nav a {
+  min-height: 48px;
+  min-width: 48px;
+}
+:is(.talix-home, .access-layout, .workspace) :is(a, button, summary) {
+  touch-action: manipulation;
+}
+:is(.talix-home, .access-layout, .workspace)
+  :is(input:not([type="checkbox"]):not([type="radio"]), textarea) {
+  min-height: 48px;
+  font-size: 16px;
+}
+:is(.access-layout, .workspace)
+  label:has(input:is([type="checkbox"], [type="radio"])) {
+  min-height: 48px;
+  padding-block: 8px;
+}
+:is(.access-layout, .workspace) input:is([type="checkbox"], [type="radio"]) {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.home-nav a,
+.topbar nav a,
+.access-footnote a,
+.home-returning a,
+.workspace .selectors > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 12px;
+}
+:is(.home-faq, .future-settings, .sidebar-future) summary {
+  padding-block: 12px;
+}
+@media (max-width: 760px) {
+  .responsive-navigation {
+    padding: 12px 20px;
+  }
+  .workspace .responsive-navigation {
+    padding: 0;
+    margin-bottom: 22px;
+  }
+  .mobile-navigation-toggle {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 16px;
+    min-height: 48px;
+    white-space: nowrap;
+  }
+  .responsive-navigation-content[data-open="false"] {
+    display: none;
+  }
+  .responsive-navigation-content[data-open="true"] {
+    display: block;
+  }
+  .responsive-navigation .home-nav,
+  .workspace .tabs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 12px;
+    margin: 8px 0 0;
+  }
+  .home-nav a,
+  .workspace .tabs > button {
+    white-space: nowrap;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .topbar {
+    gap: 12px;
+  }
+  .topbar nav {
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+  .topbar nav a {
+    white-space: nowrap;
+    padding: 8px 10px;
+  }
+  .access-links {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .access-links > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 6px;
+  }
+  .access-links strong,
+  .coming-soon {
+    white-space: nowrap;
+  }
+  .access-content .signup-steps {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .access-content .signup-steps li {
+    white-space: nowrap;
+  }
+  :is(.talix-home, .access-layout, .workspace) .actions,
+  .workspace .selectors,
+  .workspace > .row,
+  .appearance-actions,
+  .future-password {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    flex-wrap: nowrap;
+  }
+  :is(.talix-home, .access-layout, .workspace) :is(button, .button) {
+    white-space: nowrap;
+  }
+  :is(.talix-home, .access-layout, .workspace) .actions > *,
+  .appearance-actions > * {
+    width: 100%;
+  }
+  .workspace .selectors > *,
+  .workspace .selectors label {
+    width: 100%;
+    min-width: 0;
+  }
+  .preview-label,
+  .preview-location {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .home-roadmap > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+    gap: 8px;
+  }
+  .sample-order {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 8px;
+  }
+  .sample-order > span:last-child {
+    grid-column: 2;
+    margin: 0;
+    width: fit-content;
+  }
+}

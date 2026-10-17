@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ResponsiveNavigation } from "@/components/responsive-navigation";
 import { configured } from "@/lib/supabase/client";
 
 const capabilities = [
@@ -27,12 +28,15 @@ const capabilities = [
 export default function Home() {
   return (
     <main className="talix-home">
-      <nav className="home-nav" aria-label="Explore Talix">
-        <a href="#overview">Meet Talix</a>
-        <a href="#capabilities">What you can do</a>
-        <a href="#direction">Built to grow</a>
-        <a href="#questions">Questions</a>
-      </nav>
+      <ResponsiveNavigation label="Explore Talix menu">
+        {" "}
+        <nav className="home-nav" aria-label="Explore Talix">
+          <a href="#overview">Meet Talix</a>
+          <a href="#capabilities">What you can do</a>
+          <a href="#direction">Built to grow</a>
+          <a href="#questions">Questions</a>
+        </nav>
+      </ResponsiveNavigation>
       <section className="home-hero" id="overview" aria-labelledby="home-title">
         <div className="hero-copy">
           <p className="eyebrow">YOUR BUSINESS, CONNECTED</p>
