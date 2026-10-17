@@ -27,7 +27,7 @@ const capabilities = [
 
 export default function Home() {
   return (
-    <main className="talix-home">
+    <main className="talix-home" id="page-top">
       <ResponsiveNavigation label="Explore Talix menu">
         {" "}
         <nav className="home-nav" aria-label="Explore Talix">
@@ -316,6 +316,9 @@ export default function Home() {
           Already with us? <Link href="/login">Sign in</Link>
         </p>
       </section>
+      <a className="back-to-top" href="#page-top" aria-label="Back to top">
+        ↑ <span>Back to top</span>
+      </a>
       {!configured() && (
         <aside className="notice home-availability">
           Signup and ordering are temporarily unavailable. Please check back

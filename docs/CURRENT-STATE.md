@@ -57,3 +57,12 @@ The owner requested a redesigned Talix homepage after seeing the unchanged old l
 ### Mobile/touch design correction
 
 Owner approved replacing wrapped mobile navigation with compact disclosure menus and increasing touch targets. Same feature/talix-design-refresh branch/PR #14 now includes responsive public/workspace menus, deliberate single-column mobile controls and 48px touch targets. Tests exercise mobile menu opening before navigation. Review the latest matching preview/head in PR #14; no merge is implied. Cloud-browser preview access was previously declined and has not been retried; local browser screenshots and automated checks remain the visual/functional evidence.
+
+
+## Latest authorized review batch — Issues #15–21
+
+The owner finished intake and authorized these corrections, requesting a final review before merge. Work stays on feature/talix-design-refresh / PR #14. Implemented: back-to-top, visible mobile horizontal navigation (supersedes dropdown menus), consistent workspace header and top-right subscription/location context, business identity fallback, planned-feature navigation, ledger orders with an interactive modal, searchable settings tiles and internal Users tabs preserving drafts. Existing permissions and payment simulation are retained.
+
+Business-logo configuration adds a prepared migration 20261017010613_business_logos.sql (nullable logo_url, constrained public bucket, existing settings permission checks and a catalog logo field). It is locally tested but NOT applied to development. AGENTS.md requires protected schema/security approval before development execution; obtain that specific approval after presenting the prepared result. The preview remains compatible with the current ten-migration database: logo uploads stay disabled until activation, while existing branding fields can save. No owner data, policies or storage have been modified on the actual service in this batch. Main deployment hold and no-mail development mode remain unchanged.
+
+Local logo SQL tests verify shared settings managers can save/upload without product permissions, outsiders/viewers cannot, unsafe logo addresses are rejected, and public catalog adds no client identity. Browser suites use isolated SQL/Auth fixtures, not actual service account creation. Exact published head/checks/deployment and final test outcomes are recorded in PR #14. Review before merge; issues remain open until owner acceptance. No additional branches were created; retain existing previews until replaced.

@@ -122,3 +122,17 @@ Owner review requested larger navigation and descriptive text across every refre
 ### Mobile navigation and touch revision — October 16, 2026
 
 The owner rejected wrapping mobile navigation/controls and approved compact navigation menus and touch-friendly controls. Public and workspace sections now use accessible mobile disclosure menus with single-column choices; desktop navigation remains visible. Mobile actions, subscription/location selectors, resource placeholders and signup steps have deliberate single-column layouts rather than wrapped rows. Controls keep readable type and single-line labels. Buttons, primary navigation, selects and disclosure summaries have at least 48px targets; checkbox/radio labels provide larger activation areas. Paragraph text still wraps naturally. This supersedes the earlier control-wrapping approach and remains within Issue #11/PR #14.
+
+
+## Review corrections #15–21 — October 16, 2026
+
+The owner authorized this testing batch and requested a final review before merge. These changes supersede the earlier mobile dropdown and long settings-page approach:
+
+- Homepage has a touch-friendly fixed Back to top link. Mobile public/workspace navigation remains visible in a single horizontally scrollable row, without dropdowns, line wrapping or reduced type.
+- Workspace uses a consistent header with permission-aware Orders, Products, Settings and Users shortcuts; storefront/add-subscription actions remain available. Current subscription/location dropdowns occupy the top-right on desktop and dedicated full-width controls on mobile. The duplicate Business workspace entry button and old page-level selector panel are removed inside the workspace.
+- Sidebar identity uses the selected business logo or a business-name initial fallback. Planned CRM, inventory/materials, financial reporting, employee scheduling/time, marketing, communications, integrations, website-builder, industry and support areas are explicitly labeled Feature coming soon; menu presence does not implement them.
+- Orders use compact ledger rows. Selecting a row opens a modal with the existing detail, fulfillment and simulated-refund actions. Escape/Close return to the list; keyboard focus returns to the order control.
+- Settings has searchable tiles with names/descriptions and no-match feedback. Selecting a tile opens one tool instead of all settings in a long page. Hidden tool panels retain drafts.
+- Users has internal Users, Add/Edit user and Permissions tabs. Tabs have keyboard navigation and clear selected state; user/role drafts survive internal tab changes. Existing protected Owner, custom roles and delegation rules remain enforced.
+
+Business-logo upload/save is implemented against a prepared additive migration, not yet applied to development. The nullable logo URL and public business-logos bucket use existing settings.manage authority; public images are limited to JPEG/PNG/WebP up to 5 MB, uploaded under the subscription's folder without overwrites. No logo means a business initial, not another Talix logo. Public catalog output adds only the logo URL. Until database activation, logo input is disabled and existing branding can still save. Storage/image URLs and retained uploads follow the existing product-image approach; orphan cleanup is not part of this batch.
