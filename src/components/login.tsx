@@ -98,6 +98,10 @@ export function Login({
         {message ||
           (!configured() ? "Sign-in is temporarily unavailable." : "")}
       </p>
+      <div className="future-password">
+        <span>Forgot your password?</span>
+        <small className="coming-soon">Feature coming soon</small>
+      </div>
       <p>
         New to Talix? <Link href="/signup">Sign up</Link>
       </p>

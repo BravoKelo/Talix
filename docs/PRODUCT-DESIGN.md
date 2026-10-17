@@ -2,7 +2,7 @@
 
 ## Status
 
-**Design status:** Confirmed product-level workflows; no approved detailed UI or visual design.
+**Design status:** Confirmed workflows and owner-approved October 16 visual direction; implementation remains for review.
 
 ## Purpose
 
@@ -21,7 +21,7 @@ Customer-facing elements should be classified as one of:
 
 ## Current Approved Design
 
-No detailed customer-facing design has yet been approved in the current Talix repository.
+The owner approved the October 16 design direction below. Existing detailed layouts remain reviewable implementations, not authority to change unrelated workflows.
 
 The product vision establishes that Talix is intended to include:
 
@@ -96,3 +96,14 @@ Users starts with configured users, protected Owner, subscription roles and sepa
 ## Reconciliation checkpoint — October 7, 2026 (Pacific; October 8 UTC)
 
 The owner closed Issues #5–9 after review. Preserve those corrected workflows; closure does not approve merging or the complete visual design. Issue #10 authorizes focused stabilization: successful custom-role creation keeps that role selected for later saves; a failed removal retains the selected user's editor and location choices, while successful removal returns to Add a user. Adding a subscription preserves the shared client profile and retains its own purchase details. This profile correction is applied and verified on development after separate execution approval.
+
+
+## October 16 design batch — Issues #11–13
+
+The owner requested an original Talix design using blue, white and gold. Preserve current core behavior and use original branding, assets and text. Missing applicable capabilities must say Feature coming soon.
+
+Implemented for review: sign-in/signup use a white form column and blue feature/resource column, gold accents, public-resource placeholders and honest support/announcement/recovery placeholders. Existing signup/review/account/confirmation logic remains intact. The business workspace uses a grouped blue sidebar with gold active navigation, subscription/location selectors, settings category cards and responsive navigation. Access visibility continues to use the existing permission model.
+
+The storefront editor exposes existing subscription-wide business name/introduction/brand color with an adjacent layout preview, unsaved/saved feedback, cancel and persisted save. Logo/header uploads, navigation editing, detailed element colors and slideshow remain clearly labeled placeholders. Preview is a non-interactive layout representation, not a full checkout or website builder. No schema, policies, migrations, authentication methods or new integrations are introduced.
+
+All seven appearance screenshots were reviewed. Observed references include settings discovery, header/contact/mode choices, logo upload, editable/reorderable links, grouped color controls with preview and Save/Cancel; slideshow contents were not supplied. Only existing Talix settings work in this first design slice; other controls are placeholders rather than inferred implementation. Talix application colors do not restrict an owner's saved storefront brand color.
