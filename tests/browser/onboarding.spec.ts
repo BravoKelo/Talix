@@ -42,6 +42,28 @@ for (const changedPrice of [false, true])
         page.getByRole("button", { name: "Resend confirmation email" }),
       ).toHaveCount(0);
       await page.goto("/");
+      await expect(
+        page.getByRole("heading", {
+          name: "Your next order. Your next opportunity.",
+        }),
+      ).toBeVisible();
+      await page.getByRole("link", { name: "Questions", exact: true }).click();
+      await page
+        .getByText("Will I be charged when I try Talix?", { exact: true })
+        .click();
+      await expect(
+        page.getByText(/Payments are simulated; no money is collected/),
+      ).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        ),
+      ).toBe(true);
+      await page.goto("/");
+      await page.screenshot({
+        path: `test-results/landing-${test.info().project.name}.png`,
+        fullPage: true,
+      });
       await page.getByRole("link", { name: "Sign up →", exact: true }).click();
       await page
         .getByLabel("Business name", { exact: true })

@@ -127,3 +127,6 @@ The owner explicitly instructed merging the current work and deferring further m
 ## Talix visual design batch — October 16, 2026
 
 After testing the integrated core, the owner requested three original Talix design updates: blue/white/gold sign-in/signup; general workspace layout/navigation; storefront appearance editing. Issues #11–13 capture each request. Seven screenshots supplied the appearance workflow when video playback was unavailable. Implementation on one focused feature branch preserves existing behavior and permissions, with working previews for existing branding fields and labeled placeholders for unsupported capabilities. No new database/backend capability or merge is implied. The owner also requested routine cleanup of merged feature branches once their testing previews are replaced.
+
+
+The owner subsequently extended the same design batch to the public homepage. Original Talix content and illustrations replace the old minimal landing page; current capabilities, future plans and sample billing are distinguished. This stays within Issue #11/PR #14 and changes no authentication, payments, persistence or infrastructure.
