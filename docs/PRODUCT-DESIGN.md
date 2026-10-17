@@ -140,7 +140,7 @@ Business-logo upload/save is implemented against a prepared additive migration, 
 
 ## Accepted design baseline — PR #14, October 16, 2026 Pacific
 
-Owner accepted the final reviewed design and authorized merging PR #14 at b87a22c62e751ce44d7596af04c4d9a2739799ba. This supersedes earlier provisional/pending descriptions and initial unsupported-logo placeholders above.
+Owner accepted the final reviewed design and authorized merging PR #14 at 62d17846d6d298d1a1844c03e63b2e6aa3966771. This supersedes earlier provisional/pending descriptions and initial unsupported-logo placeholders above.
 
 Final behavior: visible horizontally scrollable mobile navigation; consistent workspace header/context; business-logo identity; ledger orders with modal details; searchable Settings tiles; internal Users tabs; compact uniform resting tiles; shared Add/Edit product modal; explicit Cancel actions where applicable. Order numbers start at 100001 per location with Date/time beside them. Order cancellation requires fulfillment authority and does not refund automatically. Confirmed product deletion preserves historical snapshots.
 

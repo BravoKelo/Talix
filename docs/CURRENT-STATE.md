@@ -1,8 +1,15 @@
 # Talix current state
 
+## Repository history cleanup — October 16, 2026 Pacific / October 17 UTC
+
+Owner explicitly authorized rewriting the repository history and force-pushing without further interaction. Nineteen affected commits were replaced with cleaned versions; all five branch histories were audited and no tags exist. Only historical documentation text changed; application files, migrations, dependencies and merge topology were preserved. The cleaned branch tip before this handoff is d8e860a922b95ca6b2ed7039184130188727a884. The accepted application tree is unchanged. Use the latest main branch for all future work; do not merge old design history back into it. Commit timestamps for reconstructed commits reflect the cleanup operation. Historical checkpoint IDs below refer to equivalent cleaned commits; linked CI runs originally validated the corresponding pre-rewrite source trees.
+
+GitHub retains a read-only head reference for merged PR #14, which still points to the original history. Branch cleanup does not purge that managed PR reference or cached commit views. Full server-side removal is outside the connected repository tools; see GitHub's history-removal documentation. No claim of total GitHub-side erasure is made. The three older branches were already clean and were retained. The design branch follows the cleaned baseline while its testing preview remains in use. Automatic main deployments remain disabled; no database changes or production release occurred.
+
+
 ## Accepted baseline — October 16, 2026 Pacific / October 17 UTC
 
-Owner reviewed the final preview and said “Looks good. lets proceed.” PR #14 was merged with a merge commit cf7195f09bb944e320e49fa3dca4c7ad8562534b, preserving reviewed head b87a22c62e751ce44d7596af04c4d9a2739799ba and its exact application tree b51c7a0ce33e36ac9ab56978f29e97a886a6884a. Issues #11–13 and #15–30 are accepted/completed. This section supersedes historical pending-review/unapplied statements below.
+Owner reviewed the final preview and said “Looks good. lets proceed.” PR #14 was merged with a merge commit 6e92e456f30c355129162f7ace1a0ae0e0613ed6, preserving reviewed head 62d17846d6d298d1a1844c03e63b2e6aa3966771 and its equivalent cleaned tree 93cc977d90c2a4713287f019050cdb569320bbd7. Issues #11–13 and #15–30 are accepted/completed. This section supersedes historical pending-review/unapplied statements below.
 
 Final GitHub workflow 39006918021 completed successfully: lint, TypeScript, 48 unit/SQL tests, production build and six desktop/mobile browser scenarios. Local browser suite also passed all six. Browser automation uses isolated Auth/PostgREST/Storage fixtures with actual SQL/RLS. Owner reported actual image deletion works and accepted the final filename correction.
 
@@ -110,7 +117,7 @@ Owner explicitly approved both prepared migrations. Applied unchanged SQL to Tal
 
 Live transaction checks passed 100001/100002 allocation, checkout retry safety, idempotent cancellation with unchanged paid/refund state, product/image authorization and outsider denial, referenced-versus-unreferenced image checks, authorized product deletion and preserved order tracking snapshots. All temporary Auth/workspace/product/order records were rolled back. No stored image files were uploaded/deleted during live verification, and no existing product/order state was changed except the approved numeric backfill. Real-service file-byte deletion remains for owner testing; do not report SQL policy checks as end-to-end Storage API verification. Security advisor categories/counts remain unchanged; the new helper stays private and anonymous execution is denied.
 
-Implementation head 5621726f1a1109e3ebb291c014251035318f9079 passed GitHub workflow 39003044749, including all 46 unit/SQL tests and six browser scenarios. Existing READY preview https://talix-ccie2zt3q-bravokelo.vercel.app/ now uses the activated database behavior after reload. This checkpoint changes filenames/test reference/documentation only. Main and production deployment hold remain unchanged. Final owner review/merge acceptance is still pending; keep PR #14 and review issues open.
+Implementation head 9cfd223f2427c16e1e540c76acc82cd6e1b382bf passed GitHub workflow 39003044749, including all 46 unit/SQL tests and six browser scenarios. Existing READY preview https://talix-ccie2zt3q-bravokelo.vercel.app/ now uses the activated database behavior after reload. This checkpoint changes filenames/test reference/documentation only. Main and production deployment hold remain unchanged. Final owner review/merge acceptance is still pending; keep PR #14 and review issues open.
 
 
 ### Final image picker correction — Issue #30

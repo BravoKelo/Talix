@@ -139,8 +139,13 @@ Owner testing requested a return-to-top control, an alternative to mobile dropdo
 
 ## Design and owner-review acceptance — October 16, 2026 Pacific / October 17 UTC
 
-Owner accepted the final preview (“Looks good. lets proceed.”). PR #14 merged as cf7195f09bb944e320e49fa3dca4c7ad8562534b, preserving reviewed head b87a22c62e751ce44d7596af04c4d9a2739799ba, completing Issues #11–13 and #15–30. Final workflow 39006918021 passed lint, TypeScript, 48 unit/SQL tests, build and six desktop/mobile browser scenarios. Owner reported image deletion works and accepted filename display across image pickers.
+Owner accepted the final preview (“Looks good. lets proceed.”). PR #14 merged as 6e92e456f30c355129162f7ace1a0ae0e0613ed6, preserving reviewed head 62d17846d6d298d1a1844c03e63b2e6aa3966771, completing Issues #11–13 and #15–30. Final workflow 39006918021 passed lint, TypeScript, 48 unit/SQL tests, build and six desktop/mobile browser scenarios. Owner reported image deletion works and accepted filename display across image pickers.
 
 Separately approved development activations are recorded as 20261017032355_business_logos, 20261017050812_readable_order_numbers_and_cancellation and 20261017050814_product_and_image_deletion. Thirteen migrations are applied; none replayed at merge. Live rolled-back SQL verification passed numbering, cancellation/payment separation, scoped product/image permissions, saved-reference protection and historical snapshots. Those checks do not claim automated live file-byte deletion.
 
 No production release was performed; automatic main deployment remains disabled, no-mail development mode and simulated payments remain. Retain the design feature branch while the accepted testing preview depends on it; delete after replacement per owner preference. This supersedes the historical pending acceptance/execution statuses.
+
+
+## Authorized repository history cleanup — October 16, 2026 Pacific
+
+Owner requested removal of external design-reference naming from current files and historical snapshots, then explicitly authorized a history rewrite and force-push. Audited 52 reachable commits and 316 unique original file blobs across five branches; no tags. Nineteen commits were reconstructed with cleaned historical documentation, preserving their messages and parent topology; the accepted application tree was unchanged. Three older branch histories needed no changes. Mapped affected checkpoint IDs in current documentation and issue text to cleaned commits. Reconstructed commit timestamps reflect cleanup time. GitHub's retained read-only merged PR #14 head remains a known server-managed limitation, not a successful purge. Continue from current main and avoid reintroducing old design ancestry.
