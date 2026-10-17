@@ -24,6 +24,7 @@ const catalog: Catalog = {
     name: "Example store",
     description: "Everyday essentials, thoughtfully chosen.",
     accent: "#ffffff",
+    default_location_id: "North",
   },
   locations: ["North", "South", "Empty"].map((name) => ({
     id: name,
@@ -67,14 +68,21 @@ async function mockCatalog(
 test("visual shopping: keyboard details, scoped search, cart variants and location reset", async ({
   page,
 }) => {
-  await mockCatalog(page, catalog);
+  await mockCatalog(page, {
+    ...catalog,
+    products: [
+      ...catalog.products,
+      { ...product("extra", "Travel pouch", "North"), category: "Travel" },
+    ],
+  });
   await page.goto("/shop/example");
   await expect(
     page.getByRole("heading", { name: "Example store" }),
   ).toBeVisible();
   await expect(
     page.getByRole("region", { name: "Products", exact: true }),
-  ).toHaveCount(0);
+  ).toBeVisible();
+  await expect(page.getByLabel("Choose a location")).toHaveValue("North");
   await page.getByLabel("Choose a location").selectOption("North");
   await expect(
     page.getByRole("button", { name: "View Desk organizer" }),
@@ -91,12 +99,36 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
   const secondBounds = await secondTile.boundingBox();
   expect(firstBounds).not.toBeNull();
   expect(secondBounds).not.toBeNull();
-  expect(firstBounds!.y).toBeLessThan(page.viewportSize()!.height - 120);
+  expect(firstBounds!.y).toBeLessThan(240);
+  const columns = await page
+    .locator(".catalog")
+    .evaluate(
+      (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length,
+    );
+  expect(columns).toBe(test.info().project.name === "mobile" ? 2 : 3);
+  await expect(page.locator("body > .topbar")).toBeHidden();
+  await page.getByRole("button", { name: "Your account", exact: true }).click();
+  await expect(
+    page.getByRole("link", { name: "Business sign in", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Your account", exact: true }).click();
   expect(Math.abs(firstBounds!.y - secondBounds!.y)).toBeLessThan(2);
   await page.screenshot({
     path: `test-results/storefront-grid-${test.info().project.name}.png`,
     fullPage: true,
   });
+  if (test.info().project.name === "mobile")
+    await page.getByRole("button", { name: "Menu", exact: true }).click();
+  await page.getByRole("button", { name: "Travel", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "View Travel pouch", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "View Everyday notebook", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "All products", exact: true }).click();
+  if (test.info().project.name === "mobile")
+    await page.getByRole("button", { name: "Menu", exact: true }).click();
   await page.getByLabel("Search products").fill("CANVAS");
   await expect(
     page.getByRole("button", { name: "View Everyday notebook" }),
@@ -183,10 +215,8 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
   await expect(
     page.getByRole("img", { name: "No image available for Desk organizer" }),
   ).toBeVisible();
-  await page.getByLabel("Choose a location").selectOption("");
-  await expect(
-    page.getByRole("button", { name: "Place order with simulated payment" }),
-  ).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByLabel("Choose a location")).toHaveValue("North");
 });
 
 test("empty catalog, unpublished locations, loading and unavailable states", async ({
@@ -223,4 +253,55 @@ test("empty catalog, unpublished locations, loading and unavailable states", asy
   await expect(
     page.getByRole("heading", { name: "Loading store…" }),
   ).toBeVisible();
+});
+
+test("published-location fallback and saved photo/appearance render without an application header", async ({
+  page,
+}) => {
+  await mockCatalog(page, {
+    ...catalog,
+    subscription: {
+      ...catalog.subscription,
+      default_location_id: "missing",
+      header_identity: "photo",
+      header_photo_url: "http://127.0.0.1:3100/test-product.svg",
+      header_background: "#000000",
+      storefront_button: "#ffffff",
+      storefront_font: "serif",
+      tile_corners: "round",
+    },
+  });
+  await page.goto("/shop/example");
+  await expect(page.getByLabel("Choose a location")).toHaveValue("Empty");
+  await expect(page.locator(".shop-centered-identity img")).toBeVisible();
+  await expect(page.locator(".figma-store")).toHaveCSS(
+    "font-family",
+    "Georgia, serif",
+  );
+  await expect(page.locator(".shop-header")).toHaveCSS(
+    "background-color",
+    "rgb(0, 0, 0)",
+  );
+  await expect(page.locator("body > .topbar")).toBeHidden();
+  const icons = page.locator(".shop-icon");
+  for (const icon of await icons.all()) {
+    const bounds = await icon.boundingBox();
+    expect(bounds!.width).toBeGreaterThanOrEqual(48);
+    expect(bounds!.height).toBeGreaterThanOrEqual(48);
+  }
+  if (test.info().project.name === "mobile") {
+    await page.setViewportSize({ width: 320, height: 740 });
+    expect(
+      await page
+        .locator(".catalog")
+        .evaluate(
+          (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length,
+        ),
+    ).toBe(1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
 });

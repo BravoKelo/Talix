@@ -74,9 +74,7 @@ test("location → catalog → decline → retry → fulfillment → refund", as
   try {
     await page.goto("/shop/acme-shop");
     await expect(page.getByRole("heading", { name: "Acme" })).toBeVisible();
-    await expect(
-      page.getByText("Choose a location to view its products."),
-    ).toBeVisible();
+    await expect(page.getByLabel("Choose a location")).toHaveValue(lid);
     await page.getByLabel("Choose a location").selectOption(lid);
     await page
       .getByRole("button", { name: "View Notebook", exact: true })

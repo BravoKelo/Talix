@@ -1,5 +1,7 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
+import { designFor, storefrontStyle } from "@/lib/storefront-design";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/client";
@@ -123,7 +125,13 @@ function ProductDetails({
     </TaskDialog>
   );
 }
-export function Storefront({ slug }: { slug: string }) {
+export function Storefront({
+  slug,
+  signedIn = false,
+}: {
+  slug: string;
+  signedIn?: boolean;
+}) {
   const router = useRouter();
   const [compactHeader, setCompactHeader] = useState(false);
   useEffect(() => {
@@ -132,6 +140,9 @@ export function Storefront({ slug }: { slug: string }) {
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, []);
+  const [category, setCategory] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
   const [cartNotice, setCartNotice] = useState("");
@@ -150,7 +161,25 @@ export function Storefront({ slug }: { slug: string }) {
         });
         if (error) throw error;
         if (!data) throw new Error("This business is not available.");
-        if (alive) setCatalog(data as Catalog);
+        if (alive) {
+          const next = data as Catalog;
+          setCatalog(next);
+          setCart([]);
+          setCategory("");
+          setQuery("");
+          setActiveProduct(null);
+          setRequestId(null);
+          const published = [...next.locations].sort(
+            (a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id),
+          );
+          setLocation(
+            published.find(
+              (l) => l.id === next.subscription.default_location_id,
+            )?.id ??
+              published[0]?.id ??
+              "",
+          );
+        }
       } catch (e) {
         if (alive)
           setMessage(
@@ -229,7 +258,10 @@ export function Storefront({ slug }: { slug: string }) {
   }
   if (!catalog)
     return (
-      <main className="store">
+      <main
+        className="store visual-store figma-store"
+        style={storefrontStyle({})}
+      >
         <h1>{message ? "Store unavailable" : "Loading store…"}</h1>
         <p role="status">{message}</p>
       </main>
@@ -237,17 +269,25 @@ export function Storefront({ slug }: { slug: string }) {
   const products = catalog.products.filter(
     (p) => p.location_id === null || p.location_id === location,
   );
-  const visibleProducts = products.filter((p) =>
-    `${p.name} ${p.description}`
-      .toLocaleLowerCase()
-      .includes(query.trim().toLocaleLowerCase()),
+  const categories = [
+    ...new Set(
+      products.map((p) => p.category?.trim()).filter((c): c is string => !!c),
+    ),
+  ].sort();
+  const visibleProducts = products.filter(
+    (p) =>
+      (!category || p.category === category) &&
+      `${p.name} ${p.description}`
+        .toLocaleLowerCase()
+        .includes(query.trim().toLocaleLowerCase()),
   );
+  const design = designFor(catalog.subscription);
   const selectedLocation = catalog.locations.find((l) => l.id === location);
   const itemCount = cart.reduce((sum, line) => sum + line.quantity, 0);
   return (
     <main
-      className="store visual-store"
-      style={{ "--accent": catalog.subscription.accent } as React.CSSProperties}
+      className="store visual-store figma-store"
+      style={storefrontStyle(catalog.subscription)}
     >
       <a className="shop-skip" href="#shop-location">
         Skip to location selection
@@ -257,86 +297,117 @@ export function Storefront({ slug }: { slug: string }) {
         id="shop-welcome"
       >
         <nav className="shop-nav" aria-label="Storefront">
-          <a className="shop-brand" href="#shop-products">
-            {catalog.subscription.logo_url && (
+          <a
+            className="shop-logo"
+            href="#shop-products"
+            aria-label={`${catalog.subscription.name} products`}
+          >
+            {catalog.subscription.logo_url ? (
               <Image
                 width={72}
-                height={48}
+                height={56}
                 unoptimized
-                className="business-logo"
                 src={catalog.subscription.logo_url}
                 alt={`${catalog.subscription.name} logo`}
               />
+            ) : (
+              <span className="shop-initial" aria-hidden="true">
+                {catalog.subscription.name.slice(0, 1)}
+              </span>
             )}
-            <h1>{catalog.subscription.name}</h1>
           </a>
-          <a
-            className="shop-cart-link"
-            href={location ? "#shop-cart" : "#shop-location"}
-            aria-label={`Your cart (${itemCount})`}
-          >
-            <svg
-              aria-hidden="true"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
+          <div className="shop-centered-identity">
+            {design.header_identity === "photo" &&
+            catalog.subscription.header_photo_url ? (
+              <>
+                <Image
+                  width={300}
+                  height={56}
+                  unoptimized
+                  src={catalog.subscription.header_photo_url}
+                  alt={catalog.subscription.name}
+                />
+                <h1 className="sr-only">{catalog.subscription.name}</h1>
+              </>
+            ) : (
+              <h1>{catalog.subscription.name}</h1>
+            )}
+          </div>
+          <div className="shop-header-actions">
+            <button
+              className="shop-icon secondary"
+              aria-label="Your account"
+              aria-expanded={accountOpen}
+              onClick={() => setAccountOpen(!accountOpen)}
             >
-              <path d="M2 3h3l2 12h12l3-9H6" />
-              <circle cx="9" cy="20" r="1" />
-              <circle cx="18" cy="20" r="1" />
-            </svg>
-            <span>Cart ({itemCount})</span>
-            <strong>
-              {money(
-                cart.reduce((sum, line) => sum + line.unit * line.quantity, 0),
-              )}
-            </strong>
-          </a>
+              <Image width={24} height={24} src="/storefront/user.svg" alt="" />
+            </button>
+            <a
+              className="shop-icon shop-cart-link"
+              href={location ? "#shop-cart" : "#shop-location"}
+              aria-label={`Your cart (${itemCount})`}
+            >
+              <Image width={24} height={24} src="/storefront/cart.svg" alt="" />
+              <span className="shop-cart-count" aria-hidden="true">
+                {itemCount}
+              </span>
+            </a>
+            {accountOpen && (
+              <div className="shop-account-panel">
+                <p>Business account</p>
+                <Link href={signedIn ? "/workspace" : "/login"}>
+                  {signedIn ? "Open business workspace" : "Business sign in"}
+                </Link>
+                <p className="muted">You can shop and check out as a guest.</p>
+              </div>
+            )}
+          </div>
         </nav>
-        {catalog.subscription.description && (
-          <p className="shop-header-description">
-            {catalog.subscription.description}
-          </p>
-        )}
       </header>
-      <section className="shop-location-bar" aria-label="Shopping location">
-        <div className="shop-location-panel" id="shop-location">
-          <p className="shop-location-hint">
-            Changing location clears your cart.
-          </p>
-          <label>
-            Choose a location
-            <select
-              value={location}
-              onChange={(e) => {
-                setLocation(e.target.value);
-                setCart([]);
-                setQuery("");
-                setActiveProduct(null);
-                setCartNotice("");
-                setRequestId(null);
-                setMessage("");
-              }}
-            >
-              <option value="">Select a location</option>
-              {catalog.locations.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.name} — {l.address}
-                </option>
-              ))}
-            </select>
-          </label>
-          {selectedLocation && (
-            <div className="shop-location-details">
-              <p>{selectedLocation.address}</p>
-              {selectedLocation.phone && <p>Phone: {selectedLocation.phone}</p>}
-              {selectedLocation.hours && <p>Hours: {selectedLocation.hours}</p>}
-            </div>
-          )}
-        </div>
+      <section className="shop-toolbar" aria-label="Shopping location">
+        <label id="shop-location" className="shop-location-control">
+          <span className="sr-only">Choose a location</span>
+          <select
+            aria-label="Choose a location"
+            value={location}
+            onChange={(e) => {
+              setLocation(e.target.value);
+              setCart([]);
+              setCategory("");
+              setQuery("");
+              setActiveProduct(null);
+              setCartNotice("");
+              setRequestId(null);
+              setMessage("");
+            }}
+          >
+            {!catalog.locations.length && (
+              <option value="">No published locations</option>
+            )}
+            {catalog.locations.map((l) => (
+              <option key={l.id} value={l.id}>
+                Shopping at {l.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          className="shop-menu-toggle"
+          aria-expanded={menuOpen}
+          aria-controls="shop-menu"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          Menu
+        </button>
+        <label className="shop-search">
+          <span className="sr-only">Search products</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search products"
+          />
+        </label>
       </section>
       {!location ? (
         <div className="empty">
@@ -351,46 +422,81 @@ export function Storefront({ slug }: { slug: string }) {
             className="shop-discovery"
             aria-label="Products"
           >
-            <div className="shop-catalog-heading">
-              <h2>Products</h2>
-            </div>
-            <label className="shop-search">
-              Search products
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by name or description"
-              />
-            </label>
-            <p className="muted" role="status">
-              {visibleProducts.length}{" "}
-              {visibleProducts.length === 1 ? "product" : "products"}
-            </p>
-            <div className="catalog">
-              {visibleProducts.map((p) => (
-                <ProductCard
-                  key={p.id}
-                  product={p}
-                  open={() => setActiveProduct(p)}
-                  onAdd={() => add(p, [])}
-                />
-              ))}
-            </div>
-            {!products.length ? (
-              <div className="empty">
-                No products are available at this location.
-              </div>
-            ) : (
-              !visibleProducts.length && (
-                <div className="empty">
-                  <p>No products match your search.</p>
-                  <button className="secondary" onClick={() => setQuery("")}>
-                    Clear search
+            <div className="shop-browse-layout">
+              <aside
+                id="shop-menu"
+                className={`shop-browse-menu${menuOpen ? " is-open" : ""}`}
+              >
+                <p>
+                  <strong>Browse products</strong>
+                </p>
+                <nav aria-label="Product collections">
+                  <button
+                    className="secondary"
+                    aria-pressed={!category}
+                    onClick={() => setCategory("")}
+                  >
+                    All products
                   </button>
+                  {categories.map((c) => (
+                    <button
+                      className="secondary"
+                      key={c}
+                      aria-pressed={category === c}
+                      onClick={() => setCategory(c)}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </nav>
+                <details className="shop-business-info">
+                  <summary>Location information</summary>
+                  <p>{selectedLocation?.address}</p>
+                  <p>{selectedLocation?.phone}</p>
+                  <p>{selectedLocation?.hours}</p>
+                  <p>Changing location clears your cart.</p>
+                  {catalog.subscription.description && (
+                    <p>{catalog.subscription.description}</p>
+                  )}
+                </details>
+              </aside>
+              <div className="shop-results">
+                <h2 className="sr-only">{category || "Products"}</h2>
+                <p className="sr-only" role="status">
+                  {visibleProducts.length} products
+                </p>
+                <div className="catalog">
+                  {visibleProducts.map((p) => (
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      open={() => setActiveProduct(p)}
+                      onAdd={() => add(p, [])}
+                    />
+                  ))}
                 </div>
-              )
-            )}
+                {!products.length ? (
+                  <div className="empty">
+                    No products are available at this location.
+                  </div>
+                ) : (
+                  !visibleProducts.length && (
+                    <div className="empty">
+                      <p>No products match your search.</p>
+                      <button
+                        className="secondary"
+                        onClick={() => {
+                          setQuery("");
+                          setCategory("");
+                        }}
+                      >
+                        Clear search
+                      </button>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
           </section>
           <aside className="panel cart" id="shop-cart" aria-label="Your cart">
             <h2>Your cart</h2>

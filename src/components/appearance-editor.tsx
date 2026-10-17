@@ -3,26 +3,37 @@ import Image from "next/image";
 import { ImagePicker } from "./image-picker";
 import { useImageDraft } from "@/lib/image-draft";
 import { useState } from "react";
-import type { Subscription } from "@/lib/types";
+import {
+  designFor,
+  storefrontStyle,
+  type StorefrontDesign,
+} from "@/lib/storefront-design";
+import type { Location, Subscription } from "@/lib/types";
 
-type Branding = Pick<
-  Subscription,
-  "name" | "description" | "accent" | "logo_url"
->;
+type Branding = StorefrontDesign & {
+  header_photo_url: string | null;
+  default_location_id: string | null;
+} & Pick<Subscription, "name" | "description" | "accent" | "logo_url">;
 export function AppearanceEditor({
   subscription,
   allowed,
+  locations,
   save,
   cancel,
   cleanup,
 }: {
   subscription: Subscription;
   allowed: boolean;
+  locations: Location[];
   cancel: () => void;
   cleanup: (url: string) => Promise<void>;
   save: (value: Branding) => Promise<void>;
 }) {
+  const expanded = "default_location_id" in subscription;
   const original = {
+    ...designFor(subscription),
+    header_photo_url: subscription.header_photo_url ?? null,
+    default_location_id: subscription.default_location_id ?? null,
     name: subscription.name,
     description: subscription.description,
     accent: subscription.accent,
@@ -33,11 +44,19 @@ export function AppearanceEditor({
     "business-logos",
     subscription.id,
   );
+  const photo = useImageDraft(
+    subscription.header_photo_url ?? null,
+    "business-logos",
+    subscription.id,
+  );
   const [draft, setDraft] = useState<Branding>(original);
   const [saved, setSaved] = useState<Branding>(original);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const dirty = image.dirty || JSON.stringify(draft) !== JSON.stringify(saved);
+  const dirty =
+    photo.dirty ||
+    image.dirty ||
+    JSON.stringify(draft) !== JSON.stringify(saved);
   return (
     <section
       id="storefront-appearance"
@@ -60,9 +79,17 @@ export function AppearanceEditor({
             setMessage("");
             try {
               const url = await image.prepare();
-              const value = { ...draft, logo_url: url };
+              const photoUrl = await photo.prepare();
+              const value = {
+                ...draft,
+                logo_url: url,
+                header_photo_url: photoUrl,
+              };
               await save(value);
-              const old = image.committed(url);
+              const old = [
+                ...image.committed(url),
+                ...photo.committed(photoUrl),
+              ];
               setDraft(value);
               setSaved(value);
               for (const url of old) await cleanup(url);
@@ -140,6 +167,171 @@ export function AppearanceEditor({
                 <code>{draft.accent.toUpperCase()}</code>
               </div>
             </label>
+            <fieldset className="stack" disabled={!expanded}>
+              <legend>Website style</legend>
+              {!expanded && (
+                <p className="notice">
+                  Additional storefront settings are awaiting activation.
+                </p>
+              )}
+              <label>
+                Centered header identity
+                <select
+                  aria-label="Centered header identity"
+                  value={draft.header_identity}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      header_identity: e.target
+                        .value as StorefrontDesign["header_identity"],
+                    })
+                  }
+                >
+                  <option value="name">Business name</option>
+                  <option value="photo">Uploaded photo</option>
+                </select>
+              </label>
+              <ImagePicker
+                label="Header photo"
+                filename={photo.filename}
+                disabled={!expanded}
+                choose={(file) => {
+                  try {
+                    photo.choose(file);
+                    setMessage("Photo selected. Save branding to upload it.");
+                  } catch (e) {
+                    setMessage((e as Error).message);
+                  }
+                }}
+              />
+              <p className="muted">
+                JPEG, PNG or WebP, up to 5 MB. Displayed in the center of your
+                header; the photo is public.
+              </p>
+              {photo.preview && (
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => photo.clear()}
+                >
+                  Delete header photo
+                </button>
+              )}
+              <label>
+                Default shopping location
+                <select
+                  aria-label="Default shopping location"
+                  value={draft.default_location_id ?? ""}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      default_location_id: e.target.value || null,
+                    })
+                  }
+                >
+                  <option value="">First published location</option>
+                  {locations
+                    .filter((l) => l.published)
+                    .map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <p className="muted">
+                Customers start here and can change location. If it is
+                unpublished, the first published location is used.
+              </p>
+              {(
+                [
+                  ["header_background", "Header background"],
+                  ["storefront_text", "Product text"],
+                  ["storefront_button", "Buttons"],
+                ] as const
+              ).map(([key, label]) => (
+                <label key={key}>
+                  {label}
+                  <input
+                    type="color"
+                    value={draft[key]}
+                    onChange={(e) =>
+                      setDraft({ ...draft, [key]: e.target.value })
+                    }
+                  />
+                </label>
+              ))}
+              <label>
+                Font family
+                <select
+                  aria-label="Font family"
+                  value={draft.storefront_font}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      storefront_font: e.target
+                        .value as StorefrontDesign["storefront_font"],
+                    })
+                  }
+                >
+                  <option value="sans">Sans serif</option>
+                  <option value="serif">Serif</option>
+                  <option value="mono">Monospace</option>
+                </select>
+              </label>
+              <label>
+                Text size
+                <select
+                  aria-label="Text size"
+                  value={draft.storefront_text_size}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      storefront_text_size: e.target
+                        .value as StorefrontDesign["storefront_text_size"],
+                    })
+                  }
+                >
+                  <option value="standard">Standard</option>
+                  <option value="large">Large</option>
+                </select>
+              </label>
+              <label>
+                Tile corners
+                <select
+                  aria-label="Tile corners"
+                  value={draft.tile_corners}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      tile_corners: e.target
+                        .value as StorefrontDesign["tile_corners"],
+                    })
+                  }
+                >
+                  <option value="square">Square</option>
+                  <option value="subtle">Subtle</option>
+                  <option value="round">Rounded</option>
+                </select>
+              </label>
+              <label>
+                Tile spacing
+                <select
+                  aria-label="Tile spacing"
+                  value={draft.tile_spacing}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      tile_spacing: e.target
+                        .value as StorefrontDesign["tile_spacing"],
+                    })
+                  }
+                >
+                  <option value="comfortable">Comfortable</option>
+                  <option value="compact">Compact</option>
+                </select>
+              </label>
+            </fieldset>
             <div className="appearance-actions">
               <button disabled={busy}>
                 {busy ? "Saving…" : "Save branding"}
@@ -152,6 +344,7 @@ export function AppearanceEditor({
                   setBusy(true);
                   try {
                     await image.discard();
+                    await photo.discard();
                     setDraft({ ...saved });
                     setMessage("");
                     cancel();
@@ -186,42 +379,57 @@ export function AppearanceEditor({
             STOREFRONT PREVIEW <span>{dirty ? "Unsaved" : "Saved"}</span>
           </div>
           <div
-            className="preview-header"
-            style={{ borderTopColor: draft.accent }}
+            className="appearance-live-preview"
+            style={storefrontStyle(draft)}
           >
-            {image.preview ? (
-              <Image
-                width={150}
-                height={84}
-                unoptimized
-                className="business-logo"
-                src={image.preview}
-                alt={`${draft.name} logo`}
-              />
-            ) : (
-              <div
-                className="preview-monogram"
-                style={{ color: draft.accent }}
-                aria-hidden="true"
-              >
-                {draft.name.slice(0, 1).toUpperCase() || "T"}
-              </div>
-            )}
-            <h3>{draft.name || "Your business"}</h3>
-            <p>
-              {draft.description ||
-                "Your introduction helps customers get to know your business."}
-            </p>
-          </div>
-          <div className="preview-catalog">
-            <p className="eyebrow">YOUR ONLINE STORE</p>
-            <strong>Choose a location</strong>
-            <div className="preview-location">
-              Your location <span style={{ color: draft.accent }}>→</span>
+            <div className="preview-header">
+              {image.preview && (
+                <Image
+                  width={72}
+                  height={56}
+                  unoptimized
+                  className="business-logo"
+                  src={image.preview}
+                  alt={`${draft.name} logo`}
+                />
+              )}
+              {draft.header_identity === "photo" && photo.preview ? (
+                <Image
+                  width={240}
+                  height={56}
+                  unoptimized
+                  className="preview-center-photo"
+                  src={photo.preview}
+                  alt={draft.name}
+                />
+              ) : (
+                <h3>{draft.name || "Your business"}</h3>
+              )}
+              <span aria-hidden="true">Cart</span>
             </div>
-            <p className="muted">
-              Products appear after customers select a location.
-            </p>
+            <div className="preview-catalog">
+              <details>
+                <summary>Business information</summary>
+                <p>{draft.description}</p>
+              </details>
+              <p>
+                Shopping at{" "}
+                {locations.find((l) => l.id === draft.default_location_id)
+                  ?.name ||
+                  locations.find((l) => l.published)?.name ||
+                  "your first published location"}
+              </p>
+              <div className="preview-product-grid">
+                {[1, 2, 3].map((i) => (
+                  <div key={i}>
+                    <div className="preview-photo" />
+                    <strong>Product</strong>
+                    <p>Brief description</p>
+                    <span className="preview-add">Add to cart</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
           <p className="preview-note">
             Layout preview · Products and ordering remain on your storefront.
@@ -229,36 +437,9 @@ export function AppearanceEditor({
         </aside>
       </div>
       <div className="future-settings">
-        <details>
-          <summary>
-            Header layout{" "}
-            <span className="coming-soon">Feature coming soon</span>
-          </summary>
-          <p>
-            Header templates and optional contact details will be available
-            here.
-          </p>
-        </details>
-        <details>
-          <summary>
-            Navigation links{" "}
-            <span className="coming-soon">Feature coming soon</span>
-          </summary>
-          <p>
-            Add, edit and arrange your storefront links, including mobile
-            navigation.
-          </p>
-        </details>
-        <details>
-          <summary>
-            Advanced colors{" "}
-            <span className="coming-soon">Feature coming soon</span>
-          </summary>
-          <p>
-            Individual background, text and button colors with a storefront
-            preview.
-          </p>
-        </details>
+        <p className="muted">
+          Custom navigation links and slideshows remain planned.
+        </p>
         <details>
           <summary>
             Slideshow <span className="coming-soon">Feature coming soon</span>

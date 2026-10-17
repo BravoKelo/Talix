@@ -658,9 +658,32 @@ for (const changedPrice of [false, true])
       const appearance = page.getByRole("region", {
         name: "Storefront appearance",
       });
+      const logoFilename = appearance
+        .locator(".image-picker")
+        .filter({
+          has: page.getByRole("button", {
+            name: "Choose business logo",
+            exact: true,
+          }),
+        })
+        .locator(".image-picker-name");
       await appearance
         .getByLabel("Introduction", { exact: true })
         .fill("A fresh introduction for our customers.");
+      await appearance
+        .getByLabel("Font family", { exact: true })
+        .selectOption("serif");
+      await appearance
+        .getByLabel("Tile corners", { exact: true })
+        .selectOption("round");
+      await appearance
+        .getByLabel("Tile spacing", { exact: true })
+        .selectOption("compact");
+      await expect(appearance.locator(".appearance-live-preview")).toHaveCSS(
+        "font-family",
+        "Georgia, serif",
+      );
+
       await expect(appearance.locator(".store-preview")).toContainText(
         "A fresh introduction for our customers.",
       );
@@ -678,14 +701,39 @@ for (const changedPrice of [false, true])
         .getByLabel("Introduction", { exact: true })
         .fill("A fresh introduction for our customers.");
       await appearance
+        .getByLabel("Font family", { exact: true })
+        .selectOption("serif");
+      await appearance
+        .getByLabel("Tile corners", { exact: true })
+        .selectOption("round");
+      await appearance
+        .getByLabel("Tile spacing", { exact: true })
+        .selectOption("compact");
+      await expect(appearance.locator(".appearance-live-preview")).toHaveCSS(
+        "font-family",
+        "Georgia, serif",
+      );
+
+      await appearance
         .getByRole("button", { name: "Save branding", exact: true })
         .click();
       await expect(appearance.getByRole("status")).toContainText(
         "has been saved",
       );
-      await expect(appearance.locator(".image-picker-name")).toHaveText(
-        "No file chosen",
-      );
+      await expect(logoFilename).toHaveText("No file chosen");
+      expect(
+        (
+          await gateway.db.query(
+            "select storefront_font,tile_corners,tile_spacing from public.subscriptions",
+          )
+        ).rows,
+      ).toEqual([
+        {
+          storefront_font: "serif",
+          tile_corners: "round",
+          tile_spacing: "compact",
+        },
+      ]);
       expect(
         (await gateway.db.query("select description from public.subscriptions"))
           .rows,
@@ -697,9 +745,7 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Business logo", { exact: true })
         .setInputFiles(png);
-      await expect(page.locator(".image-picker-name:visible")).toHaveText(
-        "test.png",
-      );
+      await expect(logoFilename).toHaveText("test.png");
       await appearance
         .getByRole("button", { name: "Cancel changes", exact: true })
         .click();
@@ -711,18 +757,14 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Business logo", { exact: true })
         .setInputFiles(png);
-      await expect(page.locator(".image-picker-name:visible")).toHaveText(
-        "test.png",
-      );
+      await expect(logoFilename).toHaveText("test.png");
       await appearance
         .getByRole("button", { name: "Save branding", exact: true })
         .click();
       await expect(appearance.getByRole("status")).toContainText(
         "has been saved",
       );
-      await expect(appearance.locator(".image-picker-name")).toHaveText(
-        "test.png",
-      );
+      await expect(logoFilename).toHaveText("test.png");
       expect(
         (
           await gateway.db.query(
@@ -756,8 +798,42 @@ for (const changedPrice of [false, true])
       await expect(appearance.getByRole("status")).toContainText(
         "has been saved",
       );
-      await expect(appearance.locator(".image-picker-name")).toHaveText(
-        "No file chosen",
+      await expect(logoFilename).toHaveText("No file chosen");
+      expect(
+        (
+          await gateway.db.query(
+            "select * from storage.objects where bucket_id='business-logos'",
+          )
+        ).rows,
+      ).toHaveLength(0);
+      await appearance
+        .getByLabel("Centered header identity", { exact: true })
+        .selectOption("photo");
+      await appearance
+        .getByLabel("Header photo", { exact: true })
+        .setInputFiles(png);
+      await expect(appearance.locator(".preview-center-photo")).toBeVisible();
+      await appearance
+        .getByRole("button", { name: "Save branding", exact: true })
+        .click();
+      await expect(appearance.getByRole("status")).toContainText(
+        "has been saved",
+      );
+      expect(
+        (
+          await gateway.db.query<{ header_photo_url: string | null }>(
+            "select header_photo_url from public.subscriptions",
+          )
+        ).rows[0].header_photo_url,
+      ).toBeTruthy();
+      await appearance
+        .getByRole("button", { name: "Delete header photo", exact: true })
+        .click();
+      await appearance
+        .getByRole("button", { name: "Save branding", exact: true })
+        .click();
+      await expect(appearance.getByRole("status")).toContainText(
+        "has been saved",
       );
       expect(
         (

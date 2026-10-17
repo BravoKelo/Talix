@@ -22,3 +22,7 @@ Custom domains, page builders/templates, content persistence, rich media/slidesh
 The core must remain useful without an industry subscription. Industry-specific workflows belong to the corresponding future industry subscription, with possible tier levels within it. Conceptual names such as Talix Basic, Talix Restaurant and Talix Restaurant Pro describe direction, not current entitlements or sellable benefits.
 
 Keep the existing subscription-wide branding, location-scoped catalogs and database authorization boundaries. The #32 presentation consumes generic products/options and does not branch on business type or sample plan names. Future industry/tier delivery needs demonstrated features, explicit scope, entitlement rules and separate owner approval before any schema, permission or module framework is introduced. Existing sales offerings/purchase snapshots do not imply feature entitlements.
+
+### Approved design implementation update
+
+The October 17 Figma acceptance adds the compact single business header, generic collection menu, responsive 3/2/2/1 product columns and bounded appearance/default-location controls. Implementation/migration are prepared for review; activation remains separate. This advances both hosted website adoption paths without implementing a website builder or customer account system. Existing business sign-in is the account-icon destination. Custom domains, content pages, imports, customer identity/POS and industry/tier features remain separately scoped.
