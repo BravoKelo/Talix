@@ -14,11 +14,30 @@ import { browserClient } from "@/lib/supabase/client";
 import {
   cents,
   money,
+  orderReference,
   type Subscription,
   type Location,
   type Product,
   type Order,
 } from "@/lib/types";
+const orderColumns =
+  "id,location_id,subscription_id,total_cents,payment_status,refunded_cents,status,customer_name,email,phone,items,created_at";
+async function readOrders(locationId: string) {
+  const query = (columns: string) =>
+    browserClient()
+      .from("orders")
+      .select(columns)
+      .eq("location_id", locationId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+  let result = await query(`${orderColumns},order_number`);
+  if (result.error?.code === "42703" || result.error?.code === "PGRST204")
+    result = await query(orderColumns);
+  return {
+    data: result.data as unknown as Order[] | null,
+    error: result.error,
+  };
+}
 const plannedFeatures = [
   {
     id: "customers",
@@ -220,16 +239,9 @@ export function Workspace({
   }, [sid]);
   async function loadOrders() {
     if (!lid) return;
-    const { data, error } = await browserClient()
-      .from("orders")
-      .select(
-        "id,location_id,subscription_id,total_cents,payment_status,refunded_cents,status,customer_name,email,phone,items,created_at",
-      )
-      .eq("location_id", lid)
-      .order("created_at", { ascending: false })
-      .limit(100);
+    const { data, error } = await readOrders(lid);
     if (error) throw error;
-    setOrders(data);
+    setOrders(data ?? []);
   }
   useEffect(() => {
     let alive = true;
@@ -237,14 +249,7 @@ export function Workspace({
     async function load() {
       const db = browserClient();
       const [o, a] = await Promise.all([
-        db
-          .from("orders")
-          .select(
-            "id,location_id,subscription_id,total_cents,payment_status,refunded_cents,status,customer_name,email,phone,items,created_at",
-          )
-          .eq("location_id", lid)
-          .order("created_at", { ascending: false })
-          .limit(100),
+        readOrders(lid),
         db
           .from("location_access")
           .select("role")
@@ -254,7 +259,7 @@ export function Workspace({
       ]);
       if (alive) {
         if (o.error) setMessage("Unable to load orders.");
-        else setOrders(o.data);
+        else setOrders(o.data ?? []);
         setRole(a.data?.role || "viewer");
       }
     }
@@ -290,7 +295,6 @@ export function Workspace({
     setMessage("");
     try {
       await action();
-      setMessage("Saved.");
     } catch (e) {
       setMessage(
         e instanceof Error
@@ -510,7 +514,7 @@ export function Workspace({
         <p className="eyebrow">BUSINESS WORKSPACE</p>
         <h1>{sub?.name || "Your businesses"}</h1>
       </div>
-      <p role="status">{message}</p>
+      {message && !selected && <p role="alert">{message}</p>}
       {!subs.length ? (
         createForm
       ) : (
@@ -609,9 +613,9 @@ export function Workspace({
                               <button
                                 className="secondary ledger-open"
                                 onClick={() => setSelected(o.id)}
-                                aria-label={`Open order ${o.id.slice(0, 8)} for ${o.customer_name}`}
+                                aria-label={`Open order ${orderReference(o)} for ${o.customer_name}`}
                               >
-                                {o.id.slice(0, 8)}
+                                {orderReference(o)}
                               </button>
                             </td>
                             <td>{o.customer_name}</td>
@@ -636,7 +640,7 @@ export function Workspace({
                       <br />
                       {order.phone}
                     </p>
-                    <p className="muted">Order {order.id}</p>
+                    <p className="muted">Order {orderReference(order)}</p>
                     {order.items.map((i, n) => (
                       <div className="cart-line" key={n}>
                         <strong>
@@ -689,6 +693,47 @@ export function Workspace({
                           }
                         </button>
                       )}
+                    {can("orders.fulfill") &&
+                      ["paid", "partially_refunded"].includes(
+                        order.payment_status,
+                      ) &&
+                      ["received", "in_progress", "ready"].includes(
+                        order.status,
+                      ) && (
+                        <details className="cancel-order">
+                          <summary>Cancel order</summary>
+                          <p>
+                            Stop fulfillment of this order? This cannot be
+                            undone. Payment is unchanged; record a separate
+                            refund if needed.
+                          </p>
+                          {order.order_number ? (
+                            <button
+                              className="danger"
+                              disabled={busy}
+                              onClick={() =>
+                                void run(async () => {
+                                  await rpc("advance_order", {
+                                    p_order: order.id,
+                                    p_status: "cancelled",
+                                  });
+                                  await loadOrders();
+                                })
+                              }
+                            >
+                              Confirm cancellation
+                            </button>
+                          ) : (
+                            <p>Order cancellation will be available shortly.</p>
+                          )}
+                        </details>
+                      )}
+                    {order.status === "cancelled" && (
+                      <p role="status">
+                        Order cancelled. Payment is unchanged; any refund is
+                        recorded separately.
+                      </p>
+                    )}
                     {can("orders.refund") &&
                       ["paid", "partially_refunded"].includes(
                         order.payment_status,
@@ -786,11 +831,11 @@ export function Workspace({
                   }
                 />
               )}
-              <div className="catalog" style={{ marginTop: 24 }}>
+              <div className="workspace-products">
                 {products
                   .filter((p) => !p.location_id || p.location_id === lid)
                   .map((p) => (
-                    <article className="panel" key={p.id}>
+                    <article className="panel product-tile" key={p.id}>
                       <h3>{p.name}</h3>
                       <p>{p.description}</p>
                       <p>

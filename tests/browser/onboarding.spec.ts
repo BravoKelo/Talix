@@ -409,11 +409,57 @@ for (const changedPrice of [false, true])
         path: `test-results/order-dialog-${test.info().project.name}.png`,
         fullPage: true,
       });
+      await expect(
+        orderDialog.getByText("Order #1001", { exact: true }),
+      ).toBeVisible();
+      await orderDialog.getByText("Cancel order", { exact: true }).click();
+      await expect(
+        orderDialog.getByText(/Payment is unchanged; record a separate refund/),
+      ).toBeVisible();
+      await orderDialog
+        .getByRole("button", { name: "Confirm cancellation", exact: true })
+        .click();
+      await expect(
+        orderDialog.getByText(/Order cancelled. Payment is unchanged/),
+      ).toBeVisible();
+      expect(
+        (
+          await gateway.db.query(
+            "select status,payment_status,refunded_cents from public.orders",
+          )
+        ).rows,
+      ).toEqual([
+        { status: "cancelled", payment_status: "paid", refunded_cents: 0 },
+      ]);
       await page.keyboard.press("Escape");
       await expect(orderDialog).toHaveCount(0);
       await expect(
         page.getByRole("button", { name: /Open order .* for Ledger Customer/ }),
       ).toBeFocused();
+      await expect(page.getByText("Saved.", { exact: true })).toHaveCount(0);
+      await expect(page.locator("body > footer")).toBeHidden();
+      await page.reload();
+      await page
+        .getByRole("navigation", { name: "Workspace shortcuts" })
+        .getByRole("button", { name: "Products", exact: true })
+        .click();
+      const tile = page
+        .locator(".product-tile")
+        .filter({ hasText: "Notebook" });
+      await expect(tile).toBeVisible();
+      const bounds = await tile.boundingBox();
+      expect(bounds!.width).toBeLessThanOrEqual(
+        test.info().project.name === "desktop" ? 342 : 390,
+      );
+      await tile.getByText("Edit product", { exact: true }).click();
+      await expect(
+        tile.getByRole("button", { name: "Save product", exact: true }),
+      ).toBeVisible();
+      await page.screenshot({
+        path: `test-results/products-compact-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+      await expect(page.getByText("Saved.", { exact: true })).toHaveCount(0);
       await page
         .getByRole("navigation", { name: "Workspace shortcuts" })
         .getByRole("button", { name: "Settings", exact: true })
