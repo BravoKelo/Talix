@@ -2,7 +2,7 @@
 
 ## Storefront owner review corrections — October 17, 2026
 
-Owner authorized compact image-led quick-add tiles, tile-click product dialogs and a collapsing sticky business header with the cart at top right. Presentation changes are prepared on the existing storefront branch. The configurable initial location is pending the explicit schema/catalog boundary decision described in PRODUCT-DESIGN; no default-location schema or live database change has been made.
+Owner authorized compact image-led quick-add tiles, tile-click product dialogs and a collapsing sticky business header with the cart at top right. Presentation changes are prepared on the existing storefront branch. Local lint, TypeScript, 48 unit/SQL tests, production build and all 10 desktop/mobile browser scenarios pass. Screenshot review covers both widths; browser assertions cover two-column mobile tiles, first-row visibility, direct base-product addition, modal options/focus and the persistent collapsing cart header. Browser verification uses isolated fixtures, not live customer data. The configurable initial location is pending the explicit schema/catalog boundary decision described in PRODUCT-DESIGN; no default-location schema or live database change has been made.
 
 Publication of review commit 0bd391a and PR #33 was explicitly approved, including existing automatic feature previews. Owner then authorized copying the existing development preview settings to this branch and rebuilding; deployment dpl_71wgSMCpgdG68VzCUutkgSKnhXMa reached READY at that commit. Owner confirmed sign-in works. The automated deployed-page fetch was blocked by Vercel Authentication, so no automated deployed sign-in claim is made. No merge is authorized.
 
