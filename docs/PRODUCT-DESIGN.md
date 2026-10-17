@@ -112,3 +112,8 @@ All seven appearance screenshots were reviewed. Observed references include sett
 ## Public homepage extension — October 16, 2026
 
 The owner authorized extending Issue #11/PR #14 to redesign the public landing page. The original Talix blue/white/gold page introduces ordering and fulfillment, an explicitly illustrative workspace visual, core capabilities, the customer-to-team workflow, a clearly planned capabilities section, FAQs and signup/signin links. Use original assets and copy; do not invent testimonials, metrics or certifications. Sample plans and simulated payments are disclosed before signup; industry tools and integrations are described as future capabilities. Existing onboarding and global authentication navigation are preserved.
+
+
+### Readability revision — October 16, 2026
+
+Owner review requested larger navigation and descriptive text across every refreshed page. Navigation and descriptions now use 16px text, general copy uses a 17px base, and supporting labels have a 14px minimum, including mobile. Line spacing and wrapping are increased; forms, resource links, sidebar navigation, settings and appearance previews retain their workflows. Illustrative product content also uses larger labels rather than the previous 7–12px sizes. This correction remains within Issue #11/PR #14.
