@@ -313,7 +313,23 @@ export function Users({
                   </label>
                 ))}
               </fieldset>
-              <button disabled={busy}>Save custom role</button>
+              <div className="actions">
+                <button disabled={busy}>Save custom role</button>
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    const saved = roles.find((r) => r.id === customId);
+                    setCustomName(saved?.name ?? "");
+                    setCustomPermissions(saved?.permissions ?? []);
+                    setMessage("");
+                    setUserTab("list");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           </>
         )}
@@ -400,6 +416,18 @@ export function Users({
               </fieldset>
               <div className="actions">
                 <button disabled={busy}>Save user</button>
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    edit(null);
+                    setUserTab("list");
+                    setMessage("");
+                  }}
+                >
+                  Cancel
+                </button>
                 {editing && (
                   <>
                     <button

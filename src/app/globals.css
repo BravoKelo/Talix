@@ -2733,3 +2733,92 @@ body:has(.workspace) > footer {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* Owner review #28: equal resting tiles; editing takes place outside the grid. */
+.workspace-products,
+.settings-cards,
+.catalog,
+.plan-grid {
+  grid-auto-rows: 1fr;
+  align-items: stretch;
+}
+.workspace-products .product-tile {
+  display: flex;
+  flex-direction: column;
+}
+.product-tile h3 {
+  min-height: 2.8em;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.product-tile .product-description {
+  min-height: 4.8em;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.product-tile-actions {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.product-tile-actions > button {
+  min-height: 48px;
+}
+.settings-cards .setting-tile {
+  grid-template-rows: 30px minmax(2.8em, auto) 1fr 28px;
+}
+.settings-cards .setting-tile > .coming-soon {
+  align-self: end;
+}
+.catalog > article {
+  display: flex;
+  flex-direction: column;
+}
+.catalog > article > button {
+  margin-top: auto !important;
+  min-height: 48px;
+}
+.image-edit-preview {
+  object-fit: contain;
+  max-width: 100%;
+  background: #f3f6fa;
+}
+.order-dialog fieldset {
+  min-width: 0;
+}
+.order-dialog .actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.order-dialog .actions > button {
+  min-height: 48px;
+}
+.home-capabilities,
+.sample-stats,
+.home-workflow ol {
+  grid-auto-rows: 1fr;
+}
+.workspace .sidebar-future {
+  grid-auto-rows: 1fr;
+}
+.workspace .sidebar-future > button {
+  min-height: 108px;
+}
+.workspace .sidebar-future > button > span {
+  min-height: 2.8em;
+  line-height: 1.4;
+}
+@media (max-width: 760px) {
+  .workspace .sidebar-future > button {
+    width: 240px;
+    height: 108px;
+  }
+}

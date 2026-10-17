@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ResponsiveNavigation } from "@/components/responsive-navigation";
 
+import { deleteStoredImage, type ImageBucket } from "@/lib/image-draft";
 import { AppearanceEditor } from "./appearance-editor";
 import { OrderDialog } from "./order-dialog";
 import { Users } from "./users";
@@ -111,6 +112,24 @@ export function Workspace({
   email: string;
 }) {
   const [settingsArea, setSettingsArea] = useState("");
+  const [productEditor, setProductEditor] = useState<Product | "new" | null>(
+    null,
+  );
+  const [imageCleanup, setImageCleanup] = useState<
+    { url: string; bucket: ImageBucket; sid: string }[]
+  >([]);
+  const [cleanupBusy, setCleanupBusy] = useState(false);
+  async function cleanupImage(url: string, bucket: ImageBucket, scope: string) {
+    try {
+      await deleteStoredImage(url, bucket, scope);
+    } catch {
+      setImageCleanup((previous) =>
+        previous.some((x) => x.url === url)
+          ? previous
+          : [...previous, { url, bucket, sid: scope }],
+      );
+    }
+  }
   const [settingsSearch, setSettingsSearch] = useState("");
   const [adminAccess, setAdminAccess] = useState(false);
   useEffect(() => {
@@ -199,7 +218,7 @@ export function Workspace({
     setSubs(s.data);
     setMembers(m.data);
     setSid((old) => old || s.data[0]?.id || "");
-  }, [userId]);
+  }, [userId, setSubs, setMembers, setSid]);
   useEffect(() => {
     void Promise.resolve()
       .then(loadSubscriptions)
@@ -515,6 +534,33 @@ export function Workspace({
         <h1>{sub?.name || "Your businesses"}</h1>
       </div>
       {message && !selected && <p role="alert">{message}</p>}
+      {imageCleanup.length > 0 && (
+        <section className="notice" aria-label="Image deletion needs attention">
+          <p>
+            Your changes were saved, but {imageCleanup.length} previous image(s)
+            could not be deleted. Images still used elsewhere are kept.
+          </p>
+          <button
+            className="secondary"
+            disabled={cleanupBusy}
+            onClick={async () => {
+              setCleanupBusy(true);
+              const remaining = [];
+              for (const item of imageCleanup) {
+                try {
+                  await deleteStoredImage(item.url, item.bucket, item.sid);
+                } catch {
+                  remaining.push(item);
+                }
+              }
+              setImageCleanup(remaining);
+              setCleanupBusy(false);
+            }}
+          >
+            Retry image deletion
+          </button>
+        </section>
+      )}
       {!subs.length ? (
         createForm
       ) : (
@@ -598,9 +644,9 @@ export function Workspace({
                       <caption>Orders at this location</caption>
                       <thead>
                         <tr>
-                          <th>Order</th>
+                          <th>Order number</th>
+                          <th>Date / time</th>
                           <th>Customer</th>
-                          <th>Received</th>
                           <th>Fulfillment</th>
                           <th>Payment</th>
                           <th>Total</th>
@@ -618,8 +664,8 @@ export function Workspace({
                                 {orderReference(o)}
                               </button>
                             </td>
-                            <td>{o.customer_name}</td>
                             <td>{new Date(o.created_at).toLocaleString()}</td>
+                            <td>{o.customer_name}</td>
                             <td>{o.status.replaceAll("_", " ")}</td>
                             <td>{o.payment_status.replaceAll("_", " ")}</td>
                             <td>{money(o.total_cents)}</td>
@@ -806,38 +852,22 @@ export function Workspace({
             <section>
               <div className="row">
                 <h2>Products</h2>
+                {can("products.manage") && (
+                  <button
+                    data-primary-list-action
+                    onClick={() => setProductEditor("new")}
+                  >
+                    Add product
+                  </button>
+                )}
               </div>
-              {can("products.manage") && (
-                <ProductEditor
-                  sid={sid}
-                  locations={
-                    owner ? locations : locations.filter((l) => l.id === lid)
-                  }
-                  allowGeneral={shared("products.manage")}
-                  busy={busy}
-                  save={(p) =>
-                    run(async () => {
-                      const { error } = await browserClient()
-                        .from("products")
-                        .insert(p);
-                      if (error) throw error;
-                      const { data } = await browserClient()
-                        .from("products")
-                        .select("*")
-                        .eq("subscription_id", sid)
-                        .order("name");
-                      setProducts(data || []);
-                    })
-                  }
-                />
-              )}
               <div className="workspace-products">
                 {products
                   .filter((p) => !p.location_id || p.location_id === lid)
                   .map((p) => (
                     <article className="panel product-tile" key={p.id}>
                       <h3>{p.name}</h3>
-                      <p>{p.description}</p>
+                      <p className="product-description">{p.description}</p>
                       <p>
                         {money(p.price_cents)} ·{" "}
                         {p.location_id ? "Location specific" : "General"} ·{" "}
@@ -846,9 +876,9 @@ export function Workspace({
                       {can("products.manage") &&
                         (p.location_id !== null ||
                           shared("products.manage")) && (
-                          <>
+                          <div className="product-tile-actions">
                             <button
-                              className="small secondary"
+                              className="secondary"
                               disabled={busy}
                               onClick={() =>
                                 void run(async () => {
@@ -857,8 +887,8 @@ export function Workspace({
                                     .update({ available: !p.available })
                                     .eq("id", p.id);
                                   if (error) throw error;
-                                  setProducts(
-                                    products.map((x) =>
+                                  setProducts((previous) =>
+                                    previous.map((x) =>
                                       x.id === p.id
                                         ? { ...x, available: !x.available }
                                         : x,
@@ -869,42 +899,76 @@ export function Workspace({
                             >
                               {p.available ? "Hide" : "Make available"}
                             </button>
-                            <ProductEditor
-                              key={p.id}
-                              sid={sid}
-                              locations={
-                                owner
-                                  ? locations
-                                  : locations.filter((l) => l.id === lid)
-                              }
-                              allowGeneral={shared("products.manage")}
-                              product={p}
-                              busy={busy}
-                              save={(v) =>
-                                run(async () => {
-                                  const {
-                                    subscription_id: ignored,
-                                    ...updates
-                                  } = v;
-                                  void ignored;
-                                  const { error } = await browserClient()
-                                    .from("products")
-                                    .update(updates)
-                                    .eq("id", p.id);
-                                  if (error) throw error;
-                                  setProducts(
-                                    products.map((x) =>
-                                      x.id === p.id ? { ...x, ...v } : x,
-                                    ),
-                                  );
-                                })
-                              }
-                            />
-                          </>
+                            <button
+                              className="secondary"
+                              onClick={() => setProductEditor(p)}
+                              aria-label={`Edit ${p.name}`}
+                            >
+                              Edit product
+                            </button>
+                          </div>
                         )}
                     </article>
                   ))}
               </div>
+              {productEditor && can("products.manage") && (
+                <ProductEditor
+                  key={productEditor === "new" ? "new" : productEditor.id}
+                  sid={sid}
+                  product={productEditor === "new" ? undefined : productEditor}
+                  locations={
+                    owner ? locations : locations.filter((l) => l.id === lid)
+                  }
+                  allowGeneral={shared("products.manage")}
+                  close={() => setProductEditor(null)}
+                  cleanup={(url) => cleanupImage(url, "product-images", sid)}
+                  save={async (value) => {
+                    const db = browserClient();
+                    if (productEditor === "new") {
+                      const { data, error } = await db
+                        .from("products")
+                        .insert(value)
+                        .select("*")
+                        .single();
+                      if (error) throw error;
+                      setProducts((previous) =>
+                        [...previous, data].sort((a, b) =>
+                          a.name.localeCompare(b.name),
+                        ),
+                      );
+                    } else {
+                      const { subscription_id: ignored, ...updates } = value;
+                      void ignored;
+                      const { data, error } = await db
+                        .from("products")
+                        .update(updates)
+                        .eq("id", productEditor.id)
+                        .select("*")
+                        .single();
+                      if (error) throw error;
+                      setProducts((previous) =>
+                        previous.map((x) => (x.id === data.id ? data : x)),
+                      );
+                    }
+                  }}
+                  remove={
+                    productEditor === "new"
+                      ? undefined
+                      : async () => {
+                          const { error } = await browserClient()
+                            .from("products")
+                            .delete()
+                            .eq("id", productEditor.id)
+                            .select("id")
+                            .single();
+                          if (error) throw error;
+                          setProducts((previous) =>
+                            previous.filter((p) => p.id !== productEditor.id),
+                          );
+                        }
+                  }
+                />
+              )}
             </section>
           )}
           {tab === "settings" &&
@@ -998,6 +1062,10 @@ export function Workspace({
                       key={sub.id}
                       subscription={sub}
                       allowed={shared("settings.manage")}
+                      cancel={() => setSettingsArea("")}
+                      cleanup={(url) =>
+                        cleanupImage(url, "business-logos", sid)
+                      }
                       save={async (v) => {
                         const { error } = await browserClient()
                           .from("subscriptions")
@@ -1039,6 +1107,7 @@ export function Workspace({
                           key={location.id}
                           location={location}
                           busy={busy}
+                          cancel={() => setSettingsArea("")}
                           save={(v) =>
                             run(async () => {
                               const { error } = await browserClient()
@@ -1082,7 +1151,20 @@ export function Workspace({
                           Name
                           <input name="name" required maxLength={100} />
                         </label>
-                        <button disabled={busy}>Add location</button>
+                        <div className="actions">
+                          <button disabled={busy}>Add location</button>
+                          <button
+                            type="button"
+                            className="secondary"
+                            disabled={busy}
+                            onClick={(e) => {
+                              e.currentTarget.form?.reset();
+                              setSettingsArea("");
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </form>
                     </fieldset>
                   </section>

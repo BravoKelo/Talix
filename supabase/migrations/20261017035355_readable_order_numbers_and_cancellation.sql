@@ -1,21 +1,21 @@
 -- Issues #24–25. Prepared for owner approval; do not apply to development yet.
--- Numbers are permanent and scoped to a location, starting at 1001.
+-- Numbers are permanent and scoped to a location, starting at 100001.
 alter table public.orders add column order_number integer;
 with numbered as (
-  select id, 1000 + row_number() over(partition by location_id order by created_at,id) as number
+  select id, 100000 + row_number() over(partition by location_id order by created_at,id) as number
   from public.orders
 )
 update public.orders o set order_number=n.number from numbered n where n.id=o.id;
 alter table public.orders alter column order_number set not null;
 alter table public.orders add constraint orders_location_number_unique unique(location_id,order_number);
-alter table public.orders add constraint orders_number_positive check(order_number>=1001);
+alter table public.orders add constraint orders_number_positive check(order_number>=100001);
 grant select(order_number) on public.orders to authenticated;
 
 -- Checkout already runs as the privileged checked transaction. No new public RPC.
 create function private.assign_order_number() returns trigger language plpgsql set search_path='' as $$
 begin
   perform 1 from public.locations where id=new.location_id for update;
-  select coalesce(max(order_number),1000)+1 into new.order_number from public.orders where location_id=new.location_id;
+  select coalesce(max(order_number),100000)+1 into new.order_number from public.orders where location_id=new.location_id;
   return new;
 end $$;
 revoke all on function private.assign_order_number() from public,anon,authenticated;
