@@ -250,7 +250,7 @@ export async function onboardingGateway() {
       }
       // Test gateway is HTTP; stored image URLs still obey production HTTPS constraints.
       // Translate only our own fixture Storage origin at this transport boundary.
-      for (const field of ["image_url", "logo_url"]) {
+      for (const field of ["image_url", "logo_url", "header_photo_url"]) {
         if (
           typeof input[field] === "string" &&
           input[field].startsWith(
