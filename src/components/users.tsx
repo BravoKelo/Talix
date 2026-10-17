@@ -214,7 +214,7 @@ export function Users({
         aria-labelledby="users-tab-permissions"
         hidden={userTab !== "permissions"}
       >
-        <details open>
+        <details>
           <summary>Role access — allowed and denied</summary>
           <div className="table-scroll">
             <table>
