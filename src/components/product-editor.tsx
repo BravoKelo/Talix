@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { ImagePicker } from "./image-picker";
 import { useState } from "react";
 import { TaskDialog } from "./order-dialog";
 import { useImageDraft } from "@/lib/image-draft";
@@ -257,25 +258,18 @@ export function ProductEditor({
                   .join("\n")}
               />
             </label>
-            <label>
-              Product image
-              <input
-                key={image.preview ? "image" : "empty"}
-                type="file"
-                value=""
-                accept="image/jpeg,image/png,image/webp"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  try {
-                    image.choose(file);
-                    setMessage("Image selected. Save product to upload it.");
-                  } catch (e) {
-                    setMessage((e as Error).message);
-                  }
-                }}
-              />
-            </label>
+            <ImagePicker
+              label="Product image"
+              filename={image.filename}
+              choose={(file) => {
+                try {
+                  image.choose(file);
+                  setMessage("Image selected. Save product to upload it.");
+                } catch (e) {
+                  setMessage((e as Error).message);
+                }
+              }}
+            />
             {image.preview && (
               <>
                 <Image

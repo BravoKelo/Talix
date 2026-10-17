@@ -494,12 +494,18 @@ for (const changedPrice of [false, true])
         name: "Add product",
         exact: true,
       });
+      await expect(adding.locator(".image-picker-name")).toHaveText(
+        "No file chosen",
+      );
       await adding
         .getByLabel("Name", { exact: true })
         .fill("Discarded product");
       await adding
         .getByLabel("Product image", { exact: true })
         .setInputFiles(png);
+      await expect(page.locator(".image-picker-name:visible")).toHaveText(
+        "test.png",
+      );
       await adding
         .getByRole("button", { name: "Cancel", exact: true })
         .last()
@@ -539,6 +545,9 @@ for (const changedPrice of [false, true])
       await adding
         .getByLabel("Product image", { exact: true })
         .setInputFiles(png);
+      await expect(page.locator(".image-picker-name:visible")).toHaveText(
+        "test.png",
+      );
       await adding
         .getByRole("button", { name: "Save product", exact: true })
         .click();
@@ -550,6 +559,9 @@ for (const changedPrice of [false, true])
       await disposable
         .getByRole("button", { name: "Edit Disposable product", exact: true })
         .click();
+      await expect(editing.locator(".image-picker-name")).toHaveText(
+        "test.png",
+      );
       await editing
         .getByRole("button", { name: "Delete image", exact: true })
         .click();
@@ -671,6 +683,9 @@ for (const changedPrice of [false, true])
       await expect(appearance.getByRole("status")).toContainText(
         "has been saved",
       );
+      await expect(appearance.locator(".image-picker-name")).toHaveText(
+        "No file chosen",
+      );
       expect(
         (await gateway.db.query("select description from public.subscriptions"))
           .rows,
@@ -682,6 +697,9 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Business logo", { exact: true })
         .setInputFiles(png);
+      await expect(page.locator(".image-picker-name:visible")).toHaveText(
+        "test.png",
+      );
       await appearance
         .getByRole("button", { name: "Cancel changes", exact: true })
         .click();
@@ -693,11 +711,17 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Business logo", { exact: true })
         .setInputFiles(png);
+      await expect(page.locator(".image-picker-name:visible")).toHaveText(
+        "test.png",
+      );
       await appearance
         .getByRole("button", { name: "Save branding", exact: true })
         .click();
       await expect(appearance.getByRole("status")).toContainText(
         "has been saved",
+      );
+      await expect(appearance.locator(".image-picker-name")).toHaveText(
+        "test.png",
       );
       expect(
         (
@@ -731,6 +755,9 @@ for (const changedPrice of [false, true])
         .click();
       await expect(appearance.getByRole("status")).toContainText(
         "has been saved",
+      );
+      await expect(appearance.locator(".image-picker-name")).toHaveText(
+        "No file chosen",
       );
       expect(
         (
