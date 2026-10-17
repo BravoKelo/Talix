@@ -27,7 +27,7 @@ const capabilities = [
 
 export default function Home() {
   return (
-    <main className="talix-home" id="page-top">
+    <main className="talix-home">
       <ResponsiveNavigation label="Explore Talix menu">
         {" "}
         <nav className="home-nav" aria-label="Explore Talix">
