@@ -2669,3 +2669,67 @@ body:has(.workspace) > .topbar {
     display: none;
   }
 }
+
+/* Review #22–23: a quiet workspace and compact, readable product tiles. */
+body:has(.workspace) > footer {
+  display: none;
+}
+.workspace-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 340px));
+  align-items: start;
+  gap: 16px;
+  margin-top: 16px;
+}
+.workspace-products .product-tile {
+  padding: 16px;
+  min-width: 0;
+}
+.product-tile h3 {
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+.product-tile p {
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.product-tile > details.panel {
+  padding: 0;
+  margin: 10px 0 0;
+  border: 0;
+  box-shadow: none;
+}
+.product-tile details > summary {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  cursor: pointer;
+}
+.product-tile details[open] > summary {
+  margin-bottom: 12px;
+}
+.product-tile .stack {
+  min-width: 0;
+}
+.product-tile :is(input, select, textarea) {
+  max-width: 100%;
+  min-width: 0;
+}
+.cancel-order {
+  margin: 16px 0;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.cancel-order summary {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #a1203c;
+  font-weight: 600;
+}
+@media (max-width: 600px) {
+  .workspace-products {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

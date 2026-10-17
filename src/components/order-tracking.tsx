@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { browserClient } from "@/lib/supabase/client";
-import { money, type PublicOrder } from "@/lib/types";
+import { orderReference, money, type PublicOrder } from "@/lib/types";
 export function OrderTracking({ token }: { token: string }) {
   const [order, setOrder] = useState<PublicOrder | null>(null);
   const [message, setMessage] = useState("");
@@ -79,9 +79,7 @@ export function OrderTracking({ token }: { token: string }) {
               ? "Payment declined"
               : "Your order"}
           </h1>
-          <p className="muted">
-            Reference {order.id.slice(0, 8).toUpperCase()}
-          </p>
+          <p className="muted">Order {orderReference(order)}</p>
           <div className="panel">
             <span className="badge">
               Simulated payment · {order.payment_status.replaceAll("_", " ")}
