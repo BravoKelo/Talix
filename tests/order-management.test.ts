@@ -3,7 +3,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { readFileSync } from "node:fs";
 import { initializeDatabase } from "./helpers/database";
 const db = new PGlite();
-const migration = "20261017035355_readable_order_numbers_and_cancellation.sql";
+const migration = "20261017050812_readable_order_numbers_and_cancellation.sql";
 const owner = crypto.randomUUID(),
   viewer = crypto.randomUUID(),
   outsider = crypto.randomUUID();
