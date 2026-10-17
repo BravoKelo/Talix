@@ -308,6 +308,21 @@ export function Storefront({ slug }: { slug: string }) {
               <button disabled={busy || !cart.length}>
                 {busy ? "Placing order…" : "Place order with simulated payment"}
               </button>
+              <button
+                type="button"
+                className="secondary"
+                disabled={busy}
+                onClick={(e) => {
+                  e.currentTarget.form?.reset();
+                  setRequestId(null);
+                  setMessage("");
+                  document
+                    .querySelector(".catalog")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                Cancel checkout
+              </button>
               <p role="status">{message}</p>
             </form>
           </aside>

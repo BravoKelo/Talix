@@ -31,7 +31,9 @@ function OfferingEditor({
   offering,
   busy,
   save,
+  cancel,
 }: {
+  cancel: () => void;
   types: BusinessType[];
   offering?: Offering;
   busy: boolean;
@@ -147,12 +149,24 @@ function OfferingEditor({
         Changes affect new selections. Existing subscriptions retain their
         agreed names and prices.
       </p>
-      <button disabled={busy}>{busy ? "Saving…" : "Save offering"}</button>
+      <div className="actions">
+        <button disabled={busy}>{busy ? "Saving…" : "Save offering"}</button>
+        <button
+          type="button"
+          className="secondary"
+          disabled={busy}
+          onClick={cancel}
+        >
+          Cancel
+        </button>
+      </div>
       <p role="status">{message}</p>
     </form>
   );
 }
 export function TalixAdmin() {
+  const [showOffering, setShowOffering] = useState(true),
+    [showType, setShowType] = useState(true);
   const [types, setTypes] = useState<BusinessType[]>([]),
     [offerings, setOfferings] = useState<Offering[]>([]),
     [clients, setClients] = useState<Client[]>([]),
@@ -267,7 +281,10 @@ export function TalixAdmin() {
                 <button
                   className="secondary small"
                   disabled={busy}
-                  onClick={() => setEditingType(undefined)}
+                  onClick={() => {
+                    setEditingType(undefined);
+                    setShowType(true);
+                  }}
                 >
                   Add business type
                 </button>
@@ -281,63 +298,89 @@ export function TalixAdmin() {
                   <button
                     disabled={busy}
                     className="secondary small"
-                    onClick={() => setEditingType(t)}
+                    onClick={() => {
+                      setEditingType(t);
+                      setShowType(true);
+                    }}
                   >
                     Edit {t.name}
                   </button>
                 </div>
               ))}
-              <form
-                className="stack"
-                key={editingType?.id ?? "new-type"}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const f = new FormData(e.currentTarget);
-                  void save("business_types", editingType?.id, {
-                    name: String(f.get("name")).trim(),
-                    description: String(f.get("description")),
-                    active: f.get("active") === "on",
-                  });
-                }}
-              >
-                <h3>
-                  {editingType ? "Edit business type" : "New business type"}
-                </h3>
-                <label>
-                  Name
-                  <input
-                    name="name"
-                    required
-                    maxLength={100}
-                    defaultValue={editingType?.name}
-                  />
-                </label>
-                <label>
-                  Description
-                  <textarea
-                    name="description"
-                    maxLength={1000}
-                    defaultValue={editingType?.description}
-                  />
-                </label>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="active"
-                    defaultChecked={editingType?.active ?? true}
-                  />
-                  Available for new subscriptions
-                </label>
-                <button disabled={busy}>Save business type</button>
-              </form>
+              {showType && (
+                <form
+                  className="stack"
+                  key={editingType?.id ?? "new-type"}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const f = new FormData(e.currentTarget);
+                    void save("business_types", editingType?.id, {
+                      name: String(f.get("name")).trim(),
+                      description: String(f.get("description")),
+                      active: f.get("active") === "on",
+                    });
+                  }}
+                >
+                  <h3>
+                    {editingType ? "Edit business type" : "New business type"}
+                  </h3>
+                  <label>
+                    Name
+                    <input
+                      name="name"
+                      required
+                      maxLength={100}
+                      defaultValue={editingType?.name}
+                    />
+                  </label>
+                  <label>
+                    Description
+                    <textarea
+                      name="description"
+                      maxLength={1000}
+                      defaultValue={editingType?.description}
+                    />
+                  </label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="active"
+                      defaultChecked={editingType?.active ?? true}
+                    />
+                    Available for new subscriptions
+                  </label>
+                  <div className="actions">
+                    <button disabled={busy}>Save business type</button>
+                    <button
+                      type="button"
+                      className="secondary"
+                      disabled={busy}
+                      onClick={() => {
+                        setEditingType(undefined);
+                        setShowType(false);
+                        setMessage("");
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              )}
             </section>
-            <OfferingEditor
-              key={editing?.id ?? "new-offering"}
-              types={types}
-              offering={editing}
-              busy={busy}
-              save={(v) => save("talix_offerings", editing?.id, v)}
-            />
+            {showOffering && (
+              <OfferingEditor
+                key={editing?.id ?? "new-offering"}
+                types={types}
+                offering={editing}
+                busy={busy}
+                save={(v) => save("talix_offerings", editing?.id, v)}
+                cancel={() => {
+                  setEditing(undefined);
+                  setShowOffering(false);
+                  setMessage("");
+                }}
+              />
+            )}
           </div>
           <section className="panel" style={{ marginTop: 24 }}>
             <div className="row">
@@ -345,7 +388,10 @@ export function TalixAdmin() {
               <button
                 disabled={busy}
                 className="secondary"
-                onClick={() => setEditing(undefined)}
+                onClick={() => {
+                  setEditing(undefined);
+                  setShowOffering(true);
+                }}
               >
                 Add offering
               </button>
@@ -373,6 +419,7 @@ export function TalixAdmin() {
                     disabled={busy}
                     onClick={() => {
                       setEditing(o);
+                      setShowOffering(true);
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                   >

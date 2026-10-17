@@ -89,7 +89,7 @@ it("backfills permanent numbers without changing old IDs or tracking tokens", as
   await as(null, "anon");
   const order = await track(oldToken);
   expect(order.id).toBe(oldId);
-  expect(order.order_number).toBe(1001);
+  expect(order.order_number).toBe(100001);
   expect(order).not.toHaveProperty("email");
   expect(order).not.toHaveProperty("private_token");
 });
@@ -98,9 +98,9 @@ it("allocates location numbers once across checkout retries and leaves other loc
   const request = crypto.randomUUID();
   const token = await checkout(lid, request);
   expect(await checkout(lid, request)).toBe(token);
-  expect((await track(token)).order_number).toBe(1002);
-  expect((await track(await checkout())).order_number).toBe(1003);
-  expect((await track(await checkout(secondLocation))).order_number).toBe(1001);
+  expect((await track(token)).order_number).toBe(100002);
+  expect((await track(await checkout())).order_number).toBe(100003);
+  expect((await track(await checkout(secondLocation))).order_number).toBe(100001);
 });
 it("denies cancellation to viewers and outsiders and hides another business's numbers", async () => {
   for (const id of [viewer, outsider]) {

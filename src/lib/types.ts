@@ -84,16 +84,6 @@ export function cents(value: string) {
   return n;
 }
 
-export function orderReference(order: {
-  order_number?: number;
-  created_at: string;
-}) {
-  return order.order_number
-    ? `#${order.order_number}`
-    : new Date(order.created_at).toLocaleString("en-US", {
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      });
+export function orderReference(order: { order_number?: number }) {
+  return order.order_number ? String(order.order_number) : "Pending number";
 }

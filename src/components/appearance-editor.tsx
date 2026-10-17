@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { browserClient } from "@/lib/supabase/client";
+import { useImageDraft } from "@/lib/image-draft";
 import { useState } from "react";
 import type { Subscription } from "@/lib/types";
 
@@ -12,9 +12,13 @@ export function AppearanceEditor({
   subscription,
   allowed,
   save,
+  cancel,
+  cleanup,
 }: {
   subscription: Subscription;
   allowed: boolean;
+  cancel: () => void;
+  cleanup: (url: string) => Promise<void>;
   save: (value: Branding) => Promise<void>;
 }) {
   const original = {
@@ -23,11 +27,16 @@ export function AppearanceEditor({
     accent: subscription.accent,
     logo_url: subscription.logo_url ?? null,
   };
+  const image = useImageDraft(
+    subscription.logo_url ?? null,
+    "business-logos",
+    subscription.id,
+  );
   const [draft, setDraft] = useState<Branding>(original);
   const [saved, setSaved] = useState<Branding>(original);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const dirty = JSON.stringify(draft) !== JSON.stringify(saved);
+  const dirty = image.dirty || JSON.stringify(draft) !== JSON.stringify(saved);
   return (
     <section
       id="storefront-appearance"
@@ -49,8 +58,13 @@ export function AppearanceEditor({
             setBusy(true);
             setMessage("");
             try {
-              await save(draft);
-              setSaved({ ...draft });
+              const url = await image.prepare();
+              const value = { ...draft, logo_url: url };
+              await save(value);
+              const old = image.committed(url);
+              setDraft(value);
+              setSaved(value);
+              for (const url of old) await cleanup(url);
               setMessage("Your storefront appearance has been saved.");
             } catch {
               setMessage("We couldn’t save your changes. Please try again.");
@@ -65,42 +79,17 @@ export function AppearanceEditor({
               <input
                 disabled={!("logo_url" in subscription)}
                 type="file"
+                value=""
                 accept="image/png,image/jpeg,image/webp"
-                onChange={async (e) => {
+                key={image.preview ? "logo" : "empty"}
+                onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
-                  if (
-                    file.size > 5242880 ||
-                    !["image/png", "image/jpeg", "image/webp"].includes(
-                      file.type,
-                    )
-                  ) {
-                    setMessage("Choose a JPEG, PNG or WebP image under 5 MB.");
-                    e.target.value = "";
-                    return;
-                  }
-                  setBusy(true);
-                  setMessage("");
                   try {
-                    const db = browserClient();
-                    const path = `${subscription.id}/${crypto.randomUUID()}`;
-                    const { error } = await db.storage
-                      .from("business-logos")
-                      .upload(path, file, { contentType: file.type });
-                    if (error) throw error;
-                    setDraft((previous) => ({
-                      ...previous,
-                      logo_url: db.storage
-                        .from("business-logos")
-                        .getPublicUrl(path).data.publicUrl,
-                    }));
-                    setMessage("Logo uploaded. Save branding to apply it.");
-                  } catch {
-                    setMessage(
-                      "We couldn’t upload your logo. Please try again.",
-                    );
-                  } finally {
-                    setBusy(false);
+                    image.choose(file);
+                    setMessage("Logo selected. Save branding to upload it.");
+                  } catch (e) {
+                    setMessage((e as Error).message);
                   }
                 }}
               />
@@ -110,13 +99,18 @@ export function AppearanceEditor({
                 ? "JPEG, PNG or WebP, up to 5 MB. Your logo is public."
                 : "Business logo uploads are awaiting activation."}
             </p>
-            {draft.logo_url && (
+            {image.preview && (
               <button
                 type="button"
                 className="secondary"
-                onClick={() => setDraft({ ...draft, logo_url: null })}
+                onClick={() => {
+                  image.clear();
+                  setMessage(
+                    "Image will be deleted when you save. Cancel keeps your saved logo.",
+                  );
+                }}
               >
-                Remove logo
+                Delete image
               </button>
             )}
             <label>
@@ -159,10 +153,21 @@ export function AppearanceEditor({
               <button
                 type="button"
                 className="secondary"
-                disabled={!dirty || busy}
-                onClick={() => {
-                  setDraft({ ...saved });
-                  setMessage("Unsaved changes discarded.");
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true);
+                  try {
+                    await image.discard();
+                    setDraft({ ...saved });
+                    setMessage("");
+                    cancel();
+                  } catch {
+                    setMessage(
+                      "We couldn’t discard the uploaded image. Please try again.",
+                    );
+                  } finally {
+                    setBusy(false);
+                  }
                 }}
               >
                 Cancel changes
@@ -190,13 +195,13 @@ export function AppearanceEditor({
             className="preview-header"
             style={{ borderTopColor: draft.accent }}
           >
-            {draft.logo_url ? (
+            {image.preview ? (
               <Image
                 width={150}
                 height={84}
                 unoptimized
                 className="business-logo"
-                src={draft.logo_url}
+                src={image.preview}
                 alt={`${draft.name} logo`}
               />
             ) : (
