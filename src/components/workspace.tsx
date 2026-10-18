@@ -1,4 +1,5 @@
 "use client";
+import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -574,7 +575,7 @@ export function Workspace({
                     width={150}
                     height={84}
                     unoptimized
-                    src={sub.logo_url}
+                    src={displayImageUrl(sub.logo_url)}
                     alt={`${sub.name} logo`}
                     className="business-logo"
                   />
@@ -915,6 +916,7 @@ export function Workspace({
                 <ProductEditor
                   key={productEditor === "new" ? "new" : productEditor.id}
                   sid={sid}
+                  categoriesEnabled={!!sub && "default_location_id" in sub}
                   product={productEditor === "new" ? undefined : productEditor}
                   locations={
                     owner ? locations : locations.filter((l) => l.id === lid)
@@ -1061,15 +1063,33 @@ export function Workspace({
                     <AppearanceEditor
                       key={sub.id}
                       subscription={sub}
+                      locations={locations}
                       allowed={shared("settings.manage")}
                       cancel={() => setSettingsArea("")}
                       cleanup={(url) =>
                         cleanupImage(url, "business-logos", sid)
                       }
                       save={async (v) => {
+                        const payload =
+                          "default_location_id" in sub
+                            ? { ...v }
+                            : {
+                                name: v.name,
+                                description: v.description,
+                                accent: v.accent,
+                                ...("logo_url" in sub
+                                  ? { logo_url: v.logo_url }
+                                  : {}),
+                              };
+                        if (!("header_mode" in sub))
+                          delete (payload as Partial<typeof v>).header_mode;
+                        if (!("header_links" in sub))
+                          delete (payload as Partial<typeof v>).header_links;
+                        if (!("header_layout" in sub))
+                          delete (payload as Partial<typeof v>).header_layout;
                         const { error } = await browserClient()
                           .from("subscriptions")
-                          .update(v)
+                          .update(payload)
                           .eq("id", sid);
                         if (error) throw error;
                         setSubs((previous) =>
@@ -1077,13 +1097,7 @@ export function Workspace({
                             s.id === sid
                               ? {
                                   ...s,
-                                  ...("logo_url" in s
-                                    ? v
-                                    : {
-                                        name: v.name,
-                                        description: v.description,
-                                        accent: v.accent,
-                                      }),
+                                  ...payload,
                                 }
                               : s,
                           ),

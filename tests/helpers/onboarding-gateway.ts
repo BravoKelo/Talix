@@ -2,9 +2,9 @@ import { createServer } from "node:http";
 import { PGlite } from "@electric-sql/pglite";
 import { initializeDatabase } from "./database";
 // Test-only Auth/PostgREST transport. Every data operation executes actual migration SQL/RLS.
-export async function onboardingGateway() {
+export async function onboardingGateway(skipMigrations: string[] = []) {
   const db = new PGlite();
-  await initializeDatabase(db);
+  await initializeDatabase(db, skipMigrations);
   type User = {
     id: string;
     email: string;
@@ -250,7 +250,7 @@ export async function onboardingGateway() {
       }
       // Test gateway is HTTP; stored image URLs still obey production HTTPS constraints.
       // Translate only our own fixture Storage origin at this transport boundary.
-      for (const field of ["image_url", "logo_url"]) {
+      for (const field of ["image_url", "logo_url", "header_photo_url"]) {
         if (
           typeof input[field] === "string" &&
           input[field].startsWith(

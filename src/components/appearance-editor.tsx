@@ -1,28 +1,54 @@
 "use client";
 import Image from "next/image";
+import { PageTabs } from "./page-tabs";
+import { StorefrontHeader } from "./storefront-header";
 import { ImagePicker } from "./image-picker";
 import { useImageDraft } from "@/lib/image-draft";
 import { useState } from "react";
-import type { Subscription } from "@/lib/types";
+import {
+  headerLayouts,
+  headerLayout,
+  designFor,
+  storefrontStyle,
+  type StorefrontDesign,
+} from "@/lib/storefront-design";
+import { HeaderLinkEditor } from "./header-link-editor";
+import { validHeaderLinks } from "@/lib/header-navigation";
+import type { HeaderLink, Location, Subscription } from "@/lib/types";
 
-type Branding = Pick<
-  Subscription,
-  "name" | "description" | "accent" | "logo_url"
->;
+type Branding = StorefrontDesign & {
+  header_mode: "standard" | "custom";
+  header_links: HeaderLink[];
+  header_photo_url: string | null;
+  default_location_id: string | null;
+} & Pick<Subscription, "name" | "description" | "accent" | "logo_url">;
 export function AppearanceEditor({
   subscription,
   allowed,
+  locations,
   save,
   cancel,
   cleanup,
 }: {
   subscription: Subscription;
   allowed: boolean;
+  locations: Location[];
   cancel: () => void;
   cleanup: (url: string) => Promise<void>;
   save: (value: Branding) => Promise<void>;
 }) {
+  const [tab, setTab] = useState("branding");
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [device, setDevice] = useState("desktop");
+  const expanded = "default_location_id" in subscription;
   const original = {
+    ...designFor(subscription),
+    header_mode:
+      subscription.header_mode ??
+      ("header_layout" in subscription ? "custom" : "standard"),
+    header_links: subscription.header_links ?? [],
+    header_photo_url: subscription.header_photo_url ?? null,
+    default_location_id: subscription.default_location_id ?? null,
     name: subscription.name,
     description: subscription.description,
     accent: subscription.accent,
@@ -33,11 +59,19 @@ export function AppearanceEditor({
     "business-logos",
     subscription.id,
   );
+  const photo = useImageDraft(
+    subscription.header_photo_url ?? null,
+    "business-logos",
+    subscription.id,
+  );
   const [draft, setDraft] = useState<Branding>(original);
   const [saved, setSaved] = useState<Branding>(original);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const dirty = image.dirty || JSON.stringify(draft) !== JSON.stringify(saved);
+  const dirty =
+    photo.dirty ||
+    image.dirty ||
+    JSON.stringify(draft) !== JSON.stringify(saved);
   return (
     <section
       id="storefront-appearance"
@@ -51,18 +85,63 @@ export function AppearanceEditor({
           One look for every location in this subscription.
         </p>
       </div>
-      <div className="appearance-grid">
+      <PageTabs
+        id="appearance"
+        label="Storefront design settings"
+        active={tab}
+        onChange={setTab}
+        items={["branding", "header", "products", "style"].map((id) => ({
+          id,
+          label: id[0].toUpperCase() + id.slice(1),
+        }))}
+      />
+      <div
+        className={`appearance-grid${tab === "header" ? " appearance-header-grid" : ""}`}
+      >
         <form
+          role="tabpanel"
+          id={`appearance-panel-${tab}`}
+          aria-labelledby={`appearance-tab-${tab}`}
           className="stack"
+          onInvalidCapture={(e) =>
+            setTab(
+              (e.target as HTMLElement).closest(".header-link-editor")
+                ? "header"
+                : "branding",
+            )
+          }
+          onChange={(e) => {
+            if (
+              !(
+                e.target instanceof HTMLInputElement && e.target.type === "file"
+              )
+            )
+              setMessage("");
+          }}
           onSubmit={async (e) => {
             e.preventDefault();
+            if (!validHeaderLinks(draft.header_links)) {
+              setTab("header");
+              setMessage(
+                "A custom navigation link is unfinished. Select Custom header to correct its label and HTTPS website address, or remove it.",
+              );
+              return;
+            }
             setBusy(true);
             setMessage("");
             try {
               const url = await image.prepare();
-              const value = { ...draft, logo_url: url };
+              const photoUrl = await photo.prepare();
+              const value = {
+                ...draft,
+                logo_url: url,
+                header_photo_url: photoUrl,
+              };
               await save(value);
-              const old = image.committed(url);
+              const old = [
+                ...image.committed(url),
+                ...photo.committed(photoUrl),
+              ];
               setDraft(value);
               setSaved(value);
               for (const url of old) await cleanup(url);
@@ -75,98 +154,361 @@ export function AppearanceEditor({
           }}
         >
           <fieldset disabled={!allowed || busy} className="stack">
-            <ImagePicker
-              label="Business logo"
-              filename={image.filename}
-              disabled={!("logo_url" in subscription)}
-              choose={(file) => {
-                try {
-                  image.choose(file);
-                  setMessage("Logo selected. Save branding to upload it.");
-                } catch (e) {
-                  setMessage((e as Error).message);
-                }
-              }}
-            />
-            <p className="muted">
-              {"logo_url" in subscription
-                ? "JPEG, PNG or WebP, up to 5 MB. Your logo is public."
-                : "Business logo uploads are awaiting activation."}
-            </p>
-            {image.preview && (
-              <button
-                type="button"
-                className="secondary"
-                onClick={() => {
-                  image.clear();
-                  setMessage(
-                    "Image will be deleted when you save. Cancel keeps your saved logo.",
-                  );
+            <div hidden={tab !== "branding"} className="stack">
+              <ImagePicker
+                label="Business logo"
+                filename={image.filename}
+                disabled={!("logo_url" in subscription)}
+                choose={(file) => {
+                  try {
+                    image.choose(file);
+                    setMessage("Logo selected. Save branding to upload it.");
+                  } catch (e) {
+                    setMessage((e as Error).message);
+                  }
                 }}
-              >
-                Delete image
-              </button>
-            )}
-            <label>
-              Business name
-              <input
-                required
-                maxLength={100}
-                value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
               />
-            </label>
-            <label>
-              Introduction
-              <textarea
-                maxLength={1000}
-                value={draft.description}
-                onChange={(e) =>
-                  setDraft({ ...draft, description: e.target.value })
-                }
-              />
-            </label>
-            <label>
-              Brand color
-              <div className="color-control">
+              <p className="muted">
+                {"logo_url" in subscription
+                  ? "JPEG, PNG or WebP, up to 5 MB. Your logo is public."
+                  : "Business logo uploads are awaiting activation."}
+              </p>
+              {image.preview && (
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => {
+                    image.clear();
+                    setMessage(
+                      "Image will be deleted when you save. Cancel keeps your saved logo.",
+                    );
+                  }}
+                >
+                  Delete image
+                </button>
+              )}
+              <label>
+                Business name
                 <input
-                  aria-label="Brand color"
-                  type="color"
-                  value={draft.accent}
+                  required
+                  maxLength={100}
+                  value={draft.name}
+                  onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                />
+              </label>
+              <label>
+                Introduction
+                <textarea
+                  maxLength={1000}
+                  value={draft.description}
                   onChange={(e) =>
-                    setDraft({ ...draft, accent: e.target.value })
+                    setDraft({ ...draft, description: e.target.value })
                   }
                 />
-                <code>{draft.accent.toUpperCase()}</code>
-              </div>
-            </label>
-            <div className="appearance-actions">
-              <button disabled={busy}>
-                {busy ? "Saving…" : "Save branding"}
-              </button>
-              <button
-                type="button"
-                className="secondary"
-                disabled={busy}
-                onClick={async () => {
-                  setBusy(true);
-                  try {
-                    await image.discard();
-                    setDraft({ ...saved });
-                    setMessage("");
-                    cancel();
-                  } catch {
-                    setMessage(
-                      "We couldn’t discard the uploaded image. Please try again.",
-                    );
-                  } finally {
-                    setBusy(false);
-                  }
-                }}
-              >
-                Cancel changes
-              </button>
+              </label>
             </div>
+            <div hidden={tab !== "style"} className="stack">
+              <label>
+                Brand color
+                <div className="color-control">
+                  <input
+                    aria-label="Brand color"
+                    type="color"
+                    value={draft.accent}
+                    onChange={(e) =>
+                      setDraft({ ...draft, accent: e.target.value })
+                    }
+                  />
+                  <code>{draft.accent.toUpperCase()}</code>
+                </div>
+              </label>
+            </div>
+            <fieldset className="stack" disabled={!expanded}>
+              {!expanded && (
+                <p className="notice">
+                  Additional storefront settings are awaiting activation.
+                </p>
+              )}
+              <div hidden={tab !== "header"} className="stack">
+                <h3>Header setup</h3>
+                <fieldset
+                  className="header-mode-choices"
+                  disabled={!("header_mode" in subscription)}
+                >
+                  <legend className="sr-only">Header setup</legend>
+                  {(["standard", "custom"] as const).map((mode) => (
+                    <label key={mode}>
+                      <input
+                        type="radio"
+                        name="header-mode"
+                        checked={draft.header_mode === mode}
+                        onChange={() =>
+                          setDraft({ ...draft, header_mode: mode })
+                        }
+                      />
+                      <span>
+                        <strong>
+                          {mode === "standard"
+                            ? "Standard header"
+                            : "Custom header"}
+                        </strong>
+                        <small>
+                          {mode === "standard"
+                            ? "Centered identity with Home, Shop, About and Contact."
+                            : "Choose a layout and match your website’s navigation."}
+                        </small>
+                      </span>
+                    </label>
+                  ))}
+                </fieldset>
+                {!("header_mode" in subscription) && (
+                  <p className="notice">
+                    Standard and custom navigation saving is awaiting
+                    activation. Your existing header layout remains active.
+                  </p>
+                )}
+                {draft.header_mode === "standard" ? (
+                  <p className="muted">
+                    Home returns to the top, Shop opens your products, About
+                    shows your business introduction, and Contact shows the
+                    shopper’s selected location.
+                  </p>
+                ) : null}
+                <div
+                  hidden={
+                    draft.header_mode !== "custom" &&
+                    "header_mode" in subscription
+                  }
+                  className="stack"
+                >
+                  <h3>Header layout</h3>
+                  <p className="muted">
+                    Choose a starting point. Your branding stays intact.
+                  </p>
+                  <fieldset
+                    disabled={!("header_layout" in subscription)}
+                    className="header-choices"
+                  >
+                    <legend className="sr-only">Header layout</legend>
+                    {Object.entries(headerLayouts).map(([key, label]) => (
+                      <label className="header-choice" key={key}>
+                        <span
+                          className={`header-diagram diagram-${key}`}
+                          aria-hidden="true"
+                        >
+                          <span className="diagram-logo" />
+                          <span className="diagram-name" />
+                          <span className="diagram-search" />
+                          <span className="diagram-actions">○ ▢</span>
+                        </span>
+                        <span>
+                          <input
+                            type="radio"
+                            name="header-layout"
+                            value={key}
+                            checked={draft.header_layout === key}
+                            onChange={() =>
+                              setDraft({
+                                ...draft,
+                                header_layout:
+                                  key as StorefrontDesign["header_layout"],
+                              })
+                            }
+                          />{" "}
+                          {label}
+                        </span>
+                      </label>
+                    ))}
+                  </fieldset>
+                  {!("header_layout" in subscription) && (
+                    <p className="notice">
+                      Saving header layouts is awaiting activation. Centered
+                      identity remains the default.
+                    </p>
+                  )}
+                  <HeaderLinkEditor
+                    links={draft.header_links}
+                    disabled={!("header_links" in subscription)}
+                    change={(links) =>
+                      setDraft({ ...draft, header_links: links })
+                    }
+                  />
+                </div>
+                <label>
+                  Header identity
+                  <select
+                    aria-label="Header identity"
+                    value={draft.header_identity}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        header_identity: e.target
+                          .value as StorefrontDesign["header_identity"],
+                      })
+                    }
+                  >
+                    <option value="name">Business name</option>
+                    <option value="photo">Uploaded photo</option>
+                  </select>
+                </label>
+                <p className="muted">
+                  The pinned header collapses on scroll. Account and cart remain
+                  available.
+                </p>
+              </div>
+              <div hidden={tab !== "branding"} className="stack">
+                <ImagePicker
+                  label="Header photo"
+                  filename={photo.filename}
+                  disabled={!expanded}
+                  choose={(file) => {
+                    try {
+                      photo.choose(file);
+                      setMessage("Photo selected. Save branding to upload it.");
+                    } catch (e) {
+                      setMessage((e as Error).message);
+                    }
+                  }}
+                />
+                <p className="muted">
+                  JPEG, PNG or WebP, up to 5 MB. Displayed in your header
+                  identity area; the photo is public.
+                </p>
+                {photo.preview && (
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => photo.clear()}
+                  >
+                    Delete header photo
+                  </button>
+                )}
+                <label>
+                  Default shopping location
+                  <select
+                    aria-label="Default shopping location"
+                    value={draft.default_location_id ?? ""}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        default_location_id: e.target.value || null,
+                      })
+                    }
+                  >
+                    <option value="">First published location</option>
+                    {locations
+                      .filter((l) => l.published)
+                      .map((l) => (
+                        <option key={l.id} value={l.id}>
+                          {l.name}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+                <p className="muted">
+                  Customers start here and can change location. If it is
+                  unpublished, the first published location is used.
+                </p>
+              </div>
+              <div hidden={tab !== "style"} className="stack">
+                {(
+                  [
+                    ["header_background", "Header background"],
+                    ["storefront_text", "Product text"],
+                    ["storefront_button", "Buttons"],
+                  ] as const
+                ).map(([key, label]) => (
+                  <label key={key}>
+                    {label}
+                    <input
+                      type="color"
+                      value={draft[key]}
+                      onChange={(e) =>
+                        setDraft({ ...draft, [key]: e.target.value })
+                      }
+                    />
+                  </label>
+                ))}
+                <label>
+                  Font family
+                  <select
+                    aria-label="Font family"
+                    value={draft.storefront_font}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        storefront_font: e.target
+                          .value as StorefrontDesign["storefront_font"],
+                      })
+                    }
+                  >
+                    <option value="sans">Sans serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="mono">Monospace</option>
+                  </select>
+                </label>
+                <label>
+                  Text size
+                  <select
+                    aria-label="Text size"
+                    value={draft.storefront_text_size}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        storefront_text_size: e.target
+                          .value as StorefrontDesign["storefront_text_size"],
+                      })
+                    }
+                  >
+                    <option value="standard">Standard</option>
+                    <option value="large">Large</option>
+                  </select>
+                </label>
+              </div>
+              <div hidden={tab !== "products"} className="stack">
+                <h3>Product presentation</h3>
+                <label>
+                  Tile corners
+                  <select
+                    aria-label="Tile corners"
+                    value={draft.tile_corners}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        tile_corners: e.target
+                          .value as StorefrontDesign["tile_corners"],
+                      })
+                    }
+                  >
+                    <option value="square">Square</option>
+                    <option value="subtle">Subtle</option>
+                    <option value="round">Rounded</option>
+                  </select>
+                </label>
+                <label>
+                  Tile spacing
+                  <select
+                    aria-label="Tile spacing"
+                    value={draft.tile_spacing}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        tile_spacing: e.target
+                          .value as StorefrontDesign["tile_spacing"],
+                      })
+                    }
+                  >
+                    <option value="comfortable">Comfortable</option>
+                    <option value="compact">Compact</option>
+                  </select>
+                </label>
+                <p className="muted">
+                  Three columns on desktop, two on tablet and mobile, one on
+                  very narrow phones. Product collection labels are managed with
+                  each product.
+                </p>
+              </div>
+            </fieldset>
           </fieldset>
           {!allowed && (
             <p className="muted">
@@ -181,90 +523,161 @@ export function AppearanceEditor({
                 : "Your saved appearance is shown below.")}
           </p>
         </form>
-        <aside className="store-preview">
+        <button
+          type="button"
+          className="secondary appearance-preview-toggle"
+          aria-expanded={previewOpen}
+          aria-controls="appearance-preview"
+          onClick={() => setPreviewOpen(!previewOpen)}
+        >
+          {previewOpen ? "Hide storefront preview" : "Open storefront preview"}
+        </button>
+        <aside
+          id="appearance-preview"
+          className={`store-preview${previewOpen ? " is-open" : ""}`}
+        >
           <div className="preview-label">
             STOREFRONT PREVIEW <span>{dirty ? "Unsaved" : "Saved"}</span>
           </div>
           <div
-            className="preview-header"
-            style={{ borderTopColor: draft.accent }}
+            className="preview-devices"
+            role="group"
+            aria-label="Preview device"
           >
-            {image.preview ? (
-              <Image
-                width={150}
-                height={84}
-                unoptimized
-                className="business-logo"
-                src={image.preview}
-                alt={`${draft.name} logo`}
-              />
-            ) : (
-              <div
-                className="preview-monogram"
-                style={{ color: draft.accent }}
-                aria-hidden="true"
-              >
-                {draft.name.slice(0, 1).toUpperCase() || "T"}
-              </div>
-            )}
-            <h3>{draft.name || "Your business"}</h3>
-            <p>
-              {draft.description ||
-                "Your introduction helps customers get to know your business."}
-            </p>
+            <button
+              type="button"
+              className="secondary"
+              aria-pressed={device === "desktop"}
+              onClick={() => setDevice("desktop")}
+            >
+              Desktop
+            </button>
+            <button
+              type="button"
+              className="secondary"
+              aria-pressed={device === "mobile"}
+              onClick={() => setDevice("mobile")}
+            >
+              Mobile
+            </button>
           </div>
-          <div className="preview-catalog">
-            <p className="eyebrow">YOUR ONLINE STORE</p>
-            <strong>Choose a location</strong>
-            <div className="preview-location">
-              Your location <span style={{ color: draft.accent }}>→</span>
+          <div
+            className={`appearance-live-preview header-${headerLayout(draft)} preview-device-${device}`}
+            style={storefrontStyle(draft)}
+          >
+            <div className="preview-header shop-header">
+              <StorefrontHeader
+                preview
+                location={
+                  locations.find(
+                    (l) => l.id === draft.default_location_id && l.published,
+                  ) ??
+                  locations
+                    .filter((l) => l.published)
+                    .toSorted(
+                      (a, b) =>
+                        a.name.localeCompare(b.name) ||
+                        a.id.localeCompare(b.id),
+                    )[0]
+                }
+                subscription={{
+                  ...draft,
+                  header_mode:
+                    "header_mode" in subscription
+                      ? draft.header_mode
+                      : undefined,
+                  logo_url: image.preview,
+                  header_photo_url: photo.preview,
+                }}
+                search={
+                  headerLayout(draft) === "search" ? (
+                    <span className="shop-header-search preview-search">
+                      Search products
+                    </span>
+                  ) : undefined
+                }
+              >
+                <div className="shop-header-actions" aria-hidden="true">
+                  <span className="shop-icon">
+                    <Image
+                      src="/storefront/user.svg"
+                      width={24}
+                      height={24}
+                      alt=""
+                    />
+                  </span>
+                  <span className="shop-icon">
+                    <Image
+                      src="/storefront/cart.svg"
+                      width={24}
+                      height={24}
+                      alt=""
+                    />
+                  </span>
+                </div>
+              </StorefrontHeader>
             </div>
-            <p className="muted">
-              Products appear after customers select a location.
-            </p>
+            <div className="preview-catalog">
+              <details>
+                <summary>Business information</summary>
+                <p>{draft.description}</p>
+              </details>
+              <p>
+                Shopping at{" "}
+                {locations.find((l) => l.id === draft.default_location_id)
+                  ?.name ||
+                  locations.find((l) => l.published)?.name ||
+                  "your first published location"}
+              </p>
+              <div className="preview-product-grid">
+                {[1, 2, 3].map((i) => (
+                  <div key={i}>
+                    <div className="preview-photo" />
+                    <strong>Product</strong>
+                    <p>Brief description</p>
+                    <span className="preview-add">Add to cart</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
           <p className="preview-note">
             Layout preview · Products and ordering remain on your storefront.
           </p>
         </aside>
       </div>
-      <div className="future-settings">
-        <details>
-          <summary>
-            Header layout{" "}
-            <span className="coming-soon">Feature coming soon</span>
-          </summary>
-          <p>
-            Header templates and optional contact details will be available
-            here.
-          </p>
-        </details>
-        <details>
-          <summary>
-            Navigation links{" "}
-            <span className="coming-soon">Feature coming soon</span>
-          </summary>
-          <p>
-            Add, edit and arrange your storefront links, including mobile
-            navigation.
-          </p>
-        </details>
-        <details>
-          <summary>
-            Advanced colors{" "}
-            <span className="coming-soon">Feature coming soon</span>
-          </summary>
-          <p>
-            Individual background, text and button colors with a storefront
-            preview.
-          </p>
-        </details>
-        <details>
-          <summary>
-            Slideshow <span className="coming-soon">Feature coming soon</span>
-          </summary>
-          <p>Additional storefront imagery will be configured here.</p>
-        </details>
+      <div className="appearance-actions">
+        <button
+          type="submit"
+          form={`appearance-panel-${tab}`}
+          disabled={!allowed || busy}
+        >
+          {busy ? "Saving…" : "Save branding"}
+        </button>
+        <button
+          type="button"
+          className="secondary"
+          disabled={!allowed || busy}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              await image.discard();
+              await photo.discard();
+              setDraft({ ...saved });
+              setMessage("");
+              setTab("branding");
+              cancel();
+            } catch {
+              setMessage(
+                "We couldn’t discard the uploaded image. Please try again.",
+              );
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          Cancel changes
+        </button>
       </div>
     </section>
   );

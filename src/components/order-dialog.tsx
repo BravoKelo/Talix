@@ -7,12 +7,16 @@ export function TaskDialog({
   title = "Order details",
   closeLabel = "Close",
   busy = false,
+  className = "",
+  backdropClose = false,
 }: {
   children: React.ReactNode;
   close: () => void;
   title?: string;
   closeLabel?: string;
   busy?: boolean;
+  className?: string;
+  backdropClose?: boolean;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -31,7 +35,19 @@ export function TaskDialog({
   return (
     <dialog
       ref={dialog}
-      className="order-dialog"
+      className={`order-dialog ${className}`}
+      onClick={(e) => {
+        if (backdropClose && !busy && e.target === e.currentTarget) {
+          const r = e.currentTarget.getBoundingClientRect();
+          if (
+            e.clientX < r.left ||
+            e.clientX > r.right ||
+            e.clientY < r.top ||
+            e.clientY > r.bottom
+          )
+            close();
+        }
+      }}
       aria-label={title}
       onCancel={(e) => {
         e.preventDefault();

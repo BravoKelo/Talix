@@ -74,12 +74,19 @@ test("location → catalog → decline → retry → fulfillment → refund", as
   try {
     await page.goto("/shop/acme-shop");
     await expect(page.getByRole("heading", { name: "Acme" })).toBeVisible();
-    await expect(
-      page.getByText("Choose a location to view its products."),
-    ).toBeVisible();
+    await expect(page.getByLabel("Choose a location")).toHaveValue(lid);
     await page.getByLabel("Choose a location").selectOption(lid);
+    await page
+      .getByRole("button", { name: "View Notebook", exact: true })
+      .click();
     await page.getByLabel("Gift wrap").check();
     await page.getByRole("button", { name: "Add to cart" }).click();
+    await page
+      .getByRole("button", { name: "Your cart (1)", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Go to checkout", exact: true })
+      .click();
     await page.getByLabel("Your name").fill("Alex");
     await page.getByLabel("Email", { exact: true }).fill("alex@example.com");
     await page.getByLabel("Phone", { exact: true }).fill("5551234567");

@@ -1,0 +1,1036 @@
+[
+  {
+    "name": "Restaurant Demo",
+    "industry": "Restaurant",
+    "color": "#8b3d2e",
+    "layout": "two_row",
+    "slug": "restaurant-demo",
+    "products": [
+      {
+        "name": "Roasted Vegetable Bowl",
+        "price_cents": 1450,
+        "category": "Kitchen",
+        "asset": "restaurant-demo/1.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Roasted Vegetable Bowl from our kitchen selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Garden Salad",
+        "price_cents": 1100,
+        "category": "Kitchen",
+        "asset": "restaurant-demo/2.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Garden Salad from our kitchen selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Tomato Soup",
+        "price_cents": 850,
+        "category": "Kitchen",
+        "asset": "restaurant-demo/3.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Tomato Soup from our kitchen selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Grilled Cheese",
+        "price_cents": 1000,
+        "category": "Kitchen",
+        "asset": "restaurant-demo/4.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Grilled Cheese from our kitchen selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Herb Flatbread",
+        "price_cents": 1250,
+        "category": "Kitchen",
+        "asset": "restaurant-demo/5.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Herb Flatbread from our kitchen selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Breakfast Sandwich",
+        "price_cents": 950,
+        "category": "Kitchen",
+        "asset": "restaurant-demo/6.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Breakfast Sandwich from our kitchen selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Chocolate Brownie",
+        "price_cents": 450,
+        "category": "Bakery",
+        "asset": "restaurant-demo/7.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Chocolate Brownie from our bakery selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Lemon Cake",
+        "price_cents": 550,
+        "category": "Bakery",
+        "asset": "restaurant-demo/8.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Lemon Cake from our bakery selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Butter Croissant",
+        "price_cents": 425,
+        "category": "Bakery",
+        "asset": "restaurant-demo/9.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Butter Croissant from our bakery selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "House Coffee",
+        "price_cents": 350,
+        "category": "Drinks",
+        "asset": "restaurant-demo/10.svg",
+        "available": true,
+        "location": "secondary",
+        "description": "House Coffee from our drinks selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Iced Tea",
+        "price_cents": 400,
+        "category": "Drinks",
+        "asset": "restaurant-demo/11.svg",
+        "available": false,
+        "location": "shared",
+        "description": "Iced Tea from our drinks selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Sparkling Water",
+        "price_cents": 300,
+        "category": "Drinks",
+        "asset": "restaurant-demo/12.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Sparkling Water from our drinks selection. A fictional sample for Restaurant Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Extra serving",
+            "price_cents": 200
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Hospitality Demo",
+    "industry": "Hospitality",
+    "color": "#284f6a",
+    "layout": "minimal",
+    "slug": "hospitality-demo",
+    "products": [
+      {
+        "name": "Travel Toiletry Kit",
+        "price_cents": 1800,
+        "category": "Guest Essentials",
+        "asset": "hospitality-demo/1.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Travel Toiletry Kit from our guest essentials selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Cotton Slippers",
+        "price_cents": 1600,
+        "category": "Guest Essentials",
+        "asset": "hospitality-demo/2.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Cotton Slippers from our guest essentials selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Sleep Mask",
+        "price_cents": 1200,
+        "category": "Guest Essentials",
+        "asset": "hospitality-demo/3.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Sleep Mask from our guest essentials selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Travel Toothbrush Set",
+        "price_cents": 700,
+        "category": "Guest Essentials",
+        "asset": "hospitality-demo/4.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Travel Toothbrush Set from our guest essentials selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Local Welcome Basket",
+        "price_cents": 3800,
+        "category": "Welcome Gifts",
+        "asset": "hospitality-demo/5.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Local Welcome Basket from our welcome gifts selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Chocolate Selection",
+        "price_cents": 1500,
+        "category": "Welcome Gifts",
+        "asset": "hospitality-demo/6.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Chocolate Selection from our welcome gifts selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Postcard Set",
+        "price_cents": 800,
+        "category": "Welcome Gifts",
+        "asset": "hospitality-demo/7.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Postcard Set from our welcome gifts selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Guest Journal",
+        "price_cents": 1600,
+        "category": "Welcome Gifts",
+        "asset": "hospitality-demo/8.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Guest Journal from our welcome gifts selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Woven Beach Towel",
+        "price_cents": 2800,
+        "category": "Pool & Leisure",
+        "asset": "hospitality-demo/9.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Woven Beach Towel from our pool & leisure selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Reusable Water Bottle",
+        "price_cents": 2200,
+        "category": "Pool & Leisure",
+        "asset": "hospitality-demo/10.svg",
+        "available": true,
+        "location": "secondary",
+        "description": "Reusable Water Bottle from our pool & leisure selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Canvas Day Bag",
+        "price_cents": 2600,
+        "category": "Pool & Leisure",
+        "asset": "hospitality-demo/11.svg",
+        "available": false,
+        "location": "shared",
+        "description": "Canvas Day Bag from our pool & leisure selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Sun Care Lotion",
+        "price_cents": 1400,
+        "category": "Pool & Leisure",
+        "asset": "hospitality-demo/12.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Sun Care Lotion from our pool & leisure selection. A fictional sample for Hospitality Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Hair Salon Demo",
+    "industry": "Hair Salon",
+    "color": "#6a4565",
+    "layout": "left",
+    "slug": "hair-salon-demo",
+    "products": [
+      {
+        "name": "Daily Shampoo",
+        "price_cents": 2400,
+        "category": "Hair Care",
+        "asset": "hair-salon-demo/1.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Daily Shampoo from our hair care selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Hydrating Conditioner",
+        "price_cents": 2600,
+        "category": "Hair Care",
+        "asset": "hair-salon-demo/2.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Hydrating Conditioner from our hair care selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Weekly Hair Mask",
+        "price_cents": 3200,
+        "category": "Hair Care",
+        "asset": "hair-salon-demo/3.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Weekly Hair Mask from our hair care selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Scalp Care Serum",
+        "price_cents": 2900,
+        "category": "Hair Care",
+        "asset": "hair-salon-demo/4.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Scalp Care Serum from our hair care selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Styling Cream",
+        "price_cents": 2200,
+        "category": "Styling",
+        "asset": "hair-salon-demo/5.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Styling Cream from our styling selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Texture Spray",
+        "price_cents": 2100,
+        "category": "Styling",
+        "asset": "hair-salon-demo/6.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Texture Spray from our styling selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Finishing Mist",
+        "price_cents": 1900,
+        "category": "Styling",
+        "asset": "hair-salon-demo/7.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Finishing Mist from our styling selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Heat Protection Spray",
+        "price_cents": 2500,
+        "category": "Styling",
+        "asset": "hair-salon-demo/8.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Heat Protection Spray from our styling selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Paddle Brush",
+        "price_cents": 1800,
+        "category": "Accessories",
+        "asset": "hair-salon-demo/9.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Paddle Brush from our accessories selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Wide Tooth Comb",
+        "price_cents": 1200,
+        "category": "Accessories",
+        "asset": "hair-salon-demo/10.svg",
+        "available": true,
+        "location": "secondary",
+        "description": "Wide Tooth Comb from our accessories selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Soft Hair Wrap",
+        "price_cents": 1600,
+        "category": "Accessories",
+        "asset": "hair-salon-demo/11.svg",
+        "available": false,
+        "location": "shared",
+        "description": "Soft Hair Wrap from our accessories selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Scrunchie Trio",
+        "price_cents": 900,
+        "category": "Accessories",
+        "asset": "hair-salon-demo/12.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Scrunchie Trio from our accessories selection. A fictional sample for Hair Salon Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Equipment Rental Demo",
+    "industry": "Equipment Rental",
+    "color": "#755219",
+    "layout": "search",
+    "slug": "equipment-rental-demo",
+    "products": [
+      {
+        "name": "Compact Drill",
+        "price_cents": 8900,
+        "category": "Workshop",
+        "asset": "equipment-rental-demo/1.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Compact Drill from our workshop selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Orbital Sander",
+        "price_cents": 7900,
+        "category": "Workshop",
+        "asset": "equipment-rental-demo/2.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Orbital Sander from our workshop selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Hand Tool Kit",
+        "price_cents": 6500,
+        "category": "Workshop",
+        "asset": "equipment-rental-demo/3.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Hand Tool Kit from our workshop selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Work Light",
+        "price_cents": 4200,
+        "category": "Workshop",
+        "asset": "equipment-rental-demo/4.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Work Light from our workshop selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Extension Cable",
+        "price_cents": 2800,
+        "category": "Site Essentials",
+        "asset": "equipment-rental-demo/5.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Extension Cable from our site essentials selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Folding Work Stand",
+        "price_cents": 5500,
+        "category": "Site Essentials",
+        "asset": "equipment-rental-demo/6.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Folding Work Stand from our site essentials selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Safety Glasses",
+        "price_cents": 1200,
+        "category": "Safety",
+        "asset": "equipment-rental-demo/7.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Safety Glasses from our safety selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Work Gloves",
+        "price_cents": 1600,
+        "category": "Safety",
+        "asset": "equipment-rental-demo/8.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Work Gloves from our safety selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Hearing Protection",
+        "price_cents": 2400,
+        "category": "Safety",
+        "asset": "equipment-rental-demo/9.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Hearing Protection from our safety selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Dust Mask Pack",
+        "price_cents": 900,
+        "category": "Safety",
+        "asset": "equipment-rental-demo/10.svg",
+        "available": true,
+        "location": "secondary",
+        "description": "Dust Mask Pack from our safety selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Sanding Disc Pack",
+        "price_cents": 1100,
+        "category": "Consumables",
+        "asset": "equipment-rental-demo/11.svg",
+        "available": false,
+        "location": "shared",
+        "description": "Sanding Disc Pack from our consumables selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Drill Bit Set",
+        "price_cents": 2200,
+        "category": "Consumables",
+        "asset": "equipment-rental-demo/12.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Drill Bit Set from our consumables selection. A fictional sample for Equipment Rental Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Marina Demo",
+    "industry": "Marina",
+    "color": "#176876",
+    "layout": "centered",
+    "slug": "marina-demo",
+    "products": [
+      {
+        "name": "Floating Key Ring",
+        "price_cents": 1200,
+        "category": "Onboard",
+        "asset": "marina-demo/1.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Floating Key Ring from our onboard selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Dry Storage Bag",
+        "price_cents": 3200,
+        "category": "Onboard",
+        "asset": "marina-demo/2.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Dry Storage Bag from our onboard selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Dock Line",
+        "price_cents": 2800,
+        "category": "Dockside",
+        "asset": "marina-demo/3.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Dock Line from our dockside selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Boat Fender",
+        "price_cents": 4500,
+        "category": "Dockside",
+        "asset": "marina-demo/4.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Boat Fender from our dockside selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Deck Brush",
+        "price_cents": 2600,
+        "category": "Boat Care",
+        "asset": "marina-demo/5.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Deck Brush from our boat care selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Boat Wash",
+        "price_cents": 1800,
+        "category": "Boat Care",
+        "asset": "marina-demo/6.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Boat Wash from our boat care selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Microfiber Cloth Set",
+        "price_cents": 1400,
+        "category": "Boat Care",
+        "asset": "marina-demo/7.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Microfiber Cloth Set from our boat care selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Marine Sponge",
+        "price_cents": 900,
+        "category": "Boat Care",
+        "asset": "marina-demo/8.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Marine Sponge from our boat care selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Adult Buoyancy Vest",
+        "price_cents": 6500,
+        "category": "Safety",
+        "asset": "marina-demo/9.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Adult Buoyancy Vest from our safety selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Waterproof Torch",
+        "price_cents": 2900,
+        "category": "Safety",
+        "asset": "marina-demo/10.svg",
+        "available": true,
+        "location": "secondary",
+        "description": "Waterproof Torch from our safety selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Signal Whistle",
+        "price_cents": 700,
+        "category": "Safety",
+        "asset": "marina-demo/11.svg",
+        "available": false,
+        "location": "shared",
+        "description": "Signal Whistle from our safety selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      },
+      {
+        "name": "Harbor Cap",
+        "price_cents": 2200,
+        "category": "Harbor Shop",
+        "asset": "marina-demo/12.svg",
+        "available": true,
+        "location": "shared",
+        "description": "Harbor Cap from our harbor shop selection. A fictional sample for Marina Demo.",
+        "options": [
+          {
+            "id": "extra",
+            "name": "Reusable carry bag",
+            "price_cents": 200
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "New Business Demo",
+    "industry": "Basic Business",
+    "color": "#3b4654",
+    "layout": "centered",
+    "slug": "new-business-demo",
+    "products": [
+      {
+        "name": "First Sample Product",
+        "price_cents": 1500,
+        "category": "",
+        "asset": null,
+        "available": true,
+        "location": "shared",
+        "description": "A first sample product with no image, for reviewing the new-shop experience.",
+        "options": []
+      },
+      {
+        "name": "Coming Soon Sample",
+        "price_cents": 2000,
+        "category": "",
+        "asset": null,
+        "available": false,
+        "location": "shared",
+        "description": "An unavailable sample product.",
+        "options": []
+      }
+    ]
+  }
+]

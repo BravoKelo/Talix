@@ -1,4 +1,5 @@
 "use client";
+import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
 import { ImagePicker } from "./image-picker";
 import { useState } from "react";
@@ -73,6 +74,7 @@ export function ProductEditor({
   locations,
   product,
   allowGeneral = true,
+  categoriesEnabled = false,
   save,
   close,
   remove,
@@ -82,6 +84,7 @@ export function ProductEditor({
   locations: Location[];
   product?: Product;
   allowGeneral?: boolean;
+  categoriesEnabled?: boolean;
   save: (value: Omit<Product, "id">) => Promise<void>;
   close: () => void;
   remove?: () => Promise<void>;
@@ -182,6 +185,9 @@ export function ProductEditor({
                 location_id: String(f.get("scope")) || null,
                 name: String(f.get("name")),
                 description: String(f.get("description")),
+                ...(categoriesEnabled
+                  ? { category: String(f.get("category") || "").trim() }
+                  : {}),
                 price_cents: price,
                 image_url: url,
                 available: product?.available ?? true,
@@ -219,6 +225,17 @@ export function ProductEditor({
                 maxLength={2000}
               />
             </label>
+            {categoriesEnabled && (
+              <label>
+                Collection
+                <input
+                  name="category"
+                  defaultValue={product?.category}
+                  maxLength={80}
+                  placeholder="Optional collection name"
+                />
+              </label>
+            )}
             <label>
               Price (USD)
               <input
@@ -273,7 +290,7 @@ export function ProductEditor({
             {image.preview && (
               <>
                 <Image
-                  src={image.preview}
+                  src={displayImageUrl(image.preview)}
                   alt="Product image preview"
                   width={180}
                   height={120}

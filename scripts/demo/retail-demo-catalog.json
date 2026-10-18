@@ -1,0 +1,406 @@
+[
+  {
+    "name": "Everyday Notebook",
+    "category": "Desk & Paper",
+    "price_cents": 1800,
+    "description": "Deep green cloth cover, 160 lined pages and a ribbon marker. A simple place for notes, ideas and everyday lists.",
+    "asset": "everyday-notebook.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Weekly Desk Planner",
+    "category": "Desk & Paper",
+    "price_cents": 2200,
+    "description": "An undated weekly planner with room for appointments, priorities and small reminders. Start any week of the year.",
+    "asset": "weekly-desk-planner.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Brass Writing Pen",
+    "category": "Desk & Paper",
+    "price_cents": 1600,
+    "description": "A balanced refillable writing pen with a warm brass finish and a smooth black ink refill.",
+    "asset": "brass-writing-pen.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Canvas Pencil Case",
+    "category": "Desk & Paper",
+    "price_cents": 1400,
+    "description": "A compact zip case for pens, pencils and small desk essentials. Soft canvas with a sturdy cotton lining.",
+    "asset": "canvas-pencil-case.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Everyday Canvas Tote",
+    "category": "Everyday Carry",
+    "price_cents": 2800,
+    "description": "A roomy cotton canvas tote with comfortable handles and an inside pocket. Built for daily errands and all the small things you carry.",
+    "asset": "everyday-canvas-tote.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Pocket Zip Pouch",
+    "category": "Everyday Carry",
+    "price_cents": 1200,
+    "description": "Keep keys, coins and little essentials together in this soft zip pouch. A small companion for a larger bag.",
+    "asset": "pocket-zip-pouch.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Reusable Water Bottle",
+    "category": "Everyday Carry",
+    "price_cents": 2600,
+    "description": "A 600 ml reusable bottle with a screw-top lid and a clean, simple shape. For your desk, day bag or a short walk.",
+    "asset": "reusable-water-bottle.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Everyday Key Loop",
+    "category": "Everyday Carry",
+    "price_cents": 900,
+    "description": "A woven loop with a metal ring and clip. Easy to spot in the bottom of a bag.",
+    "asset": "everyday-key-loop.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Studio Ceramic Mug",
+    "category": "Home & Living",
+    "price_cents": 2400,
+    "description": "A generous ceramic mug with a comfortable handle and a softly curved shape. A calm addition to a morning routine.",
+    "asset": "studio-ceramic-mug.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Bud Vase",
+    "category": "Home & Living",
+    "price_cents": 3200,
+    "description": "A small sculptural vase for a single stem or a few dried flowers. A simple accent for a shelf or side table.",
+    "asset": "bud-vase.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Amber Jar Candle",
+    "category": "Home & Living",
+    "price_cents": 2000,
+    "description": "A warm amber-colored candle jar with a fitted lid. An understated gift or a finishing touch for a cozy corner.",
+    "asset": "amber-jar-candle.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Small Ceramic Planter",
+    "category": "Home & Living",
+    "price_cents": 1800,
+    "description": "A small ceramic planter for a favorite houseplant. Clean lines and an easy-to-style neutral finish. Plant not included.",
+    "asset": "small-ceramic-planter.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Insulated Travel Cup",
+    "category": "Travel & Outdoors",
+    "price_cents": 3000,
+    "description": "A compact insulated cup with a fitted lid. A simple reusable companion for the daily commute.",
+    "asset": "insulated-travel-cup.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Compact Umbrella",
+    "category": "Travel & Outdoors",
+    "price_cents": 2500,
+    "description": "A compact folding umbrella with a wrist loop and matching sleeve. Small enough to keep in an everyday bag.",
+    "asset": "compact-umbrella.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Canvas Weekender",
+    "category": "Travel & Outdoors",
+    "price_cents": 6800,
+    "description": "A roomy canvas bag for an overnight stay or a light weekend away. Includes top handles and an adjustable shoulder strap.",
+    "asset": "canvas-weekender.svg",
+    "location": "annex",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Soft Woven Scarf",
+    "category": "Travel & Outdoors",
+    "price_cents": 3600,
+    "description": "A soft woven scarf in a versatile neutral tone. Light enough for layering, with a gently fringed edge.",
+    "asset": "soft-woven-scarf.svg",
+    "location": "main",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Everyday Gift Box",
+    "category": "Gifts & Sets",
+    "price_cents": 4800,
+    "description": "A ready-to-give selection of small everyday essentials, presented in a reusable box. Select optional wrapping for a finished gift.",
+    "asset": "everyday-gift-box.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      },
+      {
+        "id": "gift_note",
+        "name": "Gift note card",
+        "price_cents": 200
+      }
+    ]
+  },
+  {
+    "name": "Notebook Duo",
+    "category": "Gifts & Sets",
+    "price_cents": 3200,
+    "description": "Two coordinating notebooks for work and personal notes. A thoughtful gift for someone who always has a new idea.",
+    "asset": "notebook-duo.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      },
+      {
+        "id": "gift_note",
+        "name": "Gift note card",
+        "price_cents": 200
+      }
+    ]
+  },
+  {
+    "name": "Cotton Tea Towel Pair",
+    "category": "Gifts & Sets",
+    "price_cents": 2200,
+    "description": "A pair of soft cotton tea towels with a simple woven stripe. Useful, washable and easy to fold away.",
+    "asset": "cotton-tea-towel-pair.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      },
+      {
+        "id": "gift_note",
+        "name": "Gift note card",
+        "price_cents": 200
+      }
+    ]
+  },
+  {
+    "name": "Desk Essentials Set",
+    "category": "Gifts & Sets",
+    "price_cents": 5400,
+    "description": "A coordinated desk set combining a notebook, pen and small tray. This demo item is intentionally unavailable online.",
+    "asset": "desk-essentials-set.svg",
+    "location": "shared",
+    "available": false,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      },
+      {
+        "id": "gift_note",
+        "name": "Gift note card",
+        "price_cents": 200
+      }
+    ]
+  },
+  {
+    "name": "Soft Cotton Throw",
+    "category": "Seasonal",
+    "price_cents": 6400,
+    "description": "A soft cotton throw with a subtle woven texture and fringed ends. Fold over a chair or keep close on a cool evening.",
+    "asset": "soft-cotton-throw.svg",
+    "location": "shared",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Woven Storage Basket",
+    "category": "Seasonal",
+    "price_cents": 4200,
+    "description": "A textured basket for soft goods and small household items. This demo item is intentionally unavailable online.",
+    "asset": "woven-storage-basket.svg",
+    "location": "shared",
+    "available": false,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Small Ceramic Tray",
+    "category": "Seasonal",
+    "price_cents": 1900,
+    "description": "A low ceramic tray for keys, jewelry or small desk objects. Available at the Market Annex demo location.",
+    "asset": "small-ceramic-tray.svg",
+    "location": "annex",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  },
+  {
+    "name": "Simple Greeting Card",
+    "category": "Seasonal",
+    "price_cents": 500,
+    "description": "An unprinted-inside greeting card for a short note. This item intentionally has no image so the storefront fallback can be reviewed.",
+    "asset": null,
+    "location": "main",
+    "available": true,
+    "options": [
+      {
+        "id": "gift_wrap",
+        "name": "Gift wrapping",
+        "price_cents": 400
+      }
+    ]
+  }
+]

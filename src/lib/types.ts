@@ -1,8 +1,15 @@
+export type HeaderLink = {
+  label: string;
+  destination: "storefront" | "website";
+  url: string;
+};
+import type { StorefrontDesign } from "./storefront-design";
 export type Option = { id: string; name: string; price_cents: number };
 export type Product = {
   id: string;
   subscription_id: string;
   location_id: string | null;
+  category?: string;
   name: string;
   description: string;
   price_cents: number;
@@ -19,13 +26,17 @@ export type Location = {
   hours: string;
   published: boolean;
 };
-export type Subscription = {
+export type Subscription = Partial<StorefrontDesign> & {
   id: string;
   client_id: string;
   name: string;
   slug: string;
   accent: string;
+  header_mode?: "standard" | "custom";
+  header_links?: HeaderLink[];
   logo_url?: string | null;
+  header_photo_url?: string | null;
+  default_location_id?: string | null;
   description: string;
 };
 export type CartLine = {

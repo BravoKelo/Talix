@@ -2823,7 +2823,1388 @@ body:has(.workspace) > footer {
   }
 }
 
-.image-picker { display: grid; gap: 8px; min-width: 0; }
-.image-picker-control { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.image-picker-control button { flex: 0 0 auto; }
-.image-picker-name { min-width: 0; overflow-wrap: anywhere; }
+.image-picker {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.image-picker-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.image-picker-control button {
+  flex: 0 0 auto;
+}
+.image-picker-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Approved Figma storefront: one business header and image-led commerce. */
+body:has(.figma-store) > .topbar,
+body:has(.figma-store) > footer {
+  display: none;
+}
+body:has(.figma-store) {
+  background: white;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.figma-store {
+  max-width: none;
+  padding: 0 0 48px;
+  color: var(--shop-ink);
+  background: #fff;
+  font-family: var(--shop-font);
+  font-size: var(--shop-text-size);
+  overflow-wrap: anywhere;
+}
+.figma-store :is(button, input, select, summary, a) {
+  touch-action: manipulation;
+}
+.figma-store :is(button, input, select, summary, .shop-icon) {
+  min-height: 48px;
+  font: inherit;
+}
+.figma-store button:not(.secondary) {
+  background: var(--shop-button);
+  color: var(--shop-button-ink);
+}
+.figma-store :is(section, aside, [id]) {
+  scroll-margin-top: 80px;
+}
+.shop-skip {
+  position: absolute;
+  left: -10000px;
+}
+.shop-skip:focus {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  background: white;
+  padding: 12px;
+}
+.shop-header {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: var(--shop-header);
+  color: var(--shop-header-ink);
+  border-bottom: 1px solid #e0e5ef;
+}
+.shop-nav {
+  height: 88px;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr) 180px;
+  padding: 0 48px;
+  gap: 0;
+  transition: height 0.2s ease;
+}
+.shop-header.is-compact .shop-nav {
+  height: 56px;
+}
+.shop-logo {
+  display: flex;
+  width: 72px;
+  height: 56px;
+  align-items: center;
+  justify-content: flex-start;
+  color: inherit;
+}
+.shop-logo img {
+  max-width: 72px;
+  height: 56px;
+  object-fit: contain;
+}
+.shop-initial {
+  width: 56px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+}
+.shop-centered-identity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.shop-centered-identity h1 {
+  color: inherit;
+  font-size: 26px;
+  line-height: 1.25;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.shop-centered-identity img {
+  max-width: 100%;
+  width: 300px;
+  height: 56px;
+  object-fit: contain;
+}
+.shop-header.is-compact .shop-centered-identity h1 {
+  font-size: 20px;
+}
+.shop-header.is-compact :is(.shop-logo img, .shop-centered-identity img) {
+  height: 32px;
+}
+.shop-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+}
+.figma-store .shop-icon {
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  border-radius: 4px;
+}
+.shop-icon img {
+  width: 24px;
+  height: 24px;
+}
+.shop-header[style] .shop-icon {
+  color: inherit;
+}
+.shop-cart-count {
+  position: absolute;
+  right: 0;
+  top: 0;
+  min-width: 18px;
+  height: 18px;
+  font-size: 11px;
+  border-radius: 12px;
+  background: var(--shop-button);
+  color: var(--shop-button-ink);
+  display: grid;
+  place-items: center;
+}
+.shop-account-panel {
+  position: absolute;
+  right: 0;
+  top: 54px;
+  width: 260px;
+  border: 1px solid #e0e5ef;
+  padding: 16px;
+  background: white;
+  color: #17233b;
+  box-shadow: 0 8px 24px #17233b15;
+}
+.shop-account-panel a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  color: #173553;
+  text-decoration: underline;
+}
+.shop-toolbar {
+  max-width: 1248px;
+  margin: auto;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.shop-location-control {
+  min-width: 0;
+  max-width: 50%;
+}
+.shop-location-control select {
+  border: 0;
+  padding: 8px 28px 8px 0;
+  background: white;
+  color: var(--shop-ink);
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+.shop-search {
+  width: 360px;
+  max-width: 45%;
+  margin: 0;
+}
+.shop-search input {
+  background: #f0f2f5;
+  border: 0;
+  border-radius: 0;
+  padding: 12px 16px;
+  color: var(--shop-ink);
+}
+.shop-menu-toggle {
+  display: none;
+}
+.figma-store .store-layout {
+  display: block;
+  margin: auto;
+  max-width: 1248px;
+}
+.shop-browse-layout {
+  display: grid;
+  grid-template-columns: 176px minmax(0, 1fr);
+  gap: 32px;
+  padding-top: 24px;
+}
+.shop-browse-menu {
+  position: sticky;
+  top: 80px;
+  align-self: start;
+  min-width: 0;
+}
+.shop-browse-menu p {
+  margin: 0 0 8px;
+}
+.shop-browse-menu nav {
+  display: grid;
+  gap: 8px;
+}
+.figma-store .shop-browse-menu button {
+  color: var(--shop-ink);
+  text-align: left;
+  padding: 12px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--shop-radius);
+  white-space: normal;
+}
+.figma-store .shop-browse-menu button[aria-pressed="true"] {
+  background: #f0f2f5;
+  font-weight: 700;
+}
+.shop-business-info {
+  margin-top: 16px;
+  color: #667189;
+  font-size: 13px;
+}
+.shop-business-info summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.shop-results {
+  min-width: 0;
+}
+.figma-store .catalog {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--shop-gap);
+}
+.shop-product-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: white;
+  border: 0;
+  border-radius: 0;
+}
+.figma-store .shop-tile-open {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  flex: 1;
+  background: white;
+  color: var(--shop-ink);
+  border: 0;
+  padding: 0;
+  text-align: left;
+  white-space: normal;
+  margin: 0 !important;
+}
+.shop-product-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 330/208;
+  object-fit: cover;
+  background: #f0f2f5;
+  border-radius: var(--shop-radius);
+}
+.shop-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #667189;
+  font-size: 12px;
+}
+.shop-image-placeholder > span:first-child {
+  font-size: 32px;
+}
+.shop-card-copy {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 6px;
+  padding: 8px 0 0;
+}
+.shop-product-name {
+  font-size: var(--shop-text-size);
+  line-height: 1.4;
+  font-weight: 700;
+}
+.shop-product-summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: calc(var(--shop-text-size) - 2px);
+  line-height: 1.4;
+  color: #667189;
+  font-weight: 400;
+  min-height: 2.8em;
+}
+.shop-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+}
+.figma-store .shop-card-actions button {
+  font-size: 14px;
+  padding: 12px;
+  min-width: 112px;
+  font-weight: 400;
+  border-radius: var(--shop-radius);
+}
+.shop-product-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.shop-product-details :is(h2, p) {
+  margin: 0;
+}
+.shop-product-details .shop-product-image {
+  max-height: 360px;
+  object-fit: contain;
+}
+.shop-full-description {
+  white-space: pre-wrap;
+}
+.shop-option {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  gap: 8px;
+}
+.shop-option input {
+  flex: 0 0 auto;
+}
+.figma-store .cart {
+  position: static;
+  max-width: 720px;
+  margin: 40px 0 0 208px;
+  border-top: 1px solid #e0e5ef;
+}
+.shop-cart-notice:empty {
+  display: none;
+}
+.figma-store .cart small {
+  display: block;
+  margin: 4px 0 8px;
+}
+@media (max-width: 1360px) {
+  .shop-toolbar,
+  .figma-store .store-layout {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+}
+@media (max-width: 1100px) {
+  .figma-store .catalog {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .shop-browse-layout {
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 24px;
+  }
+  .figma-store .cart {
+    margin-left: 184px;
+  }
+}
+@media (max-width: 650px) {
+  .shop-nav {
+    height: 72px;
+    padding: 0 12px;
+    grid-template-columns: 96px minmax(0, 1fr) 96px;
+  }
+  .shop-logo,
+  .shop-logo img {
+    width: 48px;
+    height: 48px;
+  }
+  .shop-centered-identity h1 {
+    font-size: 16px;
+  }
+  .shop-header.is-compact .shop-centered-identity h1 {
+    font-size: 16px;
+  }
+  .shop-toolbar {
+    margin: 0 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 12px;
+    padding: 4px 0;
+  }
+  .shop-location-control {
+    max-width: 100%;
+  }
+  .shop-location-control select {
+    font-size: 14px;
+  }
+  .shop-menu-toggle {
+    display: block;
+    padding: 8px 16px;
+  }
+  .shop-search {
+    grid-column: 1/-1;
+    width: 100%;
+    max-width: none;
+    margin-top: 8px;
+  }
+  .figma-store .store-layout {
+    margin: 0 16px;
+  }
+  .shop-browse-layout {
+    display: block;
+    padding-top: 8px;
+  }
+  .shop-browse-menu {
+    display: none;
+    position: static;
+    margin-bottom: 16px;
+  }
+  .shop-browse-menu.is-open {
+    display: block;
+  }
+  .shop-browse-menu > p {
+    display: none;
+  }
+  .figma-store .catalog {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 14px;
+  }
+  .shop-product-image {
+    aspect-ratio: 172/208;
+  }
+  .shop-card-actions {
+    gap: 4px;
+  }
+  .figma-store .shop-card-actions button {
+    min-width: 0;
+    padding: 10px;
+    font-size: 14px;
+  }
+  .figma-store .cart {
+    margin: 32px 0 0;
+  }
+}
+@media (max-width: 359px) {
+  .figma-store .catalog {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .shop-nav {
+    grid-template-columns: 64px minmax(0, 1fr) 96px;
+  }
+  .shop-centered-identity h1 {
+    font-size: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shop-nav {
+    transition: none;
+  }
+}
+.appearance-live-preview {
+  color: var(--shop-ink);
+  font-family: var(--shop-font);
+  font-size: var(--shop-text-size);
+  background: #fff;
+}
+.appearance-live-preview .preview-header {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 48px;
+  align-items: center;
+  padding: 12px;
+  background: var(--shop-header);
+  color: var(--shop-header-ink);
+  border: 0;
+}
+.appearance-live-preview .preview-header h3 {
+  color: inherit;
+  margin: 0;
+  text-align: center;
+  grid-column: 2;
+  font-size: 18px;
+}
+.appearance-live-preview .preview-header .business-logo {
+  width: 72px;
+  height: 56px;
+  padding: 0;
+  background: transparent;
+}
+.preview-center-photo {
+  grid-column: 2;
+  width: 100%;
+  height: 56px;
+  object-fit: contain;
+}
+.preview-product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--shop-gap);
+}
+.preview-photo {
+  aspect-ratio: 330/208;
+  background: #f0f2f5;
+  margin-bottom: 8px;
+  border-radius: var(--shop-radius);
+}
+.preview-add {
+  display: block;
+  padding: 12px 4px;
+  background: var(--shop-button);
+  color: var(--shop-button-ink);
+  border-radius: var(--shop-radius);
+  font-size: 12px;
+  text-align: center;
+}
+.shop-icon img {
+  filter: var(--shop-icon-filter);
+}
+.figma-store .shop-browse-menu button {
+  justify-content: flex-start;
+}
+.shop-search input {
+  font-weight: 400;
+}
+.figma-store .shop-search input {
+  font-weight: 400;
+}
+
+/* Approved cart popup and header preset study. */
+.shop-cart-dialog.order-dialog {
+  box-sizing: border-box;
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  width: min(440px, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: 24px;
+  border: 0;
+  border-radius: 0;
+  color: var(--shop-ink, #17233b);
+  background: #fff;
+  font-family: var(--shop-font, Arial, Helvetica, sans-serif);
+  overflow: hidden;
+}
+.shop-cart-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.shop-cart-dialog::backdrop {
+  background: rgb(0 0 0 / 38%);
+}
+.shop-cart-dialog .dialog-toolbar {
+  flex: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.shop-cart-dialog .dialog-toolbar strong {
+  font-size: 24px;
+}
+.shop-cart-dialog button {
+  min-height: 48px;
+  border-radius: 0;
+}
+.shop-cart-dialog .dialog-toolbar button {
+  min-width: 72px;
+}
+.shop-cart-location {
+  margin: 0;
+  font-size: 14px;
+  color: #66708a;
+}
+.shop-cart-items {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 0 8px;
+}
+.shop-cart-items.is-empty {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.shop-cart-items.is-empty h2 {
+  font-size: 22px;
+}
+.shop-cart-item {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 16px;
+  min-height: 164px;
+  flex: none;
+}
+.shop-cart-thumb .shop-product-image {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  aspect-ratio: 1;
+}
+.shop-cart-thumb .shop-image-placeholder {
+  font-size: 9px;
+  padding: 4px;
+}
+.shop-cart-thumb .shop-image-placeholder > span:first-child {
+  display: none;
+}
+.shop-cart-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+.shop-cart-copy small {
+  font-size: 13px;
+}
+.shop-cart-copy .row {
+  font-size: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+.shop-cart-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.shop-cart-controls > button {
+  padding: 8px 12px;
+}
+.shop-quantity {
+  display: flex;
+  align-items: center;
+}
+.shop-quantity > * {
+  min-width: 48px;
+  width: 48px;
+  text-align: center;
+  padding: 0;
+}
+.shop-quantity button {
+  border: 0;
+}
+.shop-cart-footer {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.shop-cart-footer .row {
+  margin: 0;
+  font-size: 20px;
+}
+.shop-cart-footer small {
+  font-size: 13px;
+}
+.shop-checkout-step {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.shop-checkout-step > form {
+  margin: 0;
+}
+body:has(.shop-cart-dialog[open]) {
+  overflow: hidden;
+}
+.shop-header-search {
+  display: none;
+}
+.header-search .shop-header:not(.is-compact) .shop-nav {
+  grid-template-columns: 72px minmax(140px, 220px) minmax(140px, 1fr) 96px;
+  gap: 16px;
+}
+.header-search .shop-header:not(.is-compact) .shop-header-search {
+  display: block;
+  align-self: center;
+}
+.shop-header-search input {
+  min-height: 48px;
+  width: 100%;
+  background: #f0f2f5;
+  color: #17233b;
+  border: 0;
+}
+.header-search .shop-header:not(.is-compact) .shop-centered-identity {
+  justify-content: flex-start;
+}
+.header-search .shop-header:not(.is-compact) .shop-centered-identity h1 {
+  font-size: 20px;
+  text-align: left;
+}
+.header-search .shop-toolbar > .shop-search {
+  display: none;
+}
+.header-search .shop-header.is-compact + .shop-toolbar > .shop-search {
+  display: block;
+}
+:is(.header-left, .header-two_row, .header-minimal) .shop-nav {
+  grid-template-columns: 72px minmax(0, 1fr) 96px;
+  gap: 16px;
+}
+:is(.header-left, .header-two_row, .header-minimal) .shop-centered-identity {
+  justify-content: flex-start;
+}
+:is(.header-left, .header-two_row, .header-minimal) .shop-centered-identity h1 {
+  text-align: left;
+}
+.header-two_row .shop-toolbar {
+  flex-direction: row-reverse;
+}
+.header-two_row .shop-toolbar > .shop-search {
+  flex: 1;
+  max-width: 700px;
+  margin-right: auto;
+}
+.header-minimal .shop-nav {
+  height: 56px;
+}
+.header-minimal .shop-centered-identity h1 {
+  font-size: 18px;
+}
+.header-minimal .shop-logo img {
+  height: 40px;
+}
+.header-minimal .shop-initial {
+  height: 40px;
+  width: 40px;
+  font-size: 18px;
+}
+.appearance-editor [hidden] {
+  display: none !important;
+}
+.appearance-editor > .page-tabs {
+  margin-bottom: 24px;
+}
+.appearance-editor .header-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 0;
+  border: 0;
+}
+.header-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid #e0e5f0;
+  padding: 12px;
+  min-height: 130px;
+  cursor: pointer;
+  font-size: 15px;
+}
+.header-choice:has(input:checked) {
+  outline: 2px solid #17233b;
+  outline-offset: -2px;
+}
+.header-choice input {
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+.header-diagram {
+  display: grid;
+  grid-template-columns: 24px 1fr 32px;
+  align-items: center;
+  gap: 8px;
+  height: 64px;
+  padding: 8px;
+  border-bottom: 1px solid #e0e5f0;
+}
+.diagram-logo {
+  width: 20px;
+  height: 20px;
+  background: #d9dee7;
+}
+.diagram-name {
+  width: 52px;
+  height: 6px;
+  background: #17233b;
+  justify-self: center;
+}
+.diagram-actions {
+  font-size: 10px;
+  white-space: nowrap;
+}
+.diagram-search {
+  grid-column: 1/-1;
+  grid-row: 2;
+  height: 10px;
+  background: #f0f2f5;
+}
+.diagram-left .diagram-name,
+.diagram-minimal .diagram-name,
+.diagram-two_row .diagram-name {
+  justify-self: start;
+}
+.diagram-minimal {
+  height: 48px;
+}
+.diagram-search .diagram-search {
+  grid-column: 2;
+  grid-row: 1;
+  width: 64px;
+  justify-self: end;
+}
+.diagram-search .diagram-name {
+  display: none;
+}
+.preview-devices {
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+}
+.preview-devices button[aria-pressed="true"] {
+  background: #17233b;
+  color: #fff;
+}
+.appearance-live-preview {
+  container-type: inline-size;
+}
+.appearance-live-preview.preview-device-mobile {
+  max-width: 390px;
+  margin-inline: auto;
+}
+.appearance-live-preview .preview-header {
+  display: block;
+  padding: 0;
+  position: static;
+}
+.appearance-live-preview .shop-nav {
+  padding: 0 12px;
+  grid-template-columns: 48px minmax(0, 1fr) 80px;
+  height: 72px;
+  gap: 4px;
+}
+.appearance-live-preview .shop-logo {
+  width: 40px;
+  height: 48px;
+}
+.appearance-live-preview .shop-logo img {
+  max-width: 40px;
+  height: 40px;
+}
+.appearance-live-preview .shop-initial {
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+}
+.appearance-live-preview .shop-centered-identity h3 {
+  margin: 0;
+  font-size: 16px;
+  color: inherit;
+  text-align: center;
+}
+.appearance-live-preview .shop-centered-identity img {
+  width: 100%;
+  max-width: 180px;
+  height: 48px;
+  object-fit: contain;
+}
+.appearance-live-preview .shop-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 48px;
+}
+.appearance-live-preview .shop-icon img {
+  filter: var(--shop-icon-filter);
+}
+.appearance-live-preview:is(
+    .header-left,
+    .header-two_row,
+    .header-minimal,
+    .header-search
+  )
+  .shop-centered-identity {
+  justify-content: flex-start;
+}
+.appearance-live-preview:is(
+    .header-left,
+    .header-two_row,
+    .header-minimal,
+    .header-search
+  )
+  .shop-centered-identity
+  h3 {
+  text-align: left;
+}
+.appearance-live-preview.header-minimal .shop-nav {
+  height: 56px;
+}
+.appearance-live-preview.header-two_row .preview-catalog > p {
+  background: #f0f2f5;
+  padding: 12px;
+}
+.appearance-live-preview.preview-device-mobile .preview-product-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.appearance-live-preview.header-search .shop-nav {
+  height: auto;
+  min-height: 80px;
+  padding-block: 12px;
+}
+.appearance-live-preview.header-search .shop-header-search {
+  display: block;
+  grid-column: 1/-1;
+  grid-row: 2;
+  background: #f0f2f5;
+  padding: 12px;
+  color: #66708a;
+  font-size: 12px;
+}
+.appearance-live-preview.header-search .shop-header-actions {
+  grid-column: 3;
+  grid-row: 1;
+}
+.appearance-editor .appearance-actions {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 0;
+  background: #fff;
+  z-index: 1;
+}
+@media (max-width: 700px) {
+  .header-search .shop-header:not(.is-compact) .shop-nav {
+    grid-template-columns: 48px minmax(0, 1fr) 96px;
+    gap: 8px;
+  }
+  .header-search .shop-header .shop-header-search {
+    display: none !important;
+  }
+  .header-search .shop-toolbar > .shop-search {
+    display: block;
+  }
+  :is(.header-left, .header-two_row, .header-minimal) .shop-nav {
+    grid-template-columns: 48px minmax(0, 1fr) 96px;
+    gap: 8px;
+  }
+  :is(.header-left, .header-two_row) .shop-centered-identity h1 {
+    font-size: 17px;
+  }
+  .header-two_row .shop-toolbar {
+    flex-direction: row;
+  }
+  .appearance-editor .header-choices {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 359px) {
+  .shop-cart-dialog.order-dialog {
+    padding: 16px;
+  }
+  .shop-cart-item {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .shop-cart-thumb .shop-product-image {
+    width: 48px;
+    height: 48px;
+  }
+}
+.shop-nav {
+  align-items: center;
+}
+.shop-header-search input {
+  border-radius: 0;
+}
+.appearance-preview-toggle {
+  display: none;
+}
+@media (max-width: 650px) {
+  .appearance-preview-toggle {
+    display: block;
+  }
+  .appearance-editor .store-preview:not(.is-open) {
+    display: none;
+  }
+  .appearance-editor .appearance-actions {
+    position: static;
+  }
+}
+@media (min-width: 701px) {
+  :is(.header-two_row, .header-search) .shop-header:not(.is-compact) .shop-nav {
+    height: 80px;
+  }
+  .figma-store .shop-toolbar {
+    min-height: 56px;
+  }
+}
+.shop-cart-dialog .shop-cart-footer {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  text-align: left;
+}
+.shop-cart-footer > button {
+  width: 100%;
+  font-size: 16px;
+}
+
+/* Approved standard/custom navigation, shared by storefront and owner preview. */
+.shop-header {
+  container-type: inline-size;
+}
+.shop-nav {
+  position: relative;
+}
+.shop-navigation {
+  grid-column: 1/-1;
+  grid-row: 2;
+  min-width: 0;
+  width: 100%;
+  position: relative;
+}
+.shop-navigation-links {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+.shop-navigation .shop-navigation-link,
+.shop-navigation button.shop-navigation-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 8px 14px;
+  white-space: nowrap;
+  color: var(--shop-header-ink, #17233b);
+  font: inherit;
+  font-size: 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-decoration: none;
+  cursor: pointer;
+}
+.shop-navigation .shop-navigation-link:hover,
+.shop-navigation button.shop-navigation-link:hover {
+  background: color-mix(
+    in srgb,
+    var(--shop-header-ink, #17233b) 8%,
+    transparent
+  );
+  color: var(--shop-header-ink, #17233b);
+}
+.shop-navigation .shop-navigation-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -4px;
+}
+.shop-navigation-measure {
+  display: flex;
+  width: max-content;
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  height: 0;
+  overflow: hidden;
+}
+.shop-navigation-measure .shop-navigation-link {
+  flex: none;
+}
+.shop-header:has(.shop-navigation) .shop-nav {
+  height: auto;
+  min-height: 88px;
+  row-gap: 0;
+  padding-block: 10px 0;
+}
+.shop-header:has(.shop-navigation) .shop-nav > .shop-logo,
+.shop-header:has(.shop-navigation) .shop-nav > .shop-centered-identity,
+.shop-header:has(.shop-navigation) .shop-nav > .shop-header-actions,
+.shop-header:has(.shop-navigation) .shop-nav > .shop-header-search {
+  grid-row: 1;
+}
+.shop-header-actions {
+  grid-column: -2;
+}
+:is(.header-left, .header-minimal)
+  .shop-header:has(.shop-navigation)
+  .shop-nav {
+  grid-template-columns: 72px minmax(120px, 220px) minmax(48px, 1fr) 96px;
+  padding-block: 8px;
+  gap: 12px;
+}
+:is(.header-left, .header-minimal) .shop-nav .shop-navigation {
+  grid-column: 3;
+  grid-row: 1;
+}
+:is(.header-left, .header-minimal) .shop-navigation-links {
+  justify-content: flex-end;
+}
+.shop-header.is-compact:has(.shop-navigation) .shop-nav {
+  min-height: 56px;
+  padding-block: 0;
+}
+.header-centered .shop-header.is-compact .shop-nav {
+  grid-template-columns: 56px 48px minmax(0, 1fr) 96px;
+  gap: 8px;
+}
+.header-centered .shop-header.is-compact .shop-centered-identity {
+  grid-column: 3;
+}
+.header-centered .shop-header.is-compact .shop-navigation {
+  grid-column: 2;
+  grid-row: 1;
+  width: 48px;
+}
+.shop-information-dialog {
+  background: var(--shop-header, #fff);
+  color: var(--shop-header-ink, #17233b);
+  font-family: var(--shop-font, Arial, sans-serif);
+  width: min(560px, calc(100vw - 32px));
+  overflow-wrap: anywhere;
+}
+.shop-information-dialog h2 {
+  color: inherit;
+}
+.shop-information-dialog p {
+  white-space: pre-wrap;
+}
+.shop-information-dialog .dialog-toolbar button {
+  min-height: 48px;
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+}
+.shop-menu-links {
+  display: flex;
+  flex-direction: column;
+}
+.shop-navigation .shop-menu-links .shop-navigation-link {
+  white-space: normal;
+  text-align: left;
+  justify-content: flex-start;
+  overflow-wrap: anywhere;
+}
+body:has(.shop-information-dialog[open]) {
+  overflow: hidden;
+}
+.header-mode-choices {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+}
+.header-mode-choices label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  min-height: 64px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+.header-mode-choices label:has(:checked) {
+  border-color: var(--accent);
+  background: var(--soft);
+}
+.header-mode-choices input {
+  width: 20px;
+  height: 20px;
+  min-height: 20px;
+  flex: none;
+  accent-color: var(--accent);
+}
+.header-mode-choices small {
+  display: block;
+  font-weight: 400;
+  margin-top: 4px;
+  color: var(--muted);
+}
+.header-link-editor {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+.header-link-editor legend {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.header-link-row {
+  border: 1px solid var(--line);
+  min-width: 0;
+}
+.header-link-summary {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.header-link-summary button {
+  min-height: 48px;
+  min-width: 48px;
+  border: 0;
+  border-radius: 0;
+}
+.header-link-expand {
+  flex: 1;
+  min-width: 0 !important;
+  text-align: left;
+  display: block;
+  overflow: hidden;
+}
+.header-link-expand small {
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-weight: 400;
+  color: var(--muted);
+}
+.header-link-fields {
+  padding: 12px;
+  border-top: 1px solid var(--line);
+}
+.appearance-live-preview .shop-header:has(.shop-navigation) .shop-nav {
+  padding-top: 8px;
+}
+@container (max-width: 700px) {
+  :is(.figma-store, .appearance-live-preview)
+    .shop-header:has(.shop-navigation)
+    .shop-nav {
+    grid-template-columns: 40px 48px minmax(0, 1fr) 96px;
+    min-height: 72px;
+    padding: 8px;
+    gap: 4px;
+  }
+  .shop-header .shop-nav > .shop-centered-identity {
+    grid-column: 3;
+  }
+  .shop-header .shop-nav .shop-navigation {
+    grid-column: 2;
+    grid-row: 1;
+    width: 48px;
+  }
+  .shop-header .shop-header-search {
+    display: none !important;
+  }
+  .shop-header .shop-nav > .shop-logo {
+    width: 40px;
+  }
+  .shop-header .shop-logo img {
+    max-width: 40px;
+    height: 40px;
+  }
+  .shop-header .shop-initial {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+  .shop-header .shop-centered-identity :is(h1, h3) {
+    font-size: 16px;
+    text-align: center;
+  }
+  .shop-header .shop-nav .shop-header-actions {
+    grid-column: 4;
+  }
+}
+@media (max-width: 700px) {
+  .header-search .shop-toolbar > .shop-search {
+    display: block;
+  }
+}
+:is(.header-search, .header-two_row) .shop-header.is-compact .shop-nav {
+  grid-template-columns: 56px minmax(100px, 1fr) minmax(48px, 1fr) 96px;
+  gap: 8px;
+}
+:is(.header-search, .header-two_row) .shop-header.is-compact .shop-navigation {
+  grid-column: 3;
+  grid-row: 1;
+}
+:is(.header-search, .header-two_row)
+  .shop-header.is-compact
+  .shop-centered-identity {
+  grid-column: 2;
+}
+@container (max-width: 700px) {
+  :is(.figma-store, .appearance-live-preview)
+    .shop-header.is-compact:has(.shop-navigation)
+    .shop-nav {
+    grid-template-columns: 40px 48px minmax(0, 1fr) 96px;
+    gap: 4px;
+    padding-inline: 8px;
+    padding-block: 0;
+    min-height: 56px;
+  }
+  .shop-header.is-compact .shop-nav .shop-navigation {
+    grid-column: 2;
+  }
+  .shop-header.is-compact .shop-nav .shop-centered-identity {
+    grid-column: 3;
+  }
+}
+@media (min-width: 1001px) {
+  .appearance-header-grid {
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+.appearance-header-grid .header-choice {
+  min-height: 104px;
+  gap: 8px;
+}
+.appearance-header-grid .header-diagram {
+  height: 48px;
+}
+.header-minimal .shop-header:has(.shop-navigation) .shop-nav {
+  min-height: 56px;
+  padding-block: 0;
+}
