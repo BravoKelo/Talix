@@ -1,4 +1,5 @@
 "use client";
+import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
 import { ImagePicker } from "./image-picker";
 import { useState } from "react";
@@ -289,7 +290,7 @@ export function ProductEditor({
             {image.preview && (
               <>
                 <Image
-                  src={image.preview}
+                  src={displayImageUrl(image.preview)}
                   alt="Product image preview"
                   width={180}
                   height={120}

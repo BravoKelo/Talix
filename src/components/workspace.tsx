@@ -1,4 +1,5 @@
 "use client";
+import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -574,7 +575,7 @@ export function Workspace({
                     width={150}
                     height={84}
                     unoptimized
-                    src={sub.logo_url}
+                    src={displayImageUrl(sub.logo_url)}
                     alt={`${sub.name} logo`}
                     className="business-logo"
                   />

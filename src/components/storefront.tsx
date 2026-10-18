@@ -1,4 +1,5 @@
 "use client";
+import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
 import Link from "next/link";
 import { StorefrontHeader } from "./storefront-header";
@@ -17,7 +18,7 @@ function ProductImage({ product }: { product: Product }) {
       height={540}
       unoptimized
       className="shop-product-image"
-      src={product.image_url}
+      src={displayImageUrl(product.image_url)}
       alt={product.name}
       onError={() => setFailed(true)}
     />

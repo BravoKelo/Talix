@@ -1,3 +1,4 @@
+import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
 import { designFor } from "@/lib/storefront-design";
 import type { Subscription } from "@/lib/types";
@@ -30,7 +31,7 @@ export function StorefrontHeader({
             width={72}
             height={56}
             unoptimized
-            src={subscription.logo_url}
+            src={displayImageUrl(subscription.logo_url)}
             alt={`${subscription.name} logo`}
           />
         ) : (
@@ -46,7 +47,7 @@ export function StorefrontHeader({
               width={300}
               height={56}
               unoptimized
-              src={subscription.header_photo_url}
+              src={displayImageUrl(subscription.header_photo_url)}
               alt={subscription.name || "Business"}
             />
             {preview ? (

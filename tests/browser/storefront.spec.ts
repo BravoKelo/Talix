@@ -439,3 +439,41 @@ test("five header presets preserve shopping, responsive layout and collapsing ac
     ).toBe(true);
   }
 });
+
+test("bundled demo images load from the current preview origin", async ({
+  page,
+}) => {
+  const origin =
+    "https://talix-git-feature-core-storefront-visual-shopping-bravokelo.vercel.app";
+  await page.route(`${origin}/**`, (route) =>
+    route.fulfill({ status: 401, body: "Protected preview" }),
+  );
+  await mockCatalog(page, {
+    ...catalog,
+    subscription: {
+      ...catalog.subscription,
+      logo_url: `${origin}/demo-retail/logo.svg`,
+    },
+    products: [
+      {
+        ...product("demo", "Demo notebook"),
+        image_url: `${origin}/demo-retail/everyday-notebook.svg`,
+      },
+    ],
+  });
+  await page.goto("/shop/example");
+  for (const name of ["Demo notebook", "Example store logo"]) {
+    const img = page.getByRole("img", { name, exact: true });
+    await expect(img).toBeVisible();
+    await expect
+      .poll(() =>
+        img.evaluate(
+          (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
+        ),
+      )
+      .toBe(true);
+    expect(
+      await img.evaluate((el: HTMLImageElement) => new URL(el.src).origin),
+    ).toBe(new URL(page.url()).origin);
+  }
+});
