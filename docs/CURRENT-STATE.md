@@ -1,5 +1,10 @@
 # Talix current state
 
+## Retail Demo population — October 18, 2026
+
+Owner created Retail Demo and authorized unattended fictional setup (issue #34). Development setup committed: 24 products in six collections, Main Store default and Market Annex published, Studio unpublished; centered identity remains default. Eight orders were created through checkout_simulated and advanced/refunded through existing checked RPCs: received, in progress, ready, completed, cancelled, declined, partial refund and full refund. No real payments, mail, Auth users, schema/security or other businesses changed. Original bundled SVG illustrations/logo/header are in public/demo-retail; scripts/demo contains the guarded one-time setup (not a migration). External bundled demo images can be detached, not deleted through Storage cleanup. Assets require the new feature preview deployment; protected live-browser acceptance remains unverified. No merge or production release authorized.
+
+
 
 
 
