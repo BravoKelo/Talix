@@ -62,14 +62,14 @@
       }
       .layout {
         display: grid;
-        grid-template-columns: 340px minmax(0, 1fr);
+        grid-template-columns: 300px minmax(0, 1fr);
         height: calc(100dvh - 76px);
       }
       aside {
         background: #fff;
         border-right: 1px solid #d9e0da;
         overflow: auto;
-        padding: 24px;
+        padding: 20px;
       }
       h1 {
         font-size: 24px;
@@ -178,6 +178,7 @@
         flex-wrap: wrap;
       }
       .group {
+        flex-wrap: wrap;
         display: flex;
         gap: 6px;
       }
@@ -296,6 +297,80 @@
           scroll-behavior: auto !important;
         }
       }
+      aside {
+        padding: 20px;
+      }
+      .breadcrumb {
+        font-size: 12px;
+        color: #68766e;
+        margin: 0 0 8px;
+      }
+      aside h1 {
+        font-size: 22px;
+      }
+      .intro {
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+      .label {
+        margin-top: 16px;
+      }
+      .link-card {
+        padding: 0;
+        margin: 8px 0;
+        overflow: hidden;
+      }
+      .link-row {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        padding: 4px;
+      }
+      .link-row > button {
+        border: 0;
+        flex: none;
+        width: 48px;
+        padding: 8px;
+      }
+      .link-row .link-summary {
+        flex: 1;
+        min-width: 0;
+        width: auto;
+        text-align: left;
+        padding: 6px 8px;
+        min-height: 56px;
+      }
+      .link-summary strong {
+        display: block;
+        font-size: 14px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      .link-summary span {
+        display: block;
+        font-size: 12px;
+        color: #68766e;
+        margin-top: 4px;
+      }
+      .link-editor {
+        padding: 0 12px 12px;
+        border-top: 1px solid #e3e8e3;
+      }
+      .link-editor .fields {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+      }
+      .remove-link {
+        width: 100%;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #8d4234;
+      }
+      .save-row {
+        bottom: -20px;
+        padding-bottom: 20px;
+      }
     </style>
   </head>
   <body>
@@ -312,10 +387,10 @@
     </header>
     <div class="layout">
       <aside aria-label="Prototype settings">
-        <h1>Make it feel familiar.</h1>
+        <p class="breadcrumb">Storefront design / Header</p>
+        <h1>Header settings</h1>
         <p class="intro muted">
-          Match the links shoppers know from your business website. This
-          prototype changes no live business settings.
+          Choose a layout and match your website navigation.
         </p>
         <label class="label" for="preset">Header design</label
         ><select id="preset">
@@ -330,8 +405,7 @@
         >
         <h2>Website navigation</h2>
         <p class="muted" style="font-size: 13px">
-          Links keep this order. “This storefront” always points to your shop.
-          Other links use your website address.
+          Tap a link to edit. Use the arrows to reorder.
         </p>
         <div id="links"></div>
         <button id="add" class="wide">+ Add navigation link</button>
@@ -449,13 +523,14 @@
           "</svg>"
         );
       }
+      let editing = -1;
       function renderEditor() {
         $("#preset").value = draft.preset;
         $("#photo").checked = draft.photo;
         $("#links").innerHTML = draft.links
           .map(
             (l, i) =>
-              `<section class="link-card" data-i="${i}" aria-label="Navigation link ${i + 1}"><div class="fields"><label><span class="small-label">Link label</span><input data-key="label" aria-label="Link ${i + 1} label" maxlength="32" value="${esc(l.label)}"></label><label><span class="small-label">Destination</span><select data-key="kind" aria-label="Link ${i + 1} destination"><option value="website" ${l.kind === "website" ? "selected" : ""}>Website</option><option value="store" ${l.kind === "store" ? "selected" : ""}>Storefront</option></select></label></div>${l.kind === "website" ? `<label><span class="small-label">Website address</span><input data-key="url" type="url" aria-label="Link ${i + 1} address" placeholder="https://your-website.example/about" value="${esc(l.url)}"></label>` : '<p class="helper" style="margin-bottom:0">This storefront · selected location and cart stay intact.</p>'}<div class="controls"><button data-action="up" aria-label="Move link ${i + 1} up" ${i === 0 ? "disabled" : ""}>↑</button><button data-action="down" aria-label="Move link ${i + 1} down" ${i === draft.links.length - 1 ? "disabled" : ""}>↓</button><button data-action="remove" aria-label="Remove link ${i + 1}">Remove</button></div></section>`,
+              `<section class="link-card" data-i="${i}" aria-label="Navigation link ${i + 1}"><div class="link-row"><button class="link-summary" data-action="edit" aria-label="Edit link ${i + 1}" aria-expanded="${editing === i}" aria-controls="link-editor-${i}"><strong class="summary-name">${esc(l.label || "Untitled link")}</strong><span>${l.kind === "store" ? "This storefront" : "Website"} · ${editing === i ? "Close" : "Edit"}</span></button><button data-action="up" aria-label="Move link ${i + 1} up" ${i === 0 ? "disabled" : ""}>↑</button><button data-action="down" aria-label="Move link ${i + 1} down" ${i === draft.links.length - 1 ? "disabled" : ""}>↓</button></div>${editing === i ? `<div class="link-editor" id="link-editor-${i}"><div class="fields"><label><span class="small-label">Link label</span><input data-key="label" aria-label="Link ${i + 1} label" maxlength="32" value="${esc(l.label)}"></label><label><span class="small-label">Destination</span><select data-key="kind" aria-label="Link ${i + 1} destination"><option value="website" ${l.kind === "website" ? "selected" : ""}>Website</option><option value="store" ${l.kind === "store" ? "selected" : ""}>Storefront</option></select></label></div>${l.kind === "website" ? `<label><span class="small-label">Website address</span><input data-key="url" type="url" aria-label="Link ${i + 1} address" placeholder="https://your-website.example/about" value="${esc(l.url)}"></label>` : '<p class="helper">This storefront · your current shop.</p>'}<button class="remove-link" data-action="remove" aria-label="Remove link ${i + 1}">Remove link</button></div>` : ""}</section>`,
           )
           .join("");
         $("#add").disabled = draft.links.length >= 8;
@@ -469,6 +544,9 @@
         if (!card || !e.target.dataset.key) return;
         draft.links[+card.dataset.i][e.target.dataset.key] = e.target.value;
         if (e.target.dataset.key === "kind") renderEditor();
+        if (e.target.dataset.key === "label")
+          card.querySelector(".summary-name").textContent =
+            e.target.value || "Untitled link";
         status("Unsaved proposal changes");
         renderPreview();
       });
@@ -477,10 +555,20 @@
         if (!b) return;
         const i = +b.closest("[data-i]").dataset.i,
           a = b.dataset.action;
-        if (a === "remove") draft.links.splice(i, 1);
-        else {
+        if (a === "edit") {
+          editing = editing === i ? -1 : i;
+          renderEditor();
+          return;
+        }
+        if (a === "remove") {
+          draft.links.splice(i, 1);
+          if (editing === i) editing = -1;
+          else if (editing > i) editing--;
+        } else {
           const j = i + (a === "up" ? -1 : 1);
           [draft.links[i], draft.links[j]] = [draft.links[j], draft.links[i]];
+          if (editing === i) editing = j;
+          else if (editing === j) editing = i;
         }
         renderEditor();
         renderPreview();
@@ -489,6 +577,7 @@
       $("#add").onclick = () => {
         if (draft.links.length < 8)
           draft.links.push({ label: "New link", kind: "website", url: "" });
+        editing = draft.links.length - 1;
         renderEditor();
         renderPreview();
         status("Add a label and HTTPS address for the new link.");
@@ -540,6 +629,7 @@
       };
       $("#cancel").onclick = () => {
         draft = structuredClone(saved);
+        editing = -1;
         renderEditor();
         renderPreview();
         status("Unsaved changes discarded.");
