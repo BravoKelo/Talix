@@ -1,10 +1,10 @@
-# Tracking and industry changes — prepared development migrations
+# Tracking and industry changes — activated development migrations
 
-Owner approved the concrete PR #44 proposals on October 18, 2026 Pacific. These two migrations are **prepared, tested locally, and UNAPPLIED**. The development project remains `lzepujggusieapablzhn` at sixteen recorded migrations. Approval to implement the reviewed design is not execution approval for these exact files. No production release is included.
+Owner explicitly authorized applying the two reviewed migrations on October 18, 2026. Exact SQL from PR #45 head `68ee60d11979f9ae486770bc0b5f7f332bb229d9` applied successfully to development `lzepujggusieapablzhn`. Eighteen migrations are recorded; filenames match service-generated versions and SQL is unchanged. No production release is included.
 
 ## 1. Shopper tracking branding
 
-File: `supabase/migrations/20261018211631_shopper_tracking_branding.sql`.
+File: `supabase/migrations/20261018214821_shopper_tracking_branding.sql`.
 
 Replaces only the existing `track_order(uuid)` body, keeping its signature, existing order fields, private-token match, empty search path and anonymous/authenticated execution. Adds a `storefront` object containing only name, slug, logo URL, header background, text/button colors, font and text-size choice. No order token, customer contacts, client IDs or private business settings are added to the response. Invalid tokens still return null. No tables, policies, roles, Storage or Auth configuration change.
 
@@ -12,7 +12,7 @@ The application uses the existing branding contrast/fallback rules, a failed-log
 
 ## 2. Subscription industry changes
 
-File: `supabase/migrations/20261018211634_subscription_industry_changes.sql`.
+File: `supabase/migrations/20261018214826_subscription_industry_changes.sql`.
 
 Adds one append-only application history table, `subscription_changes`: subscription, sequential version, unique request identity/private payload, previous/new selection snapshots, actor and timestamp. A unique subscription/version index supports current-state lookup; the actor foreign key is indexed. Object-shape constraints apply to JSON payloads. Existing purchase rows are neither changed nor backfilled. The current plan is the latest change selection, otherwise the original purchase at version zero.
 
@@ -33,3 +33,10 @@ Products/options/images, locations, permissions, orders/refunds, client profile,
 These are independent additive changes compatible with the existing application. Without activation, industry controls stay unavailable and tracking retains its old response presentation. Use the new feature preview for current-plan review after industry changes; older clients still read the immutable original purchase.
 
 After specific owner execution approval, apply the exact reviewed SQL to the development project only. Record service migration versions without altering SQL; align repository filenames/test exclusions to service records if needed. Verify recorded migration count, function grants/search paths, Owner/admin/employee/outsider boundaries, active quotes, atomic retry/stale-review behavior, immutable purchase/order data and private tracking whitelist. Use rolled-back fixtures and compare security advisors; do not change live demo subscriptions just to test conversion. Actual live-service verification and isolated tests must be reported separately. Recheck the deployed preview after activation. Production publishing stays disabled.
+
+
+## Activation results — October 18, 2026
+
+Applied `20261018214821_shopper_tracking_branding` and `20261018214826_subscription_industry_changes`. Live transactional fixtures passed owner confirmation, identical retry, changed-request rejection, stale-review rejection, outsider read/write denial, immutable purchase/product/location preservation, anonymous tracking privacy/invalid-token behavior and grant restrictions. Fixtures were rolled back; no demo subscription was converted. The first verification attempt used an unsupported JSON helper and rolled back on error; the corrected verification passed. Broader manager/admin/revoked-owner/catalog cases remain covered by the 65 isolated SQL/unit tests, not claimed as live browser tests.
+
+Security advisors retain the existing private deny-all RLS notice (1), anonymous definer notices (5), and password-protection notice (1). Authenticated definer notices increase from 13 to 16 solely for the three intentionally checked industry RPCs. No new security category appeared. Live signed-in owner browser saving remains unverified. PR #45 stays open for final implementation acceptance; production deployment remains disabled.

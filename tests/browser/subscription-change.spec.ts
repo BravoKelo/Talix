@@ -6,7 +6,7 @@ for (const legacy of [false, true])
   }) => {
     test.setTimeout(120000);
     const gateway = await onboardingGateway(
-      legacy ? ["20261018211634_subscription_industry_changes.sql"] : [],
+      legacy ? ["20261018214826_subscription_industry_changes.sql"] : [],
     );
     let dropConfirmation = false;
     await page.context().route("http://127.0.0.1:3290/**", async (route) => {

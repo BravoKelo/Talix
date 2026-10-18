@@ -45,7 +45,7 @@ async function track(token: string) {
 beforeAll(async () => {
   await initializeDatabase(db, [
     migration,
-    "20261018211631_shopper_tracking_branding.sql",
+    "20261018214821_shopper_tracking_branding.sql",
   ]);
   for (const id of [owner, viewer, outsider])
     await db.query("insert into auth.users(id,email) values($1,$2)", [
