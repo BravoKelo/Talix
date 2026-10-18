@@ -2,9 +2,9 @@ import { createServer } from "node:http";
 import { PGlite } from "@electric-sql/pglite";
 import { initializeDatabase } from "./database";
 // Test-only Auth/PostgREST transport. Every data operation executes actual migration SQL/RLS.
-export async function onboardingGateway() {
+export async function onboardingGateway(skipMigrations: string[] = []) {
   const db = new PGlite();
-  await initializeDatabase(db);
+  await initializeDatabase(db, skipMigrations);
   type User = {
     id: string;
     email: string;

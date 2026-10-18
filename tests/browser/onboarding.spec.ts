@@ -7,7 +7,9 @@ for (const changedPrice of [false, true])
     browser,
   }) => {
     test.setTimeout(180000);
-    const gateway = await onboardingGateway();
+    const gateway = await onboardingGateway(
+      changedPrice ? ["20261018033503_storefront_header_layout.sql"] : [],
+    );
     async function connect(context: import("@playwright/test").BrowserContext) {
       await context.route("http://127.0.0.1:3290/**", async (route) => {
         const request = route.request();
@@ -658,6 +660,10 @@ for (const changedPrice of [false, true])
       const appearance = page.getByRole("region", {
         name: "Storefront appearance",
       });
+      if (test.info().project.name === "mobile")
+        await appearance
+          .getByRole("button", { name: "Open storefront preview", exact: true })
+          .click();
       const logoFilename = appearance
         .locator(".image-picker")
         .filter({
@@ -670,9 +676,13 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Introduction", { exact: true })
         .fill("A fresh introduction for our customers.");
+      await appearance.getByRole("tab", { name: "Style", exact: true }).click();
       await appearance
         .getByLabel("Font family", { exact: true })
         .selectOption("serif");
+      await appearance
+        .getByRole("tab", { name: "Products", exact: true })
+        .click();
       await appearance
         .getByLabel("Tile corners", { exact: true })
         .selectOption("round");
@@ -700,9 +710,13 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Introduction", { exact: true })
         .fill("A fresh introduction for our customers.");
+      await appearance.getByRole("tab", { name: "Style", exact: true }).click();
       await appearance
         .getByLabel("Font family", { exact: true })
         .selectOption("serif");
+      await appearance
+        .getByRole("tab", { name: "Products", exact: true })
+        .click();
       await appearance
         .getByLabel("Tile corners", { exact: true })
         .selectOption("round");
@@ -720,6 +734,9 @@ for (const changedPrice of [false, true])
       await expect(appearance.getByRole("status")).toContainText(
         "has been saved",
       );
+      await appearance
+        .getByRole("tab", { name: "Branding", exact: true })
+        .click();
       await expect(logoFilename).toHaveText("No file chosen");
       expect(
         (
@@ -798,6 +815,9 @@ for (const changedPrice of [false, true])
       await expect(appearance.getByRole("status")).toContainText(
         "has been saved",
       );
+      await appearance
+        .getByRole("tab", { name: "Branding", exact: true })
+        .click();
       await expect(logoFilename).toHaveText("No file chosen");
       expect(
         (
@@ -807,12 +827,42 @@ for (const changedPrice of [false, true])
         ).rows,
       ).toHaveLength(0);
       await appearance
-        .getByLabel("Centered header identity", { exact: true })
+        .getByRole("tab", { name: "Header", exact: true })
+        .click();
+      if (changedPrice) {
+        await expect(
+          appearance.getByRole("radio", {
+            name: "Search-focused",
+            exact: true,
+          }),
+        ).toBeDisabled();
+        await expect(
+          appearance.getByText(/Saving header layouts is awaiting activation/),
+        ).toBeVisible();
+      } else {
+        await appearance
+          .getByRole("radio", { name: "Search-focused", exact: true })
+          .check();
+        await expect(
+          appearance.locator(".appearance-live-preview"),
+        ).toHaveClass(/header-search/);
+      }
+      await page.screenshot({
+        path: `test-results/header-settings-${changedPrice ? "legacy" : "active"}-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+      await appearance
+        .getByLabel("Header identity", { exact: true })
         .selectOption("photo");
+      await appearance
+        .getByRole("tab", { name: "Branding", exact: true })
+        .click();
       await appearance
         .getByLabel("Header photo", { exact: true })
         .setInputFiles(png);
-      await expect(appearance.locator(".preview-center-photo")).toBeVisible();
+      await expect(
+        appearance.locator(".shop-centered-identity img"),
+      ).toBeVisible();
       await appearance
         .getByRole("button", { name: "Save branding", exact: true })
         .click();

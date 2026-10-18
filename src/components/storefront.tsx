@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { StorefrontHeader } from "./storefront-header";
 import { designFor, storefrontStyle } from "@/lib/storefront-design";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -145,6 +146,8 @@ export function Storefront({
   const [accountOpen, setAccountOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [cartNotice, setCartNotice] = useState("");
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [location, setLocation] = useState("");
@@ -164,6 +167,8 @@ export function Storefront({
         if (alive) {
           const next = data as Catalog;
           setCatalog(next);
+          setCartOpen(false);
+          setCheckoutOpen(false);
           setCart([]);
           setCategory("");
           setQuery("");
@@ -286,7 +291,7 @@ export function Storefront({
   const itemCount = cart.reduce((sum, line) => sum + line.quantity, 0);
   return (
     <main
-      className="store visual-store figma-store"
+      className={`store visual-store figma-store header-${design.header_layout}`}
       style={storefrontStyle(catalog.subscription)}
     >
       <a className="shop-skip" href="#shop-location">
@@ -296,43 +301,22 @@ export function Storefront({
         className={`shop-header${compactHeader ? " is-compact" : ""}`}
         id="shop-welcome"
       >
-        <nav className="shop-nav" aria-label="Storefront">
-          <a
-            className="shop-logo"
-            href="#shop-products"
-            aria-label={`${catalog.subscription.name} products`}
-          >
-            {catalog.subscription.logo_url ? (
-              <Image
-                width={72}
-                height={56}
-                unoptimized
-                src={catalog.subscription.logo_url}
-                alt={`${catalog.subscription.name} logo`}
-              />
-            ) : (
-              <span className="shop-initial" aria-hidden="true">
-                {catalog.subscription.name.slice(0, 1)}
-              </span>
-            )}
-          </a>
-          <div className="shop-centered-identity">
-            {design.header_identity === "photo" &&
-            catalog.subscription.header_photo_url ? (
-              <>
-                <Image
-                  width={300}
-                  height={56}
-                  unoptimized
-                  src={catalog.subscription.header_photo_url}
-                  alt={catalog.subscription.name}
+        <StorefrontHeader
+          subscription={catalog.subscription}
+          search={
+            design.header_layout === "search" ? (
+              <label className="shop-header-search">
+                <span className="sr-only">Search products</span>
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search products"
                 />
-                <h1 className="sr-only">{catalog.subscription.name}</h1>
-              </>
-            ) : (
-              <h1>{catalog.subscription.name}</h1>
-            )}
-          </div>
+              </label>
+            ) : undefined
+          }
+        >
           <div className="shop-header-actions">
             <button
               className="shop-icon secondary"
@@ -342,16 +326,21 @@ export function Storefront({
             >
               <Image width={24} height={24} src="/storefront/user.svg" alt="" />
             </button>
-            <a
-              className="shop-icon shop-cart-link"
-              href={location ? "#shop-cart" : "#shop-location"}
+            <button
+              className="shop-icon shop-cart-link secondary"
+              aria-haspopup="dialog"
+              onClick={() => {
+                setAccountOpen(false);
+                setCheckoutOpen(false);
+                setCartOpen(true);
+              }}
               aria-label={`Your cart (${itemCount})`}
             >
               <Image width={24} height={24} src="/storefront/cart.svg" alt="" />
               <span className="shop-cart-count" aria-hidden="true">
                 {itemCount}
               </span>
-            </a>
+            </button>
             {accountOpen && (
               <div className="shop-account-panel">
                 <p>Business account</p>
@@ -362,7 +351,7 @@ export function Storefront({
               </div>
             )}
           </div>
-        </nav>
+        </StorefrontHeader>
       </header>
       <section className="shop-toolbar" aria-label="Shopping location">
         <label id="shop-location" className="shop-location-control">
@@ -498,118 +487,232 @@ export function Storefront({
               </div>
             </div>
           </section>
-          <aside className="panel cart" id="shop-cart" aria-label="Your cart">
-            <h2>Your cart</h2>
-            <p className="muted">
-              {selectedLocation?.name} · {itemCount}{" "}
-              {itemCount === 1 ? "item" : "items"}
-            </p>
-            <p role="status" className="shop-cart-notice">
-              {cartNotice}
-            </p>
-            {!cart.length ? (
-              <p className="muted">Add a product to get started.</p>
-            ) : (
-              cart.map((l, i) => (
-                <div className="cart-line" key={`${l.product_id}-${i}`}>
-                  <div className="row">
-                    <strong>
-                      {l.name} × {l.quantity}
-                    </strong>
-                    <span>{money(l.unit * l.quantity)}</span>
-                  </div>
-                  <small>{l.optionNames.join(", ")}</small>
-                  <button
-                    className="small secondary"
-                    onClick={() => {
-                      setCart(cart.filter((_, j) => j !== i));
-                      setCartNotice(`${l.name} removed from your cart.`);
-                      setRequestId(null);
-                    }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))
-            )}
-            <div className="row" style={{ margin: "20px 0" }}>
-              <strong>Total</strong>
-              <strong>
-                {money(cart.reduce((a, l) => a + l.unit * l.quantity, 0))}
-              </strong>
-            </div>
-            <p className="muted">
-              Final pricing is checked when you place your order. USD; tax
-              calculation is not configured in this development release.
-            </p>
-            <form
-              className="stack"
-              onSubmit={checkout}
-              onChange={() => setRequestId(null)}
-            >
-              <label>
-                Your name
-                <input
-                  name="name"
-                  required
-                  maxLength={100}
-                  autoComplete="name"
-                />
-              </label>
-              <label>
-                Email
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  maxLength={254}
-                  autoComplete="email"
-                />
-              </label>
-              <label>
-                Phone
-                <input
-                  name="phone"
-                  type="tel"
-                  required
-                  minLength={7}
-                  maxLength={30}
-                  autoComplete="tel"
-                />
-              </label>
-              <div className="notice">
-                <strong>Simulated card payment</strong>
-                <p>No card information is collected and no money moves.</p>
-                <label>
-                  Test outcome
-                  <select name="outcome">
-                    <option value="approved">Approve payment</option>
-                    <option value="declined">Decline payment</option>
-                  </select>
-                </label>
-              </div>
-              <button disabled={busy || !cart.length}>
-                {busy ? "Placing order…" : "Place order with simulated payment"}
-              </button>
+        </div>
+      )}
+      <p role="status" className="sr-only">
+        {cartNotice}
+      </p>
+      {cartOpen && (
+        <TaskDialog
+          title={checkoutOpen ? "Checkout" : `Your cart (${itemCount})`}
+          close={() => {
+            setCartOpen(false);
+            setCheckoutOpen(false);
+          }}
+          busy={busy}
+          className="shop-cart-dialog"
+          backdropClose
+        >
+          <p className="shop-cart-location">
+            Shopping at {selectedLocation?.name || "No available location"}
+          </p>
+          {checkoutOpen ? (
+            <div className="shop-checkout-step">
               <button
                 type="button"
                 className="secondary"
                 disabled={busy}
-                onClick={(e) => {
-                  e.currentTarget.form?.reset();
-                  setRequestId(null);
-                  setMessage("");
-                  document
-                    .querySelector(".catalog")
-                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
+                onClick={() => setCheckoutOpen(false)}
               >
-                Cancel checkout
+                Back to cart
               </button>
-              <p role="status">{message}</p>
-            </form>
-          </aside>
-        </div>
+              <div className="row">
+                <strong>Subtotal</strong>
+                <strong>
+                  {money(cart.reduce((a, l) => a + l.unit * l.quantity, 0))}
+                </strong>
+              </div>
+              <p className="muted">
+                Final pricing is checked when you place your order. USD; tax
+                calculation is not configured in this development release.
+              </p>
+              <form
+                className="stack"
+                onSubmit={checkout}
+                onChange={() => setRequestId(null)}
+              >
+                <label>
+                  Your name
+                  <input
+                    name="name"
+                    required
+                    maxLength={100}
+                    autoComplete="name"
+                  />
+                </label>
+                <label>
+                  Email
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    maxLength={254}
+                    autoComplete="email"
+                  />
+                </label>
+                <label>
+                  Phone
+                  <input
+                    name="phone"
+                    type="tel"
+                    required
+                    minLength={7}
+                    maxLength={30}
+                    autoComplete="tel"
+                  />
+                </label>
+                <div className="notice">
+                  <strong>Simulated card payment</strong>
+                  <p>No card information is collected and no money moves.</p>
+                  <label>
+                    Test outcome
+                    <select name="outcome">
+                      <option value="approved">Approve payment</option>
+                      <option value="declined">Decline payment</option>
+                    </select>
+                  </label>
+                </div>
+                <button disabled={busy || !cart.length}>
+                  {busy
+                    ? "Placing order…"
+                    : "Place order with simulated payment"}
+                </button>
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={busy}
+                  onClick={(e) => {
+                    e.currentTarget.form?.reset();
+                    setRequestId(null);
+                    setMessage("");
+                    setCheckoutOpen(false);
+                  }}
+                >
+                  Cancel checkout
+                </button>
+                <p role="status">{message}</p>
+              </form>
+            </div>
+          ) : (
+            <>
+              <div
+                className={`shop-cart-items${!cart.length ? " is-empty" : ""}`}
+              >
+                {!cart.length ? (
+                  <div>
+                    <h2>Your cart is empty</h2>
+                    <p className="muted">
+                      Add something you like to get started.
+                    </p>
+                  </div>
+                ) : (
+                  cart.map((l, i) => {
+                    const product = catalog.products.find(
+                      (p) => p.id === l.product_id,
+                    );
+                    const change = (quantity: number) => {
+                      setCart((old) =>
+                        old.map((line, j) =>
+                          j === i ? { ...line, quantity } : line,
+                        ),
+                      );
+                      setRequestId(null);
+                      setMessage("");
+                    };
+                    return (
+                      <article
+                        className="shop-cart-item"
+                        key={l.product_id + "-" + l.option_ids.join(",")}
+                      >
+                        <div className="shop-cart-thumb">
+                          {product && (
+                            <ProductImage
+                              key={product.image_url}
+                              product={product}
+                            />
+                          )}
+                        </div>
+                        <div className="shop-cart-copy">
+                          <strong>{l.name}</strong>
+                          <small className="muted">
+                            {l.optionNames.join(", ") || "Standard"}
+                          </small>
+                          <div className="row">
+                            <strong>{money(l.unit)} each</strong>
+                            <strong>{money(l.unit * l.quantity)}</strong>
+                          </div>
+                          <div className="shop-cart-controls">
+                            <div className="shop-quantity">
+                              <button
+                                className="secondary"
+                                aria-label={`Decrease ${l.name} quantity`}
+                                disabled={l.quantity <= 1}
+                                onClick={() => change(l.quantity - 1)}
+                              >
+                                −
+                              </button>
+                              <span aria-label={`Quantity for ${l.name}`}>
+                                {l.quantity}
+                              </span>
+                              <button
+                                className="secondary"
+                                aria-label={`Increase ${l.name} quantity`}
+                                disabled={l.quantity >= 99}
+                                onClick={() => change(l.quantity + 1)}
+                              >
+                                +
+                              </button>
+                            </div>
+                            <button
+                              className="secondary"
+                              aria-label={`Remove ${l.name}`}
+                              onClick={() => {
+                                setCart((old) => old.filter((_, j) => j !== i));
+                                setRequestId(null);
+                                setMessage("");
+                                setCartNotice(
+                                  `${l.name} removed from your cart.`,
+                                );
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })
+                )}
+              </div>
+              <footer className="shop-cart-footer">
+                {!!cart.length && (
+                  <>
+                    <div className="row">
+                      <strong>Subtotal</strong>
+                      <strong>
+                        {money(
+                          cart.reduce((a, l) => a + l.unit * l.quantity, 0),
+                        )}
+                      </strong>
+                    </div>
+                    <small className="muted">
+                      Final pricing is confirmed at checkout.
+                    </small>
+                    <button onClick={() => setCheckoutOpen(true)}>
+                      Go to checkout
+                    </button>
+                  </>
+                )}
+                <button
+                  className={cart.length ? "secondary" : ""}
+                  onClick={() => setCartOpen(false)}
+                >
+                  Continue shopping
+                </button>
+              </footer>
+            </>
+          )}
+        </TaskDialog>
       )}
       {activeProduct && (
         <ProductDetails

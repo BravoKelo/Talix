@@ -1,6 +1,15 @@
 # Talix current state
 
 
+
+## Approved cart/header/settings follow-up — October 17 Pacific / October 18 UTC
+
+Owner accepted the cart popup, five header layouts and four settings tabs; Centered identity is explicitly the default. Owner then directed implementation with “You may proceed.” See PRODUCT-DESIGN and issue #32 for source frames and superseded inline-cart decisions. Work remains on feature/core-storefront-visual-shopping / PR #33. Starting remote head b4e45fa72ffffdd996e013142d5a6560e095c085; local 8fde06a has the identical tree with different commit metadata. Publish via a fast-forward from the verified remote head; never force-push.
+
+Implementation replaces the permanent cart/checkout section with the approved popup and separate checkout step, adds responsive header presets/shared identity preview, and uses the existing Users tab pattern for Branding/Header/Products/Style. Existing guest simulated checkout, tracking, permissions and location clearing remain. Prepared-only migration 20261018033503_storefront_header_layout.sql adds one checked header_layout column (centered default), update grant under existing settings authority, and a whitelist catalog field. It is NOT applied to development. Applying this new migration requires explicit execution approval after review; previous approval activated only 20261018023709_storefront_design_settings. Current development remains fourteen migrations. Until activation, Centered identity is used and preset saving stays disabled; existing design controls remain usable.
+
+Validation: lint, TypeScript, 54 unit/SQL tests, production build and all 16 desktop/mobile browser scenarios pass. Both cart scenarios passed again after the footer-style correction; final desktop/mobile cart screenshots match the approved structure. Browser coverage includes quantity/focus/checkout payload, all five responsive/collapsing header layouts and settings saves against both the new migration and the current fourteen-migration schema. Auth/Storage use isolated adapters with actual SQL/RLS, not live customer acceptance. A stale Turbopack persistence cache panicked on the first build; removing generated .next output resolved it and the clean production build passed. No dependency/tooling change was made. Existing feature-preview publication authorization remains; inspect remote CI and deployment state separately. No merge or production release is authorized. Revisit options after the owner creates a full demo business.
+
 ## Storefront settings activated — October 18, 2026 UTC
 
 Owner explicitly authorized development execution with “I approved the database migration.” Applied the exact reviewed SQL from remote head 04ea3b67bd58fd6fbbb4d8bf3eecfa6573fb7997 to Talix development lzepujggusieapablzhn as 20261018023709_storefront_design_settings. Fourteen migrations are recorded. The repository filename now matches the service version; SQL is unchanged, including its historical prepared-only comment. This supersedes pending-execution wording below.

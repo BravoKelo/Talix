@@ -192,3 +192,42 @@ it("keeps collection labels under existing product-management authority", async 
     ),
   ).rejects.toThrow();
 });
+
+it("defaults to centered and persists header presets under settings authority", async () => {
+  await as(editor);
+  expect(
+    (
+      await db.query<{ header_layout: string }>(
+        "select header_layout from public.subscriptions where id=$1",
+        [sid],
+      )
+    ).rows[0].header_layout,
+  ).toBe("centered");
+  await db.query(
+    "update public.subscriptions set header_layout='search' where id=$1",
+    [sid],
+  );
+  await expect(
+    db.query(
+      "update public.subscriptions set header_layout='arbitrary' where id=$1",
+      [sid],
+    ),
+  ).rejects.toThrow();
+  await db.exec("reset role;set role anon");
+  expect(
+    (
+      await db.query<{ v: { subscription: { header_layout: string } } }>(
+        "select public.public_catalog('example-study') as v",
+      )
+    ).rows[0].v.subscription.header_layout,
+  ).toBe("search");
+  await as(other);
+  expect(
+    (
+      await db.query(
+        "update public.subscriptions set header_layout='minimal' where id=$1 returning id",
+        [sid],
+      )
+    ).rows,
+  ).toHaveLength(0);
+});

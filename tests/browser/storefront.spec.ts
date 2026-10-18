@@ -161,7 +161,7 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
   await page.keyboard.press("Escape");
   await expect(opener).toBeFocused();
   await expect(
-    page.getByRole("link", { name: "Your cart (0)", exact: true }),
+    page.getByRole("button", { name: "Your cart (0)", exact: true }),
   ).toBeVisible();
   for (let i = 0; i < 2; i++) {
     await opener.click();
@@ -178,22 +178,18 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
     .getByRole("button", { name: "Add Everyday notebook to cart", exact: true })
     .click();
   await expect(dialog).not.toBeVisible();
-  const cart = page.getByRole("complementary", { name: "Your cart" });
-  await expect(
-    cart.getByText("Everyday notebook × 2", { exact: true }),
-  ).toBeVisible();
-  await expect(cart.getByText("$34.00", { exact: true })).toBeVisible();
   await page
-    .getByRole("navigation", { name: "Storefront" })
-    .getByRole("link", { name: "Your cart (3)" })
+    .getByRole("button", { name: "Your cart (3)", exact: true })
     .click();
-  await expect(cart).toBeInViewport();
-  await expect(page.locator(".shop-header")).toHaveClass(/is-compact/);
+  const cart = page.locator(".shop-cart-dialog");
+  await expect(cart).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "Your cart (3)" }),
-  ).toBeInViewport();
+    cart.getByLabel("Quantity for Everyday notebook").first(),
+  ).toHaveText("2");
+  await expect(cart.getByText("$34.00", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Your name", { exact: true })).toHaveCount(0);
   await cart
-    .getByRole("button", { name: "Remove", exact: true })
+    .getByRole("button", { name: "Remove Everyday notebook", exact: true })
     .last()
     .click();
   await expect(cart.getByText("$24.00", { exact: true }).last()).toBeVisible();
@@ -207,8 +203,22 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+  await cart
+    .getByRole("button", { name: "Continue shopping", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Your cart (2)", exact: true }),
+  ).toBeFocused();
   await page.getByLabel("Choose a location").selectOption("South");
-  await expect(cart.getByText("Add a product to get started.")).toBeVisible();
+  await page
+    .getByRole("button", { name: "Your cart (0)", exact: true })
+    .click();
+  await expect(
+    cart.getByText("Your cart is empty", { exact: true }),
+  ).toBeVisible();
+  await cart
+    .getByRole("button", { name: "Continue shopping", exact: true })
+    .click();
   await expect(
     page.getByRole("button", { name: "View Canvas bag" }),
   ).toHaveCount(0);
@@ -228,9 +238,16 @@ test("empty catalog, unpublished locations, loading and unavailable states", asy
   await expect(
     page.getByText("No products are available at this location."),
   ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Your cart (0)", exact: true })
+    .click();
   await expect(
-    page.getByRole("button", { name: "Place order with simulated payment" }),
-  ).toBeDisabled();
+    page.getByText("Your cart is empty", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Go to checkout", exact: true }),
+  ).toHaveCount(0);
+  await page.keyboard.press("Escape");
   await mockCatalog(page, { ...catalog, locations: [], products: [] });
   await page.reload();
   await expect(
@@ -298,6 +315,123 @@ test("published-location fallback and saved photo/appearance render without an a
           (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length,
         ),
     ).toBe(1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+});
+
+test("cart popup quantities, close/focus, empty state and checkout payload", async ({
+  page,
+}) => {
+  await mockCatalog(page, catalog);
+  let submitted: Record<string, unknown> | undefined;
+  await page.route("**/rest/v1/rpc/checkout_simulated", async (route) => {
+    submitted = route.request().postDataJSON();
+    await route.fulfill({
+      status: 400,
+      json: { message: "Verification decline" },
+    });
+  });
+  await page.goto("/shop/example");
+  await expect(page.locator("#shop-cart")).toHaveCount(0);
+  await expect(page.getByLabel("Your name", { exact: true })).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Add Everyday notebook to cart", exact: true })
+    .click();
+  const opener = page.getByRole("button", { name: /^Your cart/ });
+  await opener.click();
+  const cart = page.locator(".shop-cart-dialog");
+  await expect(cart).toBeVisible();
+  const bounds = await cart.boundingBox();
+  expect(bounds!.width).toBeLessThanOrEqual(440);
+  expect(bounds!.height).toBe(await page.evaluate(() => innerHeight));
+  await cart
+    .getByRole("button", { name: "Increase Everyday notebook quantity" })
+    .click();
+  await expect(cart.getByLabel("Quantity for Everyday notebook")).toHaveText(
+    "2",
+  );
+  await expect(cart.getByText("$20.00", { exact: true }).first()).toBeVisible();
+  await cart
+    .getByRole("button", { name: "Decrease Everyday notebook quantity" })
+    .click();
+  await expect(
+    cart.getByRole("button", { name: "Decrease Everyday notebook quantity" }),
+  ).toBeDisabled();
+  await page.screenshot({
+    path: `test-results/cart-popup-${test.info().project.name}.png`,
+  });
+  await page.keyboard.press("Escape");
+  await expect(opener).toBeFocused();
+  await opener.click();
+  await cart
+    .getByRole("button", { name: "Go to checkout", exact: true })
+    .click();
+  await cart.getByLabel("Your name", { exact: true }).fill("Example Shopper");
+  await cart
+    .getByLabel("Email", { exact: true })
+    .fill("shopper@example.invalid");
+  await cart.getByLabel("Phone", { exact: true }).fill("5551234567");
+  await cart
+    .getByRole("button", { name: "Place order with simulated payment" })
+    .click();
+  await expect(cart.getByRole("status")).toContainText("Unable to place order");
+  expect(submitted?.p_lines).toEqual([
+    { product_id: "shared", option_ids: [], quantity: 1 },
+  ]);
+  expect(submitted?.p_location).toBe("North");
+  await cart.getByRole("button", { name: "Back to cart", exact: true }).click();
+  await cart
+    .getByRole("button", { name: "Remove Everyday notebook", exact: true })
+    .click();
+  await expect(
+    cart.getByText("Your cart is empty", { exact: true }),
+  ).toBeVisible();
+  await cart
+    .getByRole("button", { name: "Continue shopping", exact: true })
+    .click();
+  await expect(opener).toBeFocused();
+});
+
+test("five header presets preserve shopping, responsive layout and collapsing actions", async ({
+  page,
+}) => {
+  for (const layout of ["centered", "left", "two_row", "search", "minimal"]) {
+    await mockCatalog(page, {
+      ...catalog,
+      subscription: { ...catalog.subscription, header_layout: layout },
+      products: [
+        ...catalog.products,
+        ...Array.from({ length: 12 }, (_, i) =>
+          product("item" + i, "Item " + i),
+        ),
+      ],
+    });
+    await page.goto("/shop/example");
+    await expect(page.locator(".figma-store")).toHaveClass(
+      new RegExp("header-" + layout),
+    );
+    await expect(
+      page.getByRole("heading", { name: "Example store", exact: true }),
+    ).toBeVisible();
+    const search = page.locator('input[type="search"]:visible');
+    await expect(search).toHaveCount(1);
+    await search.fill("notebook");
+    await expect(
+      page.getByRole("button", { name: "View Canvas bag", exact: true }),
+    ).toHaveCount(0);
+    await search.fill("");
+    await page.screenshot({
+      path: `test-results/header-${layout}-${test.info().project.name}.png`,
+    });
+    await page.evaluate(() => window.scrollTo(0, 600));
+    await expect(page.locator(".shop-header")).toHaveClass(/is-compact/);
+    await expect(
+      page.getByRole("button", { name: "Your cart (0)", exact: true }),
+    ).toBeInViewport();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

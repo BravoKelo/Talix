@@ -1,5 +1,13 @@
 import type { Subscription } from "./types";
+export const headerLayouts = {
+  centered: "Centered identity",
+  left: "Left-aligned brand",
+  two_row: "Two-row",
+  search: "Search-focused",
+  minimal: "Minimal",
+} as const;
 export type StorefrontDesign = {
+  header_layout: keyof typeof headerLayouts;
   header_identity: "name" | "photo";
   header_background: string;
   storefront_text: string;
@@ -10,6 +18,7 @@ export type StorefrontDesign = {
   tile_spacing: "compact" | "comfortable";
 };
 export const defaultDesign: StorefrontDesign = {
+  header_layout: "centered",
   header_identity: "name",
   header_background: "#ffffff",
   storefront_text: "#17233b",

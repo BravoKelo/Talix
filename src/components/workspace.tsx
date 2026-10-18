@@ -1071,7 +1071,7 @@ export function Workspace({
                       save={async (v) => {
                         const payload =
                           "default_location_id" in sub
-                            ? v
+                            ? { ...v }
                             : {
                                 name: v.name,
                                 description: v.description,
@@ -1080,6 +1080,8 @@ export function Workspace({
                                   ? { logo_url: v.logo_url }
                                   : {}),
                               };
+                        if (!("header_layout" in sub))
+                          delete (payload as Partial<typeof v>).header_layout;
                         const { error } = await browserClient()
                           .from("subscriptions")
                           .update(payload)

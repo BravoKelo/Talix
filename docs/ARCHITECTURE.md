@@ -69,3 +69,10 @@ An ordinary hosted storefront URL is the initial existing-website entry strategy
 ## Figma storefront settings — activated additive change
 
 Owner-approved implementation adds constrained subscription appearance columns, nullable default-location reference with a same-subscription composite foreign key, and an optional bounded product collection label. Existing subscriptions and products keep defaults; no data migration/rewrite is needed. The public catalog whitelist gains only these presentation fields and a published-only default-location identifier. Existing settings.manage/products.manage RLS and column grants govern edits. Existing business-logos storage handles header photos; the existing private cleanup helper now protects saved header references. There are no new public RPCs, roles, buckets, services or entitlement structures. The owner-approved migration is applied to development; exact recorded version and verification are in CURRENT-STATE.
+
+
+## Header preset persistence and cart presentation
+
+Header presets use one constrained subscription-wide header_layout value, default centered; existing settings.manage RLS/column grants and public_catalog whitelist remain the boundary. A new additive migration is prepared separately from the already applied storefront-design settings migration. No new roles, RPCs, buckets or entitlement structures are required. The shared StorefrontHeader renders storefront and owner preview identity/assets. Old databases omit the new field: Centered identity remains the fallback, preset writes stay disabled and existing appearance fields still save without sending an unknown column.
+
+Cart remains component memory, with identical product/option merging and existing checkout RPC payload. Existing native TaskDialog supplies modal focus/Escape behavior; the cart variant adds right-side/full-height presentation, backdrop dismissal and scroll isolation. Checkout appears only after the cart action. Neither carts nor shopper details gain persistence.
