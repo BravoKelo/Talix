@@ -17,3 +17,7 @@ Nine targeted interaction groups passed across five presets and desktop/mobile p
 ### Compact editor correction
 
 Owner requested a tighter left section while retaining touch friendliness and confirmed intended placement under Storefront design → Header. The review sidebar is now 300px (from 340px), has compact navigation summary rows and one expanded link editor at a time. Reorder actions remain 48px targets; link summaries are 56px minimum. Adding a link opens its editor, and reordering preserves which link is being edited. Save/Cancel remain visible. Nine interaction groups passed again, including initial collapsed rows, sidebar width and measured touch targets; the compact resting view was visually inspected. The outer review toolbar is prototype-only, not a new workspace settings page.
+
+### Color ownership correction
+
+Owner agreed to separate workspace and business branding. Outer settings/review CSS now uses the existing Talix palette from globals.css: navy #112e50, action blue #174b91, selected gold #e8b94f, background #f4f7fb, ink #172c48 and supporting tokens. The embedded storefront remains in Retail Demo's green/warm neutral palette; its source was verified byte-identical before formatting. Nine interaction groups passed again with no script errors; screenshot inspected. No application settings or database changed.

@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Talix · Header navigation review</title>
     <style>
+      :root {
+        --talix-accent: #174b91;
+        --talix-navy: #112e50;
+        --talix-gold: #e8b94f;
+        --talix-soft: #eaf2fb;
+        --talix-bg: #f4f7fb;
+        --talix-ink: #172c48;
+        --talix-muted: #5e7088;
+        --talix-line: #dae3ef;
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -13,8 +24,8 @@
         font:
           15px Arial,
           sans-serif;
-        color: #24352f;
-        background: #e9eeeb;
+        color: var(--talix-ink);
+        background: var(--talix-bg);
       }
       button,
       input,
@@ -31,12 +42,12 @@
       button:focus-visible,
       input:focus-visible,
       select:focus-visible {
-        outline: 3px solid #ae8748;
+        outline: 3px solid #aa750c;
         outline-offset: 2px;
       }
       .review-top {
         min-height: 76px;
-        background: #173b35;
+        background: var(--talix-navy);
         color: white;
         display: flex;
         align-items: center;
@@ -49,11 +60,11 @@
       }
       .review-top small {
         display: block;
-        color: #d3e1d9;
+        color: #d3e0f0;
         margin-top: 6px;
       }
       .pill {
-        border: 1px solid #709187;
+        border: 1px solid var(--talix-gold);
         border-radius: 20px;
         padding: 8px 12px;
         font-size: 12px;
@@ -67,7 +78,7 @@
       }
       aside {
         background: #fff;
-        border-right: 1px solid #d9e0da;
+        border-right: 1px solid var(--talix-line);
         overflow: auto;
         padding: 20px;
       }
@@ -83,7 +94,7 @@
         line-height: 1.5;
       }
       .muted {
-        color: #68766e;
+        color: var(--talix-muted);
       }
       .intro {
         margin: 0 0 24px;
@@ -98,29 +109,29 @@
       input {
         width: 100%;
         min-height: 48px;
-        border: 1px solid #c8d2cb;
+        border: 1px solid var(--talix-line);
         border-radius: 6px;
         padding: 10px;
         background: #fff;
-        color: #24352f;
+        color: var(--talix-ink);
       }
       button {
         min-height: 48px;
-        border: 1px solid #c8d2cb;
+        border: 1px solid var(--talix-line);
         border-radius: 6px;
         background: white;
-        color: #24352f;
+        color: var(--talix-ink);
         padding: 10px 12px;
       }
       .link-card {
-        border: 1px solid #dce3dd;
+        border: 1px solid var(--talix-line);
         border-radius: 8px;
         padding: 12px;
         margin: 12px 0;
       }
       .link-card .small-label {
         font-size: 12px;
-        color: #68766e;
+        color: var(--talix-muted);
         display: block;
         margin: 8px 0 5px;
       }
@@ -139,9 +150,9 @@
         min-width: 48px;
       }
       .primary {
-        background: #173b35;
+        background: var(--talix-accent);
         color: #fff;
-        border-color: #173b35;
+        border-color: var(--talix-accent);
       }
       .wide {
         width: 100%;
@@ -153,7 +164,7 @@
         padding: 16px 0 24px;
         display: flex;
         gap: 8px;
-        border-top: 1px solid #e0e5e1;
+        border-top: 1px solid var(--talix-line);
       }
       .save-row button {
         flex: 1;
@@ -161,7 +172,7 @@
       #save-status {
         font-size: 13px;
         min-height: 32px;
-        color: #496455;
+        color: var(--talix-muted);
       }
       .preview-area {
         min-width: 0;
@@ -183,15 +194,15 @@
         gap: 6px;
       }
       .group button[aria-pressed="true"] {
-        background: #173b35;
-        color: white;
-        border-color: #173b35;
+        background: var(--talix-gold);
+        color: #183553;
+        border-color: var(--talix-gold);
       }
       .preview-note {
         margin: 0;
         padding: 0 24px 12px;
         font-size: 13px;
-        color: #53645a;
+        color: var(--talix-muted);
       }
       .stage {
         padding: 10px 24px 28px;
@@ -201,16 +212,16 @@
       .frame-wrap {
         margin: auto;
         background: white;
-        box-shadow: 0 8px 32px #173b3518;
-        border: 1px solid #d2dbd4;
+        box-shadow: 0 8px 32px #1b3b6618;
+        border: 1px solid var(--talix-line);
         border-radius: 12px;
         overflow: hidden;
         position: relative;
       }
       .browser-bar {
         height: 32px;
-        background: #f7f9f7;
-        border-bottom: 1px solid #dce3dd;
+        background: #f8fafc;
+        border-bottom: 1px solid var(--talix-line);
         padding: 8px 14px;
         display: flex;
         gap: 5px;
@@ -219,12 +230,12 @@
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #bfcac2;
+        background: #bccada;
       }
       .browser-bar span:last-child {
         margin-left: 12px;
         font-size: 11px;
-        color: #7c8980;
+        color: var(--talix-muted);
       }
       iframe {
         border: 0;
@@ -235,12 +246,12 @@
       .helper {
         font-size: 12px;
         padding: 12px;
-        background: #f2f5f1;
+        background: var(--talix-soft);
         border-radius: 6px;
         line-height: 1.5;
       }
       .errors {
-        color: #a33c2a !important;
+        color: #b42318 !important;
       }
       .checkbox {
         display: flex;
@@ -269,7 +280,7 @@
         }
         aside {
           max-height: 540px;
-          border-bottom: 1px solid #c8d2cb;
+          border-bottom: 1px solid var(--talix-line);
         }
         .preview-area {
           min-height: 900px;
@@ -302,7 +313,7 @@
       }
       .breadcrumb {
         font-size: 12px;
-        color: #68766e;
+        color: var(--talix-muted);
         margin: 0 0 8px;
       }
       aside h1 {
@@ -350,12 +361,12 @@
       .link-summary span {
         display: block;
         font-size: 12px;
-        color: #68766e;
+        color: var(--talix-muted);
         margin-top: 4px;
       }
       .link-editor {
         padding: 0 12px 12px;
-        border-top: 1px solid #e3e8e3;
+        border-top: 1px solid var(--talix-line);
       }
       .link-editor .fields {
         grid-template-columns: minmax(0, 1fr);
@@ -365,7 +376,7 @@
         width: 100%;
         margin-top: 10px;
         font-size: 13px;
-        color: #8d4234;
+        color: #b42318;
       }
       .save-row {
         bottom: -20px;
