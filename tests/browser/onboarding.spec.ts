@@ -11,7 +11,7 @@ for (const changedPrice of [false, true])
       changedPrice
         ? [
             "20261018043256_storefront_header_layout.sql",
-            "20261018171750_storefront_header_navigation.sql",
+            "20261018174618_storefront_header_navigation.sql",
           ]
         : [],
     );

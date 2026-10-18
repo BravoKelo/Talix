@@ -1,4 +1,6 @@
-# Header navigation: prepared database change
+# Header navigation: approved development activation
+
+Owner approved execution on October 18, 2026. The exact reviewed SQL is applied to development as `20261018174618_storefront_header_navigation` (sixteen migrations). The prepared proposal below is retained as historical review context; its pending-execution wording is superseded. Live rolled-back verification passed defaults, owner/editor updates, constraints, retained custom values, catalog visibility/privacy and outsider/anonymous denial. No synthetic users remain; advisor categories/counts are unchanged. No merge or production release occurred.
 
 Issue #35 / PR #33. The owner approved the Header tab design and application implementation. This proposal is ready for separate database approval under AGENTS.md; it has not been applied to any connected database.
 
@@ -8,7 +10,7 @@ The accepted Standard/Custom choice, custom link labels, destinations and order 
 
 ## Minimal proposed change
 
-Migration: `supabase/migrations/20261018171750_storefront_header_navigation.sql`.
+Migration: `supabase/migrations/20261018174618_storefront_header_navigation.sql`.
 
 | Subscription field | Proposed value |
 |---|---|

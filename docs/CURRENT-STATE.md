@@ -1,5 +1,14 @@
 # Talix current state
 
+## Header navigation activated — October 18, 2026
+
+Owner explicitly approved the reviewed development migration and a temporary 23-hour preview access link. Applied the unchanged SQL from 4de79145bbb226fe945c4db0fbcc5a437a7b0773 as `20261018174618_storefront_header_navigation`; sixteen migrations are recorded. This supersedes prepared-only/pending-approval statements below. Filename and test references match the service version; SQL content is unchanged. Reload the workspace to enable Standard/Custom and navigation saving. Existing non-centered layouts retain Custom mode.
+
+Live rolled-back synthetic checks passed defaults, owner/editor writes, invalid mode/URL rejection, retained custom values, active-link catalog publication, inactive-link redaction, private client omission and outsider/anonymous denial. All fixtures were rolled back; zero synthetic Auth users remain. Security-advisor categories/counts are unchanged (one private deny-all RLS notice, five public and thirteen authenticated definer notices, one existing password-protection notice). No Auth configuration, Storage, product or order data changed.
+
+The approved temporary link opened the protected 4de7914 preview. Live Retail Demo checks passed Home/standard navigation, saved About text, selected-location Contact information, collapsed header/menu and direct Add to cart. Live signed-in owner-workspace saving remains unverified; isolated browser/actual SQL evidence is distinct. Review: https://talix-87483sc45-bravokelo.vercel.app/shop/retail-demo . Figma recreation remains deferred. No merge or production release is authorized.
+
+
 ## Header navigation implementation — October 18, 2026
 
 Owner approved the final Header prototype and directed Proceed. Application changes for #35 are prepared on the existing storefront feature branch / PR #33: Standard (centered Home/Shop/About/Contact) and Custom mode, five retained presets, compact ordered link editor, responsive overflow/tap menu, native About/selected-location Contact dialogs and shared branded preview. Save/Cancel and existing cart/account/checkout/uploads remain. Old-schema compatibility retains preset/branding writes and omits new columns. No deferred tablet-settings/public-landing/industry/tracking issue is included.

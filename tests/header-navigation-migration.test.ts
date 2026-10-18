@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { initializeDatabase } from "./helpers/database";
 it("upgrades existing header choices without resetting custom layouts", async () => {
   const db = new PGlite();
-  const migration = "20261018171750_storefront_header_navigation.sql";
+  const migration = "20261018174618_storefront_header_navigation.sql";
   try {
     await initializeDatabase(db, [migration]);
     const owner = crypto.randomUUID();
