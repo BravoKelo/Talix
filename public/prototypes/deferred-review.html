@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Talix follow-up review</title
+  ><style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font: 17px/1.5 system-ui;
+      background: #f4f7fa;
+      color: #16324f;
+    }
+    header {
+      background: white;
+      border-bottom: 1px solid #dce5ef;
+      padding: 16px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    main {
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    button,
+    a.button {
+      font: inherit;
+      min-height: 48px;
+      padding: 12px 20px;
+      border: 1px solid #c9d7e5;
+      border-radius: 8px;
+      background: white;
+      color: #123c70;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    button.primary {
+      background: #123c70;
+      color: white;
+    }
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .notice {
+      padding: 12px 20px;
+      background: #fff3d6;
+      border-radius: 8px;
+    }
+    .panel {
+      background: white;
+      border: 1px solid #dce5ef;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+    .brand {
+      background: #edf4ee;
+      color: #24452f;
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    .brand b {
+      font-size: 24px;
+    }
+    .initial {
+      display: inline-grid;
+      place-items: center;
+      background: #24452f;
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin-right: 12px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 0;
+      border-bottom: 1px solid #e1e8ee;
+    }
+    .steps {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .steps span {
+      padding: 10px;
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .steps .active {
+      background: #dfeddf;
+      color: #24452f;
+    }
+    small {
+      color: #566b7e;
+    }
+    select {
+      width: 100%;
+      font: inherit;
+      min-height: 48px;
+      margin: 8px 0 20px;
+      padding: 12px;
+      border: 1px solid #bdccda;
+      border-radius: 8px;
+    }
+    dialog {
+      max-width: 620px;
+      width: calc(100% - 32px);
+      max-height: 90dvh;
+      overflow: auto;
+      border: 1px solid #c9d7e5;
+      border-radius: 16px;
+      padding: 24px;
+      color: #16324f;
+    }
+    dialog::backdrop {
+      background: #102f5599;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+    h1 {
+      font-size: 30px;
+    }
+    h2 {
+      font-size: 23px;
+    }
+    li {
+      margin: 8px 0;
+    }
+    [hidden] {
+      display: none !important;
+    }
+    @media (max-width: 540px) {
+      .brand {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .panel {
+        padding: 18px;
+      }
+      main {
+        margin: 24px auto;
+      }
+    }
+  </style>
+  <header>
+    <b>talix<span style="color: #bd8720">•</span> Design review</b>
+    <nav aria-label="Review screens">
+      <button id="tracking-tab" aria-pressed="true">Order tracking</button
+      ><button id="industry-tab" aria-pressed="false">Change industry</button>
+    </nav>
+  </header>
+  <main>
+    <p class="notice">
+      Proposal for review · Fictional sample content · No account, order or
+      billing changes
+    </p>
+    <section id="tracking">
+      <div class="brand">
+        <b><span class="initial">S</span>Sample Business</b
+        ><button id="return">← Return to storefront</button>
+      </div>
+      <div class="panel">
+        <small>MAIN LOCATION · ORDER 100024</small>
+        <h1>Your order is ready</h1>
+        <p>Your order is ready to collect at Main Location.</p>
+        <div class="steps">
+          <span>Received</span><span>In progress</span
+          ><span class="active">Ready</span><span>Completed</span>
+        </div>
+        <div class="row">
+          <span>Everyday notebook × 2<br /><small>Gift wrap</small></span
+          ><strong>$24.00</strong>
+        </div>
+        <div class="row">
+          <strong>Order total</strong><strong>$24.00</strong>
+        </div>
+        <p><small>Simulated payment · Paid</small></p>
+        <p>
+          Keep your private link to follow this order. Your order updates here
+          automatically.
+        </p>
+      </div>
+      <p>
+        Uses the business’s saved logo, header color and readable type. Platform
+        sign-in links move out of the shopper tracking header. Return opens only
+        this business’s public storefront.
+      </p>
+    </section>
+    <section id="industry" hidden>
+      <p><small>BUSINESS WORKSPACE / SETTINGS / YOUR SUBSCRIPTION</small></p>
+      <h1>Your Talix subscription</h1>
+      <div class="panel">
+        <h2>Sample Business</h2>
+        <p>Other business · Starter</p>
+        <p><strong>$19.99 / month</strong></p>
+        <p>Preview subscription. No payment is being collected.</p>
+        <button class="primary" id="change">Change industry</button>
+      </div>
+      <p>
+        This first option is for businesses without industry-specific settings.
+        Businesses with specialized settings will need a supported change path.
+      </p>
+    </section>
+    <p id="status" role="status"></p>
+  </main>
+  <dialog id="flow" aria-labelledby="flow-title">
+    <h2 id="flow-title">Change your business industry</h2>
+    <div id="choose">
+      <p>
+        Choose the industry and plan that fit this business. Your login and
+        business address stay the same.
+      </p>
+      <label
+        >Industry<select id="type" aria-label="Industry">
+          <option>Retail</option>
+          <option>Restaurant</option>
+          <option>Hospitality</option>
+          <option>Hair Salon</option>
+          <option>Equipment Rental</option>
+          <option>Marina</option>
+          <option>Other business</option>
+        </select></label
+      ><label
+        >Plan<select id="plan" aria-label="Plan">
+          <option value="19.99">Starter — $19.99 / month</option>
+          <option value="29.99">Plus — $29.99 / month</option>
+          <option value="59.99">Pro — $59.99 / month</option>
+          <option value="99.99">Ultimate — $99.99 / month</option>
+        </select></label
+      >
+      <p>
+        <small
+          >Example plans only. Future industry features are not available in
+          this preview.</small
+        >
+      </p>
+      <div class="actions">
+        <button class="cancel">Cancel</button
+        ><button class="primary" id="review">Review change</button>
+      </div>
+    </div>
+    <div id="confirm" hidden>
+      <p id="selection"></p>
+      <h3>What stays with your business</h3>
+      <ul>
+        <li>Products, options, images and locations</li>
+        <li>Staff permissions and customer records</li>
+        <li>Orders, refunds and their original purchase details</li>
+        <li>Storefront settings and ordering address</li>
+      </ul>
+      <p>
+        The change takes effect after confirmation. Past subscription purchase
+        terms remain in history. Billing is simulated; there is no charge or
+        proration in this preview.
+      </p>
+      <div class="actions">
+        <button id="back">Back</button><button class="cancel">Cancel</button
+        ><button class="primary" id="confirm-button">Confirm change</button>
+      </div>
+    </div>
+  </dialog>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    for (const view of ["tracking", "industry"])
+      $(view + "-tab").onclick = () => {
+        for (const v of ["tracking", "industry"]) {
+          $(v).hidden = v !== view;
+          $(v + "-tab").setAttribute("aria-pressed", String(v === view));
+        }
+        $("status").textContent = "";
+      };
+    $("return").onclick = () => {
+      $("status").textContent =
+        "In the application, this opens the business’s public storefront without sharing the private order link.";
+    };
+    $("change").onclick = () => {
+      $("choose").hidden = false;
+      $("confirm").hidden = true;
+      $("flow").showModal();
+    };
+    for (const button of document.querySelectorAll(".cancel"))
+      button.onclick = () => $("flow").close();
+    $("review").onclick = () => {
+      $("selection").textContent =
+        "Other business · Starter ($19.99 / month) → " +
+        $("type").value +
+        " · " +
+        $("plan").selectedOptions[0].textContent;
+      $("choose").hidden = true;
+      $("confirm").hidden = false;
+      $("back").focus();
+    };
+    $("back").onclick = () => {
+      $("choose").hidden = false;
+      $("confirm").hidden = true;
+      $("type").focus();
+    };
+    $("confirm-button").onclick = () => {
+      $("flow").close();
+      $("status").textContent =
+        "Proposal confirmed for this review only. No subscription was changed.";
+    };
+  </script>
+</html>

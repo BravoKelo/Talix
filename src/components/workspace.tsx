@@ -1,4 +1,6 @@
 "use client";
+import { ProductImage } from "./product-image";
+import { SettingsIcon } from "./settings-icon";
 import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -112,6 +114,14 @@ export function Workspace({
   userId: string;
   email: string;
 }) {
+  const [compactHeader, setCompactHeader] = useState(false);
+  const [headerOpen, setHeaderOpen] = useState(false);
+  useEffect(() => {
+    const update = () => setCompactHeader(window.scrollY > 120);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
   const [settingsArea, setSettingsArea] = useState("");
   const [productEditor, setProductEditor] = useState<Product | "new" | null>(
     null,
@@ -416,15 +426,35 @@ export function Workspace({
     </section>
   );
   return (
-    <main className="workspace">
+    <main
+      className={`workspace${compactHeader && !headerOpen ? " workspace-compact" : ""}`}
+    >
+      <a className="back-to-top" href="#page-top" aria-label="Back to top">
+        ↑ <span>Back to top</span>
+      </a>
       <header
         className="workspace-header"
         aria-label="Business workspace header"
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget))
+            setHeaderOpen(false);
+        }}
       >
         <Link href="/" className="wordmark">
           talix<span>•</span>
         </Link>
         <nav className="workspace-shortcuts" aria-label="Workspace shortcuts">
+          {compactHeader && (
+            <button
+              type="button"
+              className="secondary"
+              aria-expanded={headerOpen}
+              aria-controls="workspace-context workspace-account"
+              onClick={() => setHeaderOpen(!headerOpen)}
+            >
+              {headerOpen ? "Close header details" : "Business & account"}
+            </button>
+          )}
           {sections.map((section) => (
             <button
               key={section}
@@ -460,7 +490,7 @@ export function Workspace({
             </Link>
           )}
         </nav>
-        <div className="workspace-context">
+        <div className="workspace-context" id="workspace-context">
           {" "}
           <label>
             Subscription
@@ -510,7 +540,7 @@ export function Workspace({
             </select>
           </label>
         </div>
-        <div className="workspace-account">
+        <div className="workspace-account" id="workspace-account">
           <span>{email}</span>{" "}
           <button
             className="secondary"
@@ -867,6 +897,7 @@ export function Workspace({
                   .filter((p) => !p.location_id || p.location_id === lid)
                   .map((p) => (
                     <article className="panel product-tile" key={p.id}>
+                      <ProductImage key={p.image_url} product={p} />
                       <h3>{p.name}</h3>
                       <p className="product-description">{p.description}</p>
                       <p>
@@ -1013,7 +1044,7 @@ export function Workspace({
                           } else setSettingsArea(tile.id);
                         }}
                       >
-                        <span aria-hidden="true">{tile.icon}</span>
+                        <SettingsIcon name={tile.id} />
                         <strong>{tile.title}</strong>
                         <small>{tile.description}</small>
                         {!tile.available && (

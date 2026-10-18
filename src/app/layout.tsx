@@ -1,3 +1,4 @@
+import { SignOut } from "@/components/sign-out";
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
@@ -25,9 +26,13 @@ export default async function Layout({
           </Link>
           <nav>
             {user ? (
-              <Link href="/workspace" prefetch={false}>
-                Business workspace
-              </Link>
+              <>
+                <span className="signed-in-state">Signed in</span>
+                <SignOut />
+                <Link href="/workspace" prefetch={false}>
+                  View Your Workspace
+                </Link>
+              </>
             ) : (
               <>
                 <Link href="/login">Sign in</Link>

@@ -465,6 +465,22 @@ for (const changedPrice of [false, true])
         "insert into public.products(subscription_id,name,description,price_cents) values($1,'Longer product name to compare uniform tiles','A much longer description with enough words to take several lines without changing the size of the tile or moving its actions.',2000)",
         [fixture.sid],
       );
+      await page.route("https://images.example.invalid/**", async (route) => {
+        if (route.request().url().endsWith("missing.png")) return route.abort();
+        await route.fulfill({
+          contentType: "image/png",
+          body: Buffer.from(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+            "base64",
+          ),
+        });
+      });
+      await gateway.db.query(
+        "update public.products set image_url='https://images.example.invalid/notebook.png' where name='Notebook'",
+      );
+      await gateway.db.query(
+        "update public.products set image_url='https://images.example.invalid/missing.png' where name like 'Longer product%'",
+      );
       await page.reload();
       await page
         .getByRole("navigation", { name: "Workspace shortcuts" })
@@ -474,6 +490,22 @@ for (const changedPrice of [false, true])
         .locator(".product-tile")
         .filter({ hasText: "Notebook" });
       await expect(tile).toBeVisible();
+      await expect(
+        tile.getByRole("img", { name: "Notebook", exact: true }),
+      ).toBeVisible();
+      expect(
+        await tile
+          .locator("img")
+          .evaluate(
+            (image: HTMLImageElement) =>
+              image.complete && image.naturalWidth > 0,
+          ),
+      ).toBe(true);
+      await expect(
+        page.getByRole("img", {
+          name: /No image available for Longer product/,
+        }),
+      ).toBeVisible();
       const bounds = await tile.boundingBox();
       expect(bounds!.width).toBeLessThanOrEqual(
         test.info().project.name === "desktop" ? 342 : 390,
@@ -681,6 +713,47 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Introduction", { exact: true })
         .fill("A fresh introduction for our customers.");
+      const previousViewport = page.viewportSize()!;
+      for (const viewport of [
+        { width: 820, height: 1180 },
+        { width: 1180, height: 820 },
+      ]) {
+        await page.setViewportSize(viewport);
+        await page.evaluate(() => window.scrollTo(0, 650));
+        await expect(page.locator(".workspace")).toHaveClass(
+          /workspace-compact/,
+        );
+        const headerBounds = await page
+          .locator(".workspace-header")
+          .boundingBox();
+        expect(headerBounds!.height).toBeLessThanOrEqual(80);
+        const tabsBounds = await appearance.getByRole("tablist").boundingBox();
+        expect(tabsBounds!.y).toBeGreaterThanOrEqual(headerBounds!.height - 1);
+        expect(tabsBounds!.y).toBeLessThan(viewport.height);
+        await appearance
+          .getByRole("tab", { name: "Style", exact: true })
+          .click();
+        await appearance
+          .getByRole("tab", { name: "Branding", exact: true })
+          .click();
+        await expect(
+          appearance.getByRole("textbox", {
+            name: "Introduction",
+            exact: true,
+          }),
+        ).toHaveValue("A fresh introduction for our customers.");
+        await page.screenshot({
+          path: `test-results/settings-scroll-${viewport.width}-${test.info().project.name}.png`,
+        });
+        await page
+          .getByRole("link", { name: "Back to top", exact: true })
+          .click();
+        await expect
+          .poll(() => page.evaluate(() => window.scrollY))
+          .toBeLessThan(4);
+      }
+      await page.setViewportSize(previousViewport);
+
       await appearance.getByRole("tab", { name: "Style", exact: true }).click();
       await appearance
         .getByLabel("Font family", { exact: true })
@@ -715,6 +788,7 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Introduction", { exact: true })
         .fill("A fresh introduction for our customers.");
+
       await appearance.getByRole("tab", { name: "Style", exact: true }).click();
       await appearance
         .getByLabel("Font family", { exact: true })
@@ -1225,10 +1299,63 @@ for (const changedPrice of [false, true])
           page.getByRole("heading", { name: "Second business", exact: true }),
         ).toBeVisible();
       }
+      await page.goto("/");
+      await expect(page.getByText("Signed in", { exact: true })).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "View Your Workspace", exact: true }),
+      ).toHaveCount(2);
+      await page.reload();
+      await expect(page.getByText("Signed in", { exact: true })).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        ),
+      ).toBe(true);
+      await page.screenshot({
+        path: `test-results/returning-user-${test.info().project.name}.png`,
+      });
+      const returning = await page.context().newPage();
+      await returning.goto("/");
+      await expect(
+        returning.getByText("Signed in", { exact: true }),
+      ).toBeVisible();
+      await returning.close();
+      const expiredContext = await browser.newContext({
+        storageState: await page.context().storageState(),
+      });
+      await connect(expiredContext);
+      const signedInUser = [...gateway.users.values()].find(
+        (user) => user.email === "newowner@example.invalid",
+      )!;
+      gateway.users.delete(signedInUser.id);
+      try {
+        const expired = await expiredContext.newPage();
+        await expired.goto("/");
+        await expect(
+          expired.getByText("Signed in", { exact: true }),
+        ).toHaveCount(0);
+        await expect(
+          expired.getByRole("link", {
+            name: "View Your Workspace",
+            exact: true,
+          }),
+        ).toHaveCount(0);
+        await expect(
+          expired.getByRole("link", { name: "Sign in", exact: true }),
+        ).toHaveCount(3);
+      } finally {
+        gateway.users.set(signedInUser.id, signedInUser);
+        await expiredContext.close();
+      }
       await page.getByRole("button", { name: "Sign out", exact: true }).click();
+      await expect(page).toHaveURL(/\/$/);
+      await expect(
+        page.getByRole("link", { name: "Sign in", exact: true }),
+      ).toHaveCount(3);
+      await page.goto("/login");
       await expect(page).toHaveURL(/\/login$/);
       await expect(
-        page.getByRole("link", { name: "Business workspace", exact: true }),
+        page.getByRole("link", { name: "View Your Workspace", exact: true }),
       ).toHaveCount(0);
       await page.goto("/workspace");
       await expect(page).toHaveURL(/\/login$/);
