@@ -1,5 +1,14 @@
 # Talix current state
 
+## Storefront phase accepted and merged — October 18, 2026
+
+The owner accepted the reviewed application with “Everything looks good lets roll” and authorized the merge. PR #33 merged into main as bf923ca78387ae32d1a0e69cc77275f5090f9ce2, preserving feature history. Reviewed head 83526d374415d47b74b0e69f2344dca957f8a025 passed Core checks run 39157484444 (lint, TypeScript, 59 unit/SQL tests, build, and 24 desktop/mobile browser tests); its feature preview was READY.
+
+Acceptance covers the storefront product layout, popup cart, five header presets, tabbed appearance settings, and Standard/Custom header navigation. Issues #32 and #35 are complete. The sixteen development migrations, through 20261018174618_storefront_header_navigation, were already applied and were not replayed for the merge. Earlier pending acceptance/merge statements below are historical and superseded by this record.
+
+Automatic production deployment from main remains disabled in vercel.json; this acceptance does not release production. Retain the feature branch while its review preview is in use. Live owner-workspace saving was not independently automated; do not infer that coverage from the shopper checks. Figma recreation remains deferred until allowance is available. Deferred issues #36, #38, #40, #41, #42, and #43 remain outside this phase; demo tracking issues are not closed by this acceptance.
+
+
 ## Header navigation activated — October 18, 2026
 
 Owner explicitly approved the reviewed development migration and a temporary 23-hour preview access link. Applied the unchanged SQL from 4de79145bbb226fe945c4db0fbcc5a437a7b0773 as `20261018174618_storefront_header_navigation`; sixteen migrations are recorded. This supersedes prepared-only/pending-approval statements below. Filename and test references match the service version; SQL content is unchanged. Reload the workspace to enable Standard/Custom and navigation saving. Existing non-centered layouts retain Custom mode.

@@ -149,3 +149,13 @@ No production release was performed; automatic main deployment remains disabled,
 ## Authorized repository history cleanup — October 16, 2026 Pacific
 
 Owner requested removal of external design-reference naming from current files and historical snapshots, then explicitly authorized a history rewrite and force-push. Audited 52 reachable commits and 316 unique original file blobs across five branches; no tags. Nineteen commits were reconstructed with cleaned historical documentation, preserving their messages and parent topology; the accepted application tree was unchanged. Three older branch histories needed no changes. Mapped affected checkpoint IDs in current documentation and issue text to cleaned commits. Reconstructed commit timestamps reflect cleanup time. GitHub's retained read-only merged PR #14 head remains a known server-managed limitation, not a successful purge. Continue from current main and avoid reintroducing old design ancestry.
+
+
+## Storefront phase accepted and merged — October 18, 2026
+
+The owner accepted the reviewed application with “Everything looks good lets roll” and authorized the merge. PR #33 merged into main as bf923ca78387ae32d1a0e69cc77275f5090f9ce2, preserving feature history. Reviewed head 83526d374415d47b74b0e69f2344dca957f8a025 passed Core checks run 39157484444 (lint, TypeScript, 59 unit/SQL tests, build, and 24 desktop/mobile browser tests); its feature preview was READY.
+
+Acceptance covers the storefront product layout, popup cart, five header presets, tabbed appearance settings, and Standard/Custom header navigation. Issues #32 and #35 are complete. The sixteen development migrations, through 20261018174618_storefront_header_navigation, were already applied and were not replayed for the merge. Earlier pending acceptance/merge statements below are historical and superseded by this record.
+
+Automatic production deployment from main remains disabled in vercel.json; this acceptance does not release production. Retain the feature branch while its review preview is in use. Live owner-workspace saving was not independently automated; do not infer that coverage from the shopper checks. Figma recreation remains deferred until allowance is available. Deferred issues #36, #38, #40, #41, #42, and #43 remain outside this phase; demo tracking issues are not closed by this acceptance.
+
