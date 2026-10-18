@@ -159,3 +159,11 @@ Acceptance covers the storefront product layout, popup cart, five header presets
 
 Automatic production deployment from main remains disabled in vercel.json; this acceptance does not release production. Retain the feature branch while its review preview is in use. Live owner-workspace saving was not independently automated; do not infer that coverage from the shopper checks. Figma recreation remains deferred until allowance is available. Deferred issues #36, #38, #40, #41, #42, and #43 remain outside this phase; demo tracking issues are not closed by this acceptance.
 
+
+
+## Deferred batch accepted and merged — October 18, 2026 Pacific
+
+Owner approved PR #44 at 1911ea74b0380b22f4e02eb4b87ee014ad963b34 and the linked tracking/industry proposals with “Approved.” PR #44 merged with history preserved as e77446657ee8abb276b0ff61842ceaff053255c9. Core checks 39166225703 passed lint, TypeScript, 59 unit/SQL tests, build and 26 desktop/mobile browser tests; preview was READY. Issues #36/#41/#42/#43 are accepted. No production deployment or live data/configuration change. Main deployment remains disabled; review branch retained.
+
+The concrete design/persistence boundaries in DEFERRED-FOLLOWUP-REVIEW.md for #38/#40 are now approved for implementation and migration preparation. This supersedes proposal-only wording. Original purchases remain immutable; owner-only versioned/idempotent industry confirmation and append-only history, compatible catalog quotes, privacy-safe tracking branding and public return link are the bounded scope. No real billing, entitlement/industry modules or industry data conversion. Exact migration execution and final acceptance of the new implementation remain separate.
+

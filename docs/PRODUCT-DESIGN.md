@@ -246,3 +246,11 @@ Automatic production deployment from main remains disabled in vercel.json; this 
 Owner authorized beginning the deferred issues after the storefront merge. The application review batch implements #36 saved images/fallbacks in workspace product cards, #41 singular count wording, #42 compact pinned workspace shortcuts with Business & account expansion, sticky settings tabs/return to top and aligned smaller icon tiles, and #43 Signed in → Sign out → View Your Workspace with a session-aware hero action beside Explore Talix. Keep Talix workspace styling separate from storefront branding, permission visibility and staged drafts. Final visuals remain for owner review.
 
 The fictional tracking/industry review in public/prototypes/deferred-review.html and docs/DEFERRED-FOLLOWUP-REVIEW.md is a proposal, not accepted design or live functionality. Preserve current tracking/privacy and immutable subscription purchase behavior until the proposed protected changes receive review. No schema activation, merge or production release is implied.
+
+
+## Deferred batch accepted and merged — October 18, 2026 Pacific
+
+Owner approved PR #44 at 1911ea74b0380b22f4e02eb4b87ee014ad963b34 and the linked tracking/industry proposals with “Approved.” PR #44 merged with history preserved as e77446657ee8abb276b0ff61842ceaff053255c9. Core checks 39166225703 passed lint, TypeScript, 59 unit/SQL tests, build and 26 desktop/mobile browser tests; preview was READY. Issues #36/#41/#42/#43 are accepted. No production deployment or live data/configuration change. Main deployment remains disabled; review branch retained.
+
+The concrete design/persistence boundaries in DEFERRED-FOLLOWUP-REVIEW.md for #38/#40 are now approved for implementation and migration preparation. This supersedes proposal-only wording. Original purchases remain immutable; owner-only versioned/idempotent industry confirmation and append-only history, compatible catalog quotes, privacy-safe tracking branding and public return link are the bounded scope. No real billing, entitlement/industry modules or industry data conversion. Exact migration execution and final acceptance of the new implementation remain separate.
+

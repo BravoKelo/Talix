@@ -1,5 +1,12 @@
 # Talix current state
 
+## Deferred batch accepted and merged — October 18, 2026 Pacific
+
+Owner approved PR #44 at 1911ea74b0380b22f4e02eb4b87ee014ad963b34 and the linked tracking/industry proposals with “Approved.” PR #44 merged with history preserved as e77446657ee8abb276b0ff61842ceaff053255c9. Core checks 39166225703 passed lint, TypeScript, 59 unit/SQL tests, build and 26 desktop/mobile browser tests; preview was READY. Issues #36/#41/#42/#43 are accepted. No production deployment or live data/configuration change. Main deployment remains disabled; review branch retained.
+
+The concrete design/persistence boundaries in DEFERRED-FOLLOWUP-REVIEW.md for #38/#40 are now approved for implementation and migration preparation. This supersedes proposal-only wording. Original purchases remain immutable; owner-only versioned/idempotent industry confirmation and append-only history, compatible catalog quotes, privacy-safe tracking branding and public return link are the bounded scope. No real billing, entitlement/industry modules or industry data conversion. Exact migration execution and final acceptance of the new implementation remain separate.
+
+
 ## Deferred follow-ups opened — October 18, 2026 Pacific
 
 Owner directed “Please begin work on the deferred issues” after PR #33 acceptance. New focused branch `feature/deferred-workspace-review` starts from main fa7b6f0486c6703f70213d730b60cb0b553f3c17. Issues #36/#41/#42/#43 implement saved workspace product images, singular product counts, compact persistent settings navigation/return-to-top/aligned icons, and clear returning-user landing actions. Details and concrete #38/#40 proposals: `DEFERRED-FOLLOWUP-REVIEW.md`; interactive fictional review at `/prototypes/deferred-review.html`. Industry conversion and tracking branding need review of their described persistence boundaries; neither migration is prepared/applied. No live business data, Auth/Storage configuration or production deployment changed. Issues remain open for owner acceptance; no merge authorized.
