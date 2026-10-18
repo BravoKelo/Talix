@@ -4208,3 +4208,161 @@ body:has(.shop-information-dialog[open]) {
   min-height: 56px;
   padding-block: 0;
 }
+
+/* Deferred workspace corrections: existing saved images and compact navigation. */
+.workspace .product-tile > .shop-product-image {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  background: #f1f5f9;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.workspace .product-tile > .shop-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.settings-cards .setting-tile {
+  grid-template-columns: 32px minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  gap: 6px 12px;
+  padding: 16px;
+  min-height: 140px;
+}
+.setting-tile .settings-icon {
+  grid-column: 1;
+  grid-row: 1;
+  color: #123c70;
+}
+.setting-tile > strong {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  min-height: 2.8em;
+  font-size: 17px;
+  line-height: 1.4;
+}
+.setting-tile > small {
+  grid-column: 2;
+  grid-row: 2;
+  line-height: 1.5;
+}
+.setting-tile > .coming-soon {
+  grid-column: 2;
+  grid-row: 3;
+}
+.workspace-compact {
+  --workspace-header-height: 76px;
+}
+.workspace-compact .workspace-header {
+  grid-template-columns: 100px minmax(0, 1fr);
+  grid-template-rows: 48px;
+  height: 76px;
+  padding: 10px 16px;
+  gap: 8px;
+}
+.workspace-compact .workspace-context,
+.workspace-compact .workspace-account {
+  display: none;
+}
+.workspace-compact .workspace-shortcuts {
+  grid-column: 2;
+  grid-row: 1;
+}
+.workspace .page-tabs {
+  position: sticky;
+  top: var(--workspace-header-height);
+  z-index: 18;
+  background: #fff;
+  scroll-margin-top: calc(var(--workspace-header-height) + 72px);
+}
+.workspace button,
+.workspace input,
+.workspace select {
+  scroll-margin-top: calc(var(--workspace-header-height) + 90px);
+}
+.public-sign-out {
+  display: inline-flex;
+  position: relative;
+}
+.public-sign-out button {
+  min-height: 48px;
+}
+.public-sign-out [role="alert"] {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 240px;
+  padding: 12px;
+  background: #fff;
+  color: #9b2424;
+  z-index: 30;
+  box-shadow: 0 4px 16px #102f5533;
+}
+.signed-in-state {
+  font-size: 14px;
+  white-space: nowrap;
+}
+@media (max-width: 1100px) and (min-width: 761px) {
+  .workspace-compact {
+    --workspace-header-height: 76px;
+  }
+}
+@media (max-width: 760px) {
+  .workspace {
+    --workspace-header-height: 340px;
+    padding-top: 364px;
+  }
+  .workspace-header {
+    position: fixed;
+    height: 340px;
+    margin: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .workspace-context {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .workspace-compact {
+    --workspace-header-height: 116px;
+  }
+  .workspace-compact .workspace-header {
+    height: 116px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 40px 48px;
+  }
+  .workspace-compact .workspace-header > .wordmark {
+    font-size: 28px;
+  }
+  .workspace-compact .workspace-shortcuts {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .workspace .page-tabs {
+    top: var(--workspace-header-height);
+  }
+  .settings-cards {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  }
+  .topbar nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
+@media (max-width: 760px) {
+  .topbar:has(.signed-in-state) {
+    flex-wrap: wrap;
+    padding-block: 12px;
+  }
+  .topbar:has(.signed-in-state) nav {
+    width: 100%;
+    min-width: 0;
+  }
+}

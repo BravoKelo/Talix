@@ -1,6 +1,6 @@
 "use client";
-import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
+import { ProductImage } from "./product-image";
 import Link from "next/link";
 import { StorefrontHeader } from "./storefront-header";
 import { headerLayout, storefrontStyle } from "@/lib/storefront-design";
@@ -10,29 +10,6 @@ import { browserClient } from "@/lib/supabase/client";
 import { TaskDialog } from "@/components/order-dialog";
 import { money, type Catalog, type CartLine, type Product } from "@/lib/types";
 type Line = CartLine & { name: string; unit: number; optionNames: string[] };
-function ProductImage({ product }: { product: Product }) {
-  const [failed, setFailed] = useState(false);
-  return product.image_url && !failed ? (
-    <Image
-      width={720}
-      height={540}
-      unoptimized
-      className="shop-product-image"
-      src={displayImageUrl(product.image_url)}
-      alt={product.name}
-      onError={() => setFailed(true)}
-    />
-  ) : (
-    <div
-      className="shop-product-image shop-image-placeholder"
-      role="img"
-      aria-label={`No image available for ${product.name}`}
-    >
-      <span aria-hidden="true">◇</span>
-      <span>No image available</span>
-    </div>
-  );
-}
 function ProductCard({
   product,
   open,
@@ -451,7 +428,8 @@ export function Storefront({
               <div className="shop-results">
                 <h2 className="sr-only">{category || "Products"}</h2>
                 <p className="sr-only" role="status">
-                  {visibleProducts.length} products
+                  {visibleProducts.length}{" "}
+                  {visibleProducts.length === 1 ? "product" : "products"}
                 </p>
                 <div className="catalog">
                   {visibleProducts.map((p) => (

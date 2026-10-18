@@ -1,3 +1,4 @@
+import { serverClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { ResponsiveNavigation } from "@/components/responsive-navigation";
 import { configured } from "@/lib/supabase/client";
@@ -25,7 +26,10 @@ const capabilities = [
   ],
 ];
 
-export default function Home() {
+export default async function Home() {
+  const user = configured()
+    ? (await (await serverClient()).auth.getUser()).data.user
+    : null;
   return (
     <main className="talix-home">
       <ResponsiveNavigation label="Explore Talix menu">
@@ -60,6 +64,13 @@ export default function Home() {
             <a className="button secondary" href="#capabilities">
               Explore Talix
             </a>
+            <Link
+              className="button secondary"
+              href={user ? "/workspace" : "/login"}
+              prefetch={false}
+            >
+              {user ? "View Your Workspace" : "Sign in"}
+            </Link>
           </div>
           <p className="hero-note">
             One workspace. Multiple locations. Your business at the center.

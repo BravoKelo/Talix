@@ -240,3 +240,9 @@ Acceptance covers the storefront product layout, popup cart, five header presets
 
 Automatic production deployment from main remains disabled in vercel.json; this acceptance does not release production. Retain the feature branch while its review preview is in use. Live owner-workspace saving was not independently automated; do not infer that coverage from the shopper checks. Figma recreation remains deferred until allowance is available. Deferred issues #36, #38, #40, #41, #42, and #43 remain outside this phase; demo tracking issues are not closed by this acceptance.
 
+
+## Deferred follow-up implementation review — October 18, 2026
+
+Owner authorized beginning the deferred issues after the storefront merge. The application review batch implements #36 saved images/fallbacks in workspace product cards, #41 singular count wording, #42 compact pinned workspace shortcuts with Business & account expansion, sticky settings tabs/return to top and aligned smaller icon tiles, and #43 Signed in → Sign out → View Your Workspace with a session-aware hero action beside Explore Talix. Keep Talix workspace styling separate from storefront branding, permission visibility and staged drafts. Final visuals remain for owner review.
+
+The fictional tracking/industry review in public/prototypes/deferred-review.html and docs/DEFERRED-FOLLOWUP-REVIEW.md is a proposal, not accepted design or live functionality. Preserve current tracking/privacy and immutable subscription purchase behavior until the proposed protected changes receive review. No schema activation, merge or production release is implied.

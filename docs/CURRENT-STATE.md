@@ -1,5 +1,10 @@
 # Talix current state
 
+## Deferred follow-ups opened — October 18, 2026 Pacific
+
+Owner directed “Please begin work on the deferred issues” after PR #33 acceptance. New focused branch `feature/deferred-workspace-review` starts from main fa7b6f0486c6703f70213d730b60cb0b553f3c17. Issues #36/#41/#42/#43 implement saved workspace product images, singular product counts, compact persistent settings navigation/return-to-top/aligned icons, and clear returning-user landing actions. Details and concrete #38/#40 proposals: `DEFERRED-FOLLOWUP-REVIEW.md`; interactive fictional review at `/prototypes/deferred-review.html`. Industry conversion and tracking branding need review of their described persistence boundaries; neither migration is prepared/applied. No live business data, Auth/Storage configuration or production deployment changed. Issues remain open for owner acceptance; no merge authorized.
+
+
 ## Storefront phase accepted and merged — October 18, 2026
 
 The owner accepted the reviewed application with “Everything looks good lets roll” and authorized the merge. PR #33 merged into main as bf923ca78387ae32d1a0e69cc77275f5090f9ce2, preserving feature history. Reviewed head 83526d374415d47b74b0e69f2344dca957f8a025 passed Core checks run 39157484444 (lint, TypeScript, 59 unit/SQL tests, build, and 24 desktop/mobile browser tests); its feature preview was READY.

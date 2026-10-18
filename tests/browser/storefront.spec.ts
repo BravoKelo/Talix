@@ -131,10 +131,16 @@ test("visual shopping: keyboard details, scoped search, cart variants and locati
     await page.getByRole("button", { name: "Menu", exact: true }).click();
   await page.getByLabel("Search products").fill("CANVAS");
   await expect(
+    page.getByRole("status").filter({ hasText: /^1 product$/ }),
+  ).toHaveCount(1);
+  await expect(
     page.getByRole("button", { name: "View Everyday notebook" }),
   ).toHaveCount(0);
   await page.getByLabel("Search products").fill("unmatched");
   await expect(page.getByText("No products match your search.")).toBeVisible();
+  await expect(
+    page.getByRole("status").filter({ hasText: /^0 products$/ }),
+  ).toHaveCount(1);
   await page.getByRole("button", { name: "Clear search" }).click();
   const opener = page.getByRole("button", {
     name: "View Everyday notebook",
