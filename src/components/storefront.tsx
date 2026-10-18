@@ -3,7 +3,7 @@ import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
 import Link from "next/link";
 import { StorefrontHeader } from "./storefront-header";
-import { designFor, storefrontStyle } from "@/lib/storefront-design";
+import { headerLayout, storefrontStyle } from "@/lib/storefront-design";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/client";
@@ -287,25 +287,23 @@ export function Storefront({
         .toLocaleLowerCase()
         .includes(query.trim().toLocaleLowerCase()),
   );
-  const design = designFor(catalog.subscription);
   const selectedLocation = catalog.locations.find((l) => l.id === location);
   const itemCount = cart.reduce((sum, line) => sum + line.quantity, 0);
   return (
     <main
-      className={`store visual-store figma-store header-${design.header_layout}`}
+      className={`store visual-store figma-store header-${headerLayout(catalog.subscription)}`}
+      id="shop-welcome"
       style={storefrontStyle(catalog.subscription)}
     >
       <a className="shop-skip" href="#shop-location">
         Skip to location selection
       </a>
-      <header
-        className={`shop-header${compactHeader ? " is-compact" : ""}`}
-        id="shop-welcome"
-      >
+      <header className={`shop-header${compactHeader ? " is-compact" : ""}`}>
         <StorefrontHeader
           subscription={catalog.subscription}
+          location={selectedLocation}
           search={
-            design.header_layout === "search" ? (
+            headerLayout(catalog.subscription) === "search" ? (
               <label className="shop-header-search">
                 <span className="sr-only">Search products</span>
                 <input

@@ -1,23 +1,26 @@
 import { displayImageUrl } from "@/lib/demo-image";
 import Image from "next/image";
-import { designFor } from "@/lib/storefront-design";
-import type { Subscription } from "@/lib/types";
+import { StorefrontNavigation } from "./storefront-navigation";
+import { designFor, headerLayout } from "@/lib/storefront-design";
+import type { Location, Subscription } from "@/lib/types";
 
 export function StorefrontHeader({
   subscription,
   children,
   search,
   preview = false,
+  location,
 }: {
   subscription: Partial<Subscription>;
   children: React.ReactNode;
   search?: React.ReactNode;
   preview?: boolean;
+  location?: Location;
 }) {
   const design = designFor(subscription);
   return (
     <div
-      className={`shop-nav header-nav-${design.header_layout}`}
+      className={`shop-nav header-nav-${headerLayout(subscription)}`}
       role={preview ? undefined : "navigation"}
       aria-label={preview ? undefined : "Storefront"}
     >
@@ -62,6 +65,11 @@ export function StorefrontHeader({
           <h1>{subscription.name}</h1>
         )}
       </div>
+      <StorefrontNavigation
+        subscription={subscription}
+        location={location}
+        preview={preview}
+      />
       {search}
       {children}
     </div>

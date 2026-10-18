@@ -7,13 +7,18 @@ import { useImageDraft } from "@/lib/image-draft";
 import { useState } from "react";
 import {
   headerLayouts,
+  headerLayout,
   designFor,
   storefrontStyle,
   type StorefrontDesign,
 } from "@/lib/storefront-design";
-import type { Location, Subscription } from "@/lib/types";
+import { HeaderLinkEditor } from "./header-link-editor";
+import { validHeaderLinks } from "@/lib/header-navigation";
+import type { HeaderLink, Location, Subscription } from "@/lib/types";
 
 type Branding = StorefrontDesign & {
+  header_mode: "standard" | "custom";
+  header_links: HeaderLink[];
   header_photo_url: string | null;
   default_location_id: string | null;
 } & Pick<Subscription, "name" | "description" | "accent" | "logo_url">;
@@ -38,6 +43,10 @@ export function AppearanceEditor({
   const expanded = "default_location_id" in subscription;
   const original = {
     ...designFor(subscription),
+    header_mode:
+      subscription.header_mode ??
+      ("header_layout" in subscription ? "custom" : "standard"),
+    header_links: subscription.header_links ?? [],
     header_photo_url: subscription.header_photo_url ?? null,
     default_location_id: subscription.default_location_id ?? null,
     name: subscription.name,
@@ -86,13 +95,21 @@ export function AppearanceEditor({
           label: id[0].toUpperCase() + id.slice(1),
         }))}
       />
-      <div className="appearance-grid">
+      <div
+        className={`appearance-grid${tab === "header" ? " appearance-header-grid" : ""}`}
+      >
         <form
           role="tabpanel"
           id={`appearance-panel-${tab}`}
           aria-labelledby={`appearance-tab-${tab}`}
           className="stack"
-          onInvalidCapture={() => setTab("branding")}
+          onInvalidCapture={(e) =>
+            setTab(
+              (e.target as HTMLElement).closest(".header-link-editor")
+                ? "header"
+                : "branding",
+            )
+          }
           onChange={(e) => {
             if (
               !(
@@ -103,6 +120,13 @@ export function AppearanceEditor({
           }}
           onSubmit={async (e) => {
             e.preventDefault();
+            if (!validHeaderLinks(draft.header_links)) {
+              setTab("header");
+              setMessage(
+                "A custom navigation link is unfinished. Select Custom header to correct its label and HTTPS website address, or remove it.",
+              );
+              return;
+            }
             setBusy(true);
             setMessage("");
             try {
@@ -206,51 +230,110 @@ export function AppearanceEditor({
                 </p>
               )}
               <div hidden={tab !== "header"} className="stack">
-                <h3>Header layout</h3>
-                <p className="muted">
-                  Choose a starting point. Your branding stays intact.
-                </p>
+                <h3>Header setup</h3>
                 <fieldset
-                  disabled={!("header_layout" in subscription)}
-                  className="header-choices"
+                  className="header-mode-choices"
+                  disabled={!("header_mode" in subscription)}
                 >
-                  <legend className="sr-only">Header layout</legend>
-                  {Object.entries(headerLayouts).map(([key, label]) => (
-                    <label className="header-choice" key={key}>
-                      <span
-                        className={`header-diagram diagram-${key}`}
-                        aria-hidden="true"
-                      >
-                        <span className="diagram-logo" />
-                        <span className="diagram-name" />
-                        <span className="diagram-search" />
-                        <span className="diagram-actions">○ ▢</span>
-                      </span>
+                  <legend className="sr-only">Header setup</legend>
+                  {(["standard", "custom"] as const).map((mode) => (
+                    <label key={mode}>
+                      <input
+                        type="radio"
+                        name="header-mode"
+                        checked={draft.header_mode === mode}
+                        onChange={() =>
+                          setDraft({ ...draft, header_mode: mode })
+                        }
+                      />
                       <span>
-                        <input
-                          type="radio"
-                          name="header-layout"
-                          value={key}
-                          checked={draft.header_layout === key}
-                          onChange={() =>
-                            setDraft({
-                              ...draft,
-                              header_layout:
-                                key as StorefrontDesign["header_layout"],
-                            })
-                          }
-                        />{" "}
-                        {label}
+                        <strong>
+                          {mode === "standard"
+                            ? "Standard header"
+                            : "Custom header"}
+                        </strong>
+                        <small>
+                          {mode === "standard"
+                            ? "Centered identity with Home, Shop, About and Contact."
+                            : "Choose a layout and match your website’s navigation."}
+                        </small>
                       </span>
                     </label>
                   ))}
                 </fieldset>
-                {!("header_layout" in subscription) && (
+                {!("header_mode" in subscription) && (
                   <p className="notice">
-                    Saving header layouts is awaiting activation. Centered
-                    identity remains the default.
+                    Standard and custom navigation saving is awaiting
+                    activation. Your existing header layout remains active.
                   </p>
                 )}
+                {draft.header_mode === "standard" ? (
+                  <p className="muted">
+                    Home returns to the top, Shop opens your products, About
+                    shows your business introduction, and Contact shows the
+                    shopper’s selected location.
+                  </p>
+                ) : null}
+                <div
+                  hidden={
+                    draft.header_mode !== "custom" &&
+                    "header_mode" in subscription
+                  }
+                  className="stack"
+                >
+                  <h3>Header layout</h3>
+                  <p className="muted">
+                    Choose a starting point. Your branding stays intact.
+                  </p>
+                  <fieldset
+                    disabled={!("header_layout" in subscription)}
+                    className="header-choices"
+                  >
+                    <legend className="sr-only">Header layout</legend>
+                    {Object.entries(headerLayouts).map(([key, label]) => (
+                      <label className="header-choice" key={key}>
+                        <span
+                          className={`header-diagram diagram-${key}`}
+                          aria-hidden="true"
+                        >
+                          <span className="diagram-logo" />
+                          <span className="diagram-name" />
+                          <span className="diagram-search" />
+                          <span className="diagram-actions">○ ▢</span>
+                        </span>
+                        <span>
+                          <input
+                            type="radio"
+                            name="header-layout"
+                            value={key}
+                            checked={draft.header_layout === key}
+                            onChange={() =>
+                              setDraft({
+                                ...draft,
+                                header_layout:
+                                  key as StorefrontDesign["header_layout"],
+                              })
+                            }
+                          />{" "}
+                          {label}
+                        </span>
+                      </label>
+                    ))}
+                  </fieldset>
+                  {!("header_layout" in subscription) && (
+                    <p className="notice">
+                      Saving header layouts is awaiting activation. Centered
+                      identity remains the default.
+                    </p>
+                  )}
+                  <HeaderLinkEditor
+                    links={draft.header_links}
+                    disabled={!("header_links" in subscription)}
+                    change={(links) =>
+                      setDraft({ ...draft, header_links: links })
+                    }
+                  />
+                </div>
                 <label>
                   Header identity
                   <select
@@ -479,19 +562,35 @@ export function AppearanceEditor({
             </button>
           </div>
           <div
-            className={`appearance-live-preview header-${draft.header_layout} preview-device-${device}`}
+            className={`appearance-live-preview header-${headerLayout(draft)} preview-device-${device}`}
             style={storefrontStyle(draft)}
           >
             <div className="preview-header shop-header">
               <StorefrontHeader
                 preview
+                location={
+                  locations.find(
+                    (l) => l.id === draft.default_location_id && l.published,
+                  ) ??
+                  locations
+                    .filter((l) => l.published)
+                    .toSorted(
+                      (a, b) =>
+                        a.name.localeCompare(b.name) ||
+                        a.id.localeCompare(b.id),
+                    )[0]
+                }
                 subscription={{
                   ...draft,
+                  header_mode:
+                    "header_mode" in subscription
+                      ? draft.header_mode
+                      : undefined,
                   logo_url: image.preview,
                   header_photo_url: photo.preview,
                 }}
                 search={
-                  draft.header_layout === "search" ? (
+                  headerLayout(draft) === "search" ? (
                     <span className="shop-header-search preview-search">
                       Search products
                     </span>

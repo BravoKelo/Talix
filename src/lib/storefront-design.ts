@@ -36,6 +36,9 @@ export function designFor(s: Partial<Subscription>): StorefrontDesign {
     ]),
   ) as StorefrontDesign;
 }
+export function headerLayout(s: Partial<Subscription>) {
+  return s.header_mode === "standard" ? "centered" : designFor(s).header_layout;
+}
 export function contrastText(hex: string) {
   const rgb = hex.match(/[a-f\d]{2}/gi)?.map((v) => parseInt(v, 16) / 255) ?? [
     1, 1, 1,

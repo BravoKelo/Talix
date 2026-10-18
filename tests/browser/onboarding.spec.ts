@@ -8,7 +8,12 @@ for (const changedPrice of [false, true])
   }) => {
     test.setTimeout(180000);
     const gateway = await onboardingGateway(
-      changedPrice ? ["20261018043256_storefront_header_layout.sql"] : [],
+      changedPrice
+        ? [
+            "20261018043256_storefront_header_layout.sql",
+            "20261018171750_storefront_header_navigation.sql",
+          ]
+        : [],
     );
     async function connect(context: import("@playwright/test").BrowserContext) {
       await context.route("http://127.0.0.1:3290/**", async (route) => {
@@ -831,15 +836,55 @@ for (const changedPrice of [false, true])
         .click();
       if (changedPrice) {
         await expect(
-          appearance.getByRole("radio", {
-            name: "Search-focused",
-            exact: true,
-          }),
+          appearance.getByRole("radio", { name: /Custom header/ }),
         ).toBeDisabled();
         await expect(
-          appearance.getByText(/Saving header layouts is awaiting activation/),
+          appearance.getByText(
+            /Standard and custom navigation saving is awaiting activation/,
+          ),
         ).toBeVisible();
       } else {
+        await appearance.getByRole("radio", { name: /Custom header/ }).check();
+        await appearance
+          .getByRole("button", { name: "Add navigation link", exact: true })
+          .click();
+        await appearance
+          .getByRole("textbox", { name: "Link label", exact: true })
+          .fill("Our website");
+        await appearance
+          .getByRole("combobox", { name: "Destination", exact: true })
+          .selectOption("website");
+        await appearance
+          .getByLabel("HTTPS website address", { exact: true })
+          .fill("https://example.com/about");
+        await appearance
+          .getByRole("button", { name: "Add navigation link", exact: true })
+          .click();
+        await appearance
+          .getByRole("textbox", { name: "Link label", exact: true })
+          .fill("Order online");
+        await expect(
+          appearance.getByRole("textbox", { name: "Link label", exact: true }),
+        ).toHaveCount(1);
+        await appearance
+          .getByRole("button", { name: "Move Order online up", exact: true })
+          .click();
+        await appearance
+          .getByRole("radio", { name: /Standard header/ })
+          .check();
+        await expect(
+          appearance.getByRole("button", {
+            name: "Add navigation link",
+            exact: true,
+          }),
+        ).toBeHidden();
+        await appearance.getByRole("radio", { name: /Custom header/ }).check();
+        await expect(
+          appearance.getByRole("button", {
+            name: "Our website https://example.com/about",
+            exact: true,
+          }),
+        ).toBeVisible();
         await appearance
           .getByRole("radio", { name: "Search-focused", exact: true })
           .check();
@@ -892,6 +937,112 @@ for (const changedPrice of [false, true])
           )
         ).rows,
       ).toHaveLength(0);
+      if (!changedPrice) {
+        const savedNavigation = (
+          await gateway.db.query<{
+            header_mode: string;
+            header_links: unknown[];
+          }>("select header_mode,header_links from public.subscriptions")
+        ).rows[0];
+        expect(savedNavigation).toEqual({
+          header_mode: "custom",
+          header_links: [
+            { label: "Order online", destination: "storefront", url: "" },
+            {
+              label: "Our website",
+              destination: "website",
+              url: "https://example.com/about",
+            },
+          ],
+        });
+        await appearance
+          .getByRole("tab", { name: "Header", exact: true })
+          .click();
+        await appearance
+          .getByRole("button", {
+            name: "Our website https://example.com/about",
+            exact: true,
+          })
+          .click();
+        await appearance
+          .getByRole("textbox", { name: "HTTPS website address", exact: true })
+          .fill("javascript:alert(1)");
+        await appearance
+          .getByRole("radio", { name: /Standard header/ })
+          .check();
+        await appearance
+          .getByRole("button", { name: "Save branding", exact: true })
+          .click();
+        await expect(appearance.getByRole("status")).toContainText(
+          "custom navigation link is unfinished",
+        );
+        expect(
+          (
+            await gateway.db.query<{ header_mode: string }>(
+              "select header_mode from public.subscriptions",
+            )
+          ).rows[0].header_mode,
+        ).toBe("custom");
+        await appearance
+          .getByRole("button", { name: "Cancel changes", exact: true })
+          .click();
+        await expect(appearance).toBeHidden();
+        await page
+          .getByRole("button", { name: /Storefront appearance Business logo/ })
+          .click();
+        await appearance
+          .getByRole("tab", { name: "Header", exact: true })
+          .click();
+        await expect(
+          appearance.getByRole("radio", { name: /Custom header/ }),
+        ).toBeChecked();
+        await expect(
+          appearance.getByRole("button", {
+            name: "Our website https://example.com/about",
+            exact: true,
+          }),
+        ).toBeVisible();
+        const orderLink = appearance.getByRole("button", {
+          name: "Order online This storefront",
+          exact: true,
+        });
+        if ((await orderLink.getAttribute("aria-expanded")) !== "true")
+          await orderLink.click();
+        await appearance
+          .getByRole("textbox", { name: "Link label", exact: true })
+          .fill("Unsaved label");
+        await appearance
+          .getByRole("button", { name: "Cancel changes", exact: true })
+          .click();
+        await page
+          .getByRole("button", { name: /Storefront appearance Business logo/ })
+          .click();
+        await appearance
+          .getByRole("tab", { name: "Header", exact: true })
+          .click();
+        await expect(
+          appearance.getByRole("button", {
+            name: "Order online This storefront",
+            exact: true,
+          }),
+        ).toBeVisible();
+        await appearance
+          .getByRole("radio", { name: /Standard header/ })
+          .check();
+        await appearance
+          .getByRole("button", { name: "Save branding", exact: true })
+          .click();
+        await expect(appearance.getByRole("status")).toContainText(
+          "has been saved",
+        );
+        expect(
+          (
+            await gateway.db.query<{ header_links: unknown[] }>(
+              "select header_links from public.subscriptions",
+            )
+          ).rows[0].header_links,
+        ).toEqual(savedNavigation.header_links);
+      }
       await gateway.addAccount("employee@example.invalid");
       await page
         .getByRole("navigation", { name: "Workspace shortcuts" })

@@ -1081,6 +1081,10 @@ export function Workspace({
                                   ? { logo_url: v.logo_url }
                                   : {}),
                               };
+                        if (!("header_mode" in sub))
+                          delete (payload as Partial<typeof v>).header_mode;
+                        if (!("header_links" in sub))
+                          delete (payload as Partial<typeof v>).header_links;
                         if (!("header_layout" in sub))
                           delete (payload as Partial<typeof v>).header_layout;
                         const { error } = await browserClient()

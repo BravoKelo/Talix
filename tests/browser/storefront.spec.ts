@@ -477,3 +477,230 @@ test("bundled demo images load from the current preview origin", async ({
     ).toBe(new URL(page.url()).origin);
   }
 });
+
+test("standard navigation uses saved content, follows the selected location and preserves the cart", async ({
+  page,
+}) => {
+  await mockCatalog(page, {
+    ...catalog,
+    subscription: {
+      ...catalog.subscription,
+      header_mode: "standard",
+      header_layout: "search",
+    },
+    products: [
+      ...catalog.products,
+      ...Array.from({ length: 12 }, (_, i) => product("item" + i, "Item " + i)),
+    ],
+  });
+  await page.goto("/shop/example");
+  await expect(page.locator(".figma-store")).toHaveClass(/header-centered/);
+  async function navigate(name: string) {
+    const link = page
+      .getByRole("navigation", { name: "Business navigation", exact: true })
+      .getByRole("button", { name, exact: true });
+    if (!(await link.count()))
+      await page
+        .getByRole("button", {
+          name: /Open navigation menu|More navigation links/,
+        })
+        .click();
+    await page.getByRole("button", { name, exact: true }).click();
+  }
+  for (const button of await page
+    .getByRole("navigation", { name: "Business navigation", exact: true })
+    .getByRole("button")
+    .all()) {
+    await expect(button).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  }
+  await navigate("About");
+  await expect(
+    page.getByRole("dialog", { name: "About", exact: true }),
+  ).toContainText(catalog.subscription.description);
+  await page.keyboard.press("Escape");
+  await navigate("Contact");
+  await expect(
+    page.getByRole("dialog", { name: "Contact", exact: true }),
+  ).toContainText("North Street");
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Choose a location" })
+    .selectOption("South");
+  await navigate("Contact");
+  await expect(
+    page.getByRole("dialog", { name: "Contact", exact: true }),
+  ).toContainText("South Street");
+  await page.keyboard.press("Escape");
+  await page
+    .getByRole("button", { name: "Add Everyday notebook to cart", exact: true })
+    .click();
+  await page.evaluate(() => window.scrollTo(0, 600));
+  await expect(page.locator(".shop-header")).toHaveClass(/is-compact/);
+  const menu = page.getByRole("button", {
+    name: "Open navigation menu",
+    exact: false,
+  });
+  await expect(menu).toBeInViewport();
+  expect(
+    await menu.evaluate((el) => el.getBoundingClientRect().height),
+  ).toBeGreaterThanOrEqual(48);
+  await menu.click();
+  await page
+    .getByRole("navigation", { name: "Menu links" })
+    .getByRole("link", { name: "Home", exact: true })
+    .click();
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(10);
+  await page
+    .getByRole("button", { name: "Your cart (1)", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toContainText("Everyday notebook");
+  await page.keyboard.press("Escape");
+  await page.screenshot({
+    path: `test-results/navigation-standard-${test.info().project.name}.png`,
+  });
+});
+
+test("custom navigation handles long links and overflow for every preset", async ({
+  page,
+}) => {
+  for (const layout of [
+    "centered",
+    "left",
+    "two_row",
+    "search",
+    "minimal",
+  ] as const) {
+    await mockCatalog(page, {
+      ...catalog,
+      subscription: {
+        ...catalog.subscription,
+        header_mode: "custom",
+        header_layout: layout,
+        header_links: Array.from({ length: 8 }, (_, i) => ({
+          label: i === 7 ? "Order online" : "Long website navigation link " + i,
+          destination: i === 7 ? "storefront" : "website",
+          url: i === 7 ? "" : "https://example.com/page/" + i,
+        })),
+      },
+    });
+    await page.goto("/shop/example");
+    const more = page.getByRole("button", {
+      name: /More navigation links|Open navigation menu/,
+    });
+    await expect(more).toBeVisible();
+    await more.click();
+    await expect(
+      page
+        .getByRole("navigation", { name: "Menu links" })
+        .getByRole("link", { name: "Order online" }),
+    ).toHaveAttribute("href", "#shop-welcome");
+    await expect(
+      page
+        .getByRole("navigation", { name: "Menu links" })
+        .getByRole("link", { name: "Long website navigation link 6" }),
+    ).toHaveAttribute("href", "https://example.com/page/6");
+    await page.keyboard.press("Escape");
+    await expect(more).toBeFocused();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `test-results/navigation-${layout}-${test.info().project.name}.png`,
+    });
+  }
+});
+
+test("tablet headers remain compact, touch friendly and use business colors", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 768, height: 1024 });
+  for (const layout of [
+    "centered",
+    "left",
+    "two_row",
+    "search",
+    "minimal",
+  ] as const) {
+    await mockCatalog(page, {
+      ...catalog,
+      subscription: {
+        ...catalog.subscription,
+        header_mode: "custom",
+        header_layout: layout,
+        header_background: "#174b91",
+        header_links: [
+          {
+            label: "Our business",
+            destination: "website",
+            url: "https://example.com",
+          },
+          { label: "Order online", destination: "storefront", url: "" },
+        ],
+      },
+      products: [
+        ...catalog.products,
+        ...Array.from({ length: 12 }, (_, i) =>
+          product("tablet" + i, "Tablet item " + i),
+        ),
+      ],
+    });
+    await page.goto("/shop/example");
+    const nav = page.getByRole("navigation", {
+      name: "Business navigation",
+      exact: true,
+    });
+    const first = nav.locator("a,button").first();
+    await expect(first).toHaveCSS("color", "rgb(255, 255, 255)");
+    await expect(first).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    for (const control of await nav.locator("a,button").all()) {
+      await expect(control).toHaveCSS("color", "rgb(255, 255, 255)");
+      await expect(control).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    }
+    expect(
+      await first.evaluate((el) => el.getBoundingClientRect().height),
+    ).toBeGreaterThanOrEqual(48);
+    await page.evaluate(() => window.scrollTo(0, 600));
+    await expect(page.locator(".shop-header")).toHaveClass(/is-compact/);
+    await expect
+      .poll(() =>
+        page
+          .locator(".shop-header")
+          .evaluate((el) => el.getBoundingClientRect().height),
+      )
+      .toBeLessThanOrEqual(64);
+    await expect(
+      page.getByRole("button", { name: "Your cart (0)", exact: true }),
+    ).toBeInViewport();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `test-results/navigation-tablet-${layout}-${test.info().project.name}.png`,
+    });
+    await page.setViewportSize({ width: 320, height: 780 });
+
+    await expect(
+      page.getByRole("button", { name: "Your cart (0)", exact: true }),
+    ).toBeInViewport();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await expect
+      .poll(() =>
+        page
+          .locator(".shop-header")
+          .evaluate((el) => el.getBoundingClientRect().height),
+      )
+      .toBeLessThanOrEqual(64);
+    await page.screenshot({
+      path: `test-results/navigation-narrow-${layout}-${test.info().project.name}.png`,
+    });
+    await page.setViewportSize({ width: 768, height: 1024 });
+  }
+});

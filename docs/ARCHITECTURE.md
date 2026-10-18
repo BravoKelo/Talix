@@ -76,3 +76,10 @@ Owner-approved implementation adds constrained subscription appearance columns, 
 Header presets use one constrained subscription-wide header_layout value, default centered; existing settings.manage RLS/column grants and public_catalog whitelist remain the boundary. The separately approved additive header-choice migration is applied to development; CURRENT-STATE records its version and verification. No new roles, RPCs, buckets or entitlement structures are required. The shared StorefrontHeader renders storefront and owner preview identity/assets. Old databases omit the new field: Centered identity remains the fallback, preset writes stay disabled and existing appearance fields still save without sending an unknown column.
 
 Cart remains component memory, with identical product/option merging and existing checkout RPC payload. Existing native TaskDialog supplies modal focus/Escape behavior; the cart variant adds right-side/full-height presentation, backdrop dismissal and scroll isolation. Checkout appears only after the cart action. Neither carts nor shopper details gain persistence.
+
+
+## Header navigation — prepared activation, issue #35
+
+The application now shares Standard/Custom navigation between the storefront and appearance preview. Standard uses centered identity and built-in storefront/About/selected-location Contact destinations; Custom uses the saved preset and ordered website/storefront links. Responsive width measurement keeps fitting links inline and moves overflow into the native dialog. The collapsed centered/mobile header uses a tap menu. No new endpoint, client persistence or checkout behavior is introduced.
+
+The prepared-only migration and its exact validation/grants/catalog proposal are in `HEADER-NAVIGATION-MIGRATION.md`. Database execution requires separate owner approval. Until activation, the editor disables the unavailable mode/link writes, strips unknown columns from the payload and retains prior preset/branding saves. The existing public catalog continues to work without the new fields.

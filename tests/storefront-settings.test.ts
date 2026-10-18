@@ -231,3 +231,106 @@ it("defaults to centered and persists header presets under settings authority", 
     ).rows,
   ).toHaveLength(0);
 });
+
+it("persists standard/custom mode, preserves ordered custom links, and redacts inactive links", async () => {
+  await as(editor);
+  expect(
+    (
+      await db.query<{ header_mode: string; header_links: unknown[] }>(
+        "select header_mode,header_links from public.subscriptions where id=$1",
+        [sid],
+      )
+    ).rows[0],
+  ).toEqual({ header_mode: "standard", header_links: [] });
+  const links = [
+    {
+      label: "Our website",
+      destination: "website",
+      url: "https://business.example/about?from=shop#story",
+    },
+    { label: "Order online", destination: "storefront", url: "" },
+  ];
+  await db.query(
+    "update public.subscriptions set header_mode='custom',header_links=$2::jsonb where id=$1",
+    [sid, JSON.stringify(links)],
+  );
+  await db.exec("reset role;set role anon");
+  const publicSub = async () =>
+    (
+      await db.query<{ v: { subscription: Record<string, unknown> } }>(
+        "select public.public_catalog('example-study') as v",
+      )
+    ).rows[0].v.subscription;
+  expect((await publicSub()).header_links).toEqual(links);
+  expect(await publicSub()).not.toHaveProperty("client_id");
+  await expect(
+    db.query(
+      "update public.subscriptions set header_mode='custom' where id=$1",
+      [sid],
+    ),
+  ).rejects.toThrow();
+  await as(editor);
+  await db.query(
+    "update public.subscriptions set header_mode='standard' where id=$1",
+    [sid],
+  );
+  expect(
+    (
+      await db.query<{ header_links: unknown[] }>(
+        "select header_links from public.subscriptions where id=$1",
+        [sid],
+      )
+    ).rows[0].header_links,
+  ).toEqual(links);
+  await db.exec("reset role;set role anon");
+  expect((await publicSub()).header_links).toEqual([]);
+  await as(other);
+  expect(
+    (
+      await db.query(
+        "update public.subscriptions set header_links='[]',header_mode='custom' where id=$1 returning id",
+        [sid],
+      )
+    ).rows,
+  ).toHaveLength(0);
+});
+it("rejects malformed navigation and unsafe destinations at the database boundary", async () => {
+  await as(editor);
+  for (const links of [
+    null,
+    {},
+    [null],
+    [{}],
+    [{ label: "", destination: "storefront", url: "" }],
+    [{ label: "x".repeat(33), destination: "storefront", url: "" }],
+    Array.from({ length: 9 }, () => ({
+      label: "Shop",
+      destination: "storefront",
+      url: "",
+    })),
+    ...[
+      "javascript:alert(1)",
+      "http://example.com",
+      "//example.com",
+      "https://user:pass@example.com",
+      "https://example.com\\evil",
+      "https://example.com/a b",
+      "https://",
+    ].map((url) => [{ label: "Unsafe", destination: "website", url }]),
+    [{ label: "Shop", destination: "storefront", url: "https://example.com" }],
+    [{ label: "Shop", destination: "storefront", url: "", extra: true }],
+  ]) {
+    await expect(
+      db.query(
+        "update public.subscriptions set header_links=$2::jsonb where id=$1",
+        [sid, JSON.stringify(links)],
+      ),
+    ).rejects.toThrow();
+  }
+  await expect(
+    db.query(
+      "update public.subscriptions set header_mode='unknown' where id=$1",
+      [sid],
+    ),
+  ).rejects.toThrow();
+});
