@@ -1,5 +1,14 @@
 # Talix current state
 
+
+## Storefront settings activated — October 18, 2026 UTC
+
+Owner explicitly authorized development execution with “I approved the database migration.” Applied the exact reviewed SQL from remote head 04ea3b67bd58fd6fbbb4d8bf3eecfa6573fb7997 to Talix development lzepujggusieapablzhn as 20261018023709_storefront_design_settings. Fourteen migrations are recorded. The repository filename now matches the service version; SQL is unchanged, including its historical prepared-only comment. This supersedes pending-execution wording below.
+
+Live rolled-back synthetic checks passed owner appearance/default-location save, unsafe photo URL rejection, product collection insertion, unpublished default redaction, private client-field omission, saved-header-photo cleanup protection and outsider update/cleanup denial. All synthetic Auth/workspace/product fixtures were rolled back; existing business records and Storage objects were not edited. The same-business default foreign key is present. Security advisor categories/counts are unchanged (private admin deny-all notice, existing public/authenticated RPC notices and leaked-password protection notice). This is database verification, not deployed browser acceptance.
+
+Reload the existing feature preview workspace to enable appearance/default-location and product collection controls. PR #33 remains open; visual acceptance and merge are separate. No production release or merge is authorized.
+
 ## Approved Figma implementation — October 17, 2026
 
 Owner rejected the earlier storefront preview, collaboratively refined Figma, and accepted its v2 direction with “Lets proceed.” PRODUCT-DESIGN records the exact frames and approved behavior. Implementation remains on feature/core-storefront-visual-shopping / PR #33. Remote starting head verified fa29fd8cd8915c901e0d950ad2952d006183afe3; local starting tree at 860e7e3 is identical, with different commit object metadata after connector publication. Publish subsequent changes as a fast-forward from the verified remote head, not a force-push.
