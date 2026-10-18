@@ -1,5 +1,12 @@
 # Talix current state
 
+## Tracking and industry implementation prepared — October 18, 2026 Pacific
+
+Owner approved the PR #44 application batch and linked tracking/industry proposals. The application batch is merged; issues #36/#41/#42/#43 are closed. New work for #38/#40 is on `feature/tracking-industry-followup` from main cf02e4791123a884d908708b761e0ac0cad71490. Prepared changes add private-token business branding/public return navigation and Owner-reviewed industry/plan changes with immutable original purchases and versioned, idempotent change history. Talix staff can read current terms/history and original purchases separately; employees cannot change industries. No real billing or industry modules.
+
+Two CLI-generated migrations are PREPARED ONLY: 20261018211631_shopper_tracking_branding and 20261018211634_subscription_industry_changes. Review `TRACKING-INDUSTRY-MIGRATIONS.md` for exact boundaries and activation checks. Development remains at sixteen migrations. No live SQL, subscriptions, Auth, Storage or production configuration changed. Exact migration execution and final new-implementation acceptance remain separate. PR records exact-head validation/deployment evidence; old pending proposal wording is historical.
+
+
 ## Deferred batch accepted and merged — October 18, 2026 Pacific
 
 Owner approved PR #44 at 1911ea74b0380b22f4e02eb4b87ee014ad963b34 and the linked tracking/industry proposals with “Approved.” PR #44 merged with history preserved as e77446657ee8abb276b0ff61842ceaff053255c9. Core checks 39166225703 passed lint, TypeScript, 59 unit/SQL tests, build and 26 desktop/mobile browser tests; preview was READY. Issues #36/#41/#42/#43 are accepted. No production deployment or live data/configuration change. Main deployment remains disabled; review branch retained.

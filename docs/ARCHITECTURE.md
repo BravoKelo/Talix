@@ -88,3 +88,7 @@ The prepared-only migration and its exact validation/grants/catalog proposal are
 ### Navigation activation — October 18, 2026
 
 Owner separately approved development execution. The reviewed navigation SQL is applied unchanged as `20261018174618_storefront_header_navigation`. This supersedes prepared-activation wording above. Existing RLS/catalog boundaries were verified with rolled-back synthetic records; security-advisor categories/counts are unchanged. Application source remains the reviewed 4de7914 implementation. No merge or production release is authorized.
+
+## Approved prepared follow-up — subscription changes and private tracking
+
+The October 18 owner approval accepts the bounded persistence proposal in DEFERRED-FOLLOWUP-REVIEW.md. The prepared TRACKING-INDUSTRY-MIGRATIONS.md records an additive private-token tracking whitelist and Owner-checked industry change transactions. Original subscription_purchases remains immutable; latest subscription_changes selection represents current terms, with version/request checks and row locking. Existing protected Owner membership and Talix administrator read allowlist remain the authorities; no manager write power, new role, real billing or industry module is added. Actual activation evidence belongs in CURRENT-STATE; these migrations are not yet applied.

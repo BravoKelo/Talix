@@ -43,7 +43,10 @@ async function track(token: string) {
   ).rows[0].value;
 }
 beforeAll(async () => {
-  await initializeDatabase(db, [migration]);
+  await initializeDatabase(db, [
+    migration,
+    "20261018211631_shopper_tracking_branding.sql",
+  ]);
   for (const id of [owner, viewer, outsider])
     await db.query("insert into auth.users(id,email) values($1,$2)", [
       id,
@@ -100,7 +103,9 @@ it("allocates location numbers once across checkout retries and leaves other loc
   expect(await checkout(lid, request)).toBe(token);
   expect((await track(token)).order_number).toBe(100002);
   expect((await track(await checkout())).order_number).toBe(100003);
-  expect((await track(await checkout(secondLocation))).order_number).toBe(100001);
+  expect((await track(await checkout(secondLocation))).order_number).toBe(
+    100001,
+  );
 });
 it("denies cancellation to viewers and outsiders and hides another business's numbers", async () => {
   for (const id of [viewer, outsider]) {

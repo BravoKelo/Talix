@@ -95,6 +95,13 @@ test("location → catalog → decline → retry → fulfillment → refund", as
       .getByRole("button", { name: "Place order with simulated payment" })
       .click();
     await expect(page).toHaveURL(/\/orders\/[a-f0-9-]+/);
+    const returnLink = page.getByRole("link", { name: "Return to storefront" });
+    await expect(returnLink).toHaveAttribute("href", "/shop/acme-shop");
+    await expect(returnLink).toHaveAttribute("referrerpolicy", "no-referrer");
+    await expect(page.locator("body > .topbar")).toBeHidden();
+    await page.screenshot({
+      path: `test-results/branded-tracking-${test.info().project.name}.png`,
+    });
     await expect(
       page.getByRole("heading", { name: "Payment declined" }),
     ).toBeVisible();

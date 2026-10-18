@@ -1,4 +1,5 @@
 "use client";
+import { SubscriptionSummary } from "./subscription-summary";
 import { useCallback, useEffect, useState } from "react";
 import { browserClient } from "@/lib/supabase/client";
 import { cents, money } from "@/lib/types";
@@ -448,6 +449,8 @@ export function TalixAdmin() {
                 .filter((p) => p.client_id === c.id)
                 .map((p) => (
                   <div className="cart-line" key={p.subscription_id}>
+                    <SubscriptionSummary id={p.subscription_id} readOnly />
+                    <strong>Original purchase</strong>
                     <strong>{p.business_details.business_name}</strong> ·{" "}
                     {p.selection.business_type.name}
                     <p>

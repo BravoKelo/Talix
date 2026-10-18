@@ -1,5 +1,7 @@
 # Deferred follow-up review — October 18, 2026
 
+Owner subsequently approved this review in full. PR #44 is merged; #38/#40 implementation and exact migration preparation continue separately. Earlier proposal-only and no-merge statements below are historical. See TRACKING-INDUSTRY-MIGRATIONS.md; live execution and final acceptance of the new implementation remain pending.
+
 Owner directed “Please begin work on the deferred issues” after accepting PR #33. This opens a new follow-up branch; prior storefront boundaries remain historical. No merge, production release, schema activation or conversion of existing subscriptions is authorized.
 
 ## Implemented for application review
