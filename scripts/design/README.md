@@ -21,3 +21,7 @@ Owner requested a tighter left section while retaining touch friendliness and co
 ### Color ownership correction
 
 Owner agreed to separate workspace and business branding. Outer settings/review CSS now uses the existing Talix palette from globals.css: navy #112e50, action blue #174b91, selected gold #e8b94f, background #f4f7fb, ink #172c48 and supporting tokens. The embedded storefront remains in Retail Demo's green/warm neutral palette; its source was verified byte-identical before formatting. Nine interaction groups passed again with no script errors; screenshot inspected. No application settings or database changed.
+
+### Standard/Custom mode revision
+
+Owner approved adding Standard (default) and Custom radio modes. Standard automatically supplies Home/Shop/About/Contact; custom links/editor remain only under Custom. The prototype's Standard links have working in-store destinations (top/products/business-info dialog/location-contact dialog), not placeholder external URLs. New mode checks passed default selection, hidden custom controls, About/Contact and selected-location content, custom draft retention while switching, and Save/reload retention. All prior layout/menu/overflow/editor checks also pass: eleven interaction groups, five layouts, two preview device modes, no script errors. This remains a proposal for review and uses only its own browser-local state.
