@@ -2,6 +2,13 @@
 
 
 
+
+## Header choice activated — October 17 Pacific / October 18 UTC
+
+Owner explicitly approved the prepared header-choice migration. Applied the unchanged reviewed SQL from 8af980b40e15f79c7c98f7c93e0c4c30f3d42835 to Talix development lzepujggusieapablzhn as 20261018043256_storefront_header_layout. Fifteen migrations are recorded. Repository filename and the legacy-schema browser exclusion are aligned with the service version; SQL content is unchanged. This supersedes the pending header-execution statements below.
+
+Live rolled-back synthetic checks passed Centered identity default, owner preset save, invalid-value rejection, public catalog choice/client-field privacy and outsider write denial. No existing business records or Storage objects were edited. Security advisor categories/counts are unchanged. These are database checks, not deployed browser acceptance. Reload the existing preview workspace to enable all five persisted header choices; Centered identity remains the default. PR #33 stays open; no merge or production release is authorized.
+
 ## Approved cart/header/settings follow-up — October 17 Pacific / October 18 UTC
 
 Owner accepted the cart popup, five header layouts and four settings tabs; Centered identity is explicitly the default. Owner then directed implementation with “You may proceed.” See PRODUCT-DESIGN and issue #32 for source frames and superseded inline-cart decisions. Work remains on feature/core-storefront-visual-shopping / PR #33. Starting remote head b4e45fa72ffffdd996e013142d5a6560e095c085; local 8fde06a has the identical tree with different commit metadata. Publish via a fast-forward from the verified remote head; never force-push.

@@ -8,7 +8,7 @@ for (const changedPrice of [false, true])
   }) => {
     test.setTimeout(180000);
     const gateway = await onboardingGateway(
-      changedPrice ? ["20261018033503_storefront_header_layout.sql"] : [],
+      changedPrice ? ["20261018043256_storefront_header_layout.sql"] : [],
     );
     async function connect(context: import("@playwright/test").BrowserContext) {
       await context.route("http://127.0.0.1:3290/**", async (route) => {
