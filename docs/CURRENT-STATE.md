@@ -2,7 +2,7 @@
 
 ## Engineering standards documentation review — October 18, 2026 Pacific
 
-Owner requested documentation-only engineering standards on `docs/engineering-standards`, based on main c71e690e50d635c3bbd7d556e0d802f720928084. [Assessment](standards/assessment.md) and [standards index](standards/README.md) record implemented vs future boundaries, classified rules and tooling limits. Proposed standards await PR approval; do not claim adoption or merge yet. No application, schema, CI, dependencies or service configuration changed.
+Owner requested documentation-only engineering standards on `docs/engineering-standards`, based on main c71e690e50d635c3bbd7d556e0d802f720928084. [Assessment](standards/assessment.md) and [standards index](standards/README.md) record implemented vs future boundaries, classified rules and tooling limits. Owner accepted and authorized merge of PR #47 at 38f50e104768c256eb3e349e95a71874a2bcdde2; merged as f96a3d3692a8311ec72762303c875e1b2ef14d1c. Core checks run 39199903149 passed. The 47 classified standards are adopted for future applicable work; this is not a retrospective code-compliance certification or code-audit authorization. No application, schema, CI, dependencies or service configuration changed.
 
 Owner confirmed manual deletion of the seven merged branches; only main and feature/website-owner-onboarding remained before this separately requested documentation branch. This supersedes earlier review-branch retention instructions. Issues #31/#34/#37 were closed by explicit owner direction; #31 closure retains its documented GitHub-managed history limitation. Next product work is the website/owner setup proposal, not implementation of undefined templates, entitlements, domains or fees.
 

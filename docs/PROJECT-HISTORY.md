@@ -180,3 +180,8 @@ Owner explicitly authorized merging PR #45 at reviewed head 3e27402604eeb35aec50
 
 Corrected review preview https://talix-6vm0uyt1q-bravokelo.vercel.app is READY at the accepted head. Disabled sign-in was caused by development connection variables being scoped only to older branches; the existing public URL/publishable key are now scoped to feature/tracking-industry-followup preview. The earlier immutable preview lacks configuration and should not be used. Agent live sign-in/owner UI saving remains unverified behind Vercel protection; owner acceptance does not invent that coverage. Main auto-deployment remains disabled in vercel.json; retain the feature branch for its review preview. This acceptance supersedes pending acceptance/merge wording below.
 
+
+
+## October 18, 2026 Pacific — engineering standards accepted
+
+Owner authorized PR #47 at 38f50e104768c256eb3e349e95a71874a2bcdde2. Exact-head Core checks run 39199903149 passed; merged with history preserved as f96a3d3692a8311ec72762303c875e1b2ef14d1c. Adopted 47 classified engineering standards and concise AGENTS guidance. Ten Markdown files only; no app/schema/CI/dependency/configuration change. A future code audit or corrective implementation remains separately scoped. Production publishing stays disabled.

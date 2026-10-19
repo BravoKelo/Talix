@@ -1,6 +1,6 @@
 # Engineering standards
 
-Status: proposed for owner review in the documentation PR. These standards govern new and materially changed work after acceptance; they do not certify the existing codebase or authorize retrofits.
+Status: accepted by the owner and merged through PR #47 on October 18, 2026 Pacific. These standards govern new and materially changed work; they do not certify the existing codebase or authorize retrofits.
 
 Read [AGENTS.md](../../AGENTS.md) first, then the relevant standards below. [Architecture](../ARCHITECTURE.md), [accepted ADRs](../adr/0001-shared-commerce-core.md), [product vision](../PRODUCT-VISION.md), and [product design](../PRODUCT-DESIGN.md) retain their existing ownership. A conflict with an accepted decision must be surfaced before implementation; these documents do not silently supersede it.
 
