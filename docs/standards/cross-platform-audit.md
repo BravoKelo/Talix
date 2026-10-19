@@ -1,6 +1,6 @@
 # Cross-platform readiness audit checklist
 
-Use with an authorized audit or affected feature review, alongside [cross-platform standards](cross-platform.md) and [testing/workflow](testing-and-workflow.md). This checklist extends future assessment instructions; it does not reopen or alter a prior baseline report. No audit, remediation, new issue, migration, live test or infrastructure work is authorized by its existence.
+Use with an authorized audit or affected feature review, alongside [cross-platform standards](cross-platform.md) [accessibility standards](accessibility.md) and [testing/workflow](testing-and-workflow.md). This checklist extends future assessment instructions; it does not reopen or alter a prior baseline report. No audit, remediation, new issue, migration, live test or infrastructure work is authorized by its existence.
 
 Record exact baseline, target clients/browser versions/input methods, inspected components and limits. For each item record standard ID, current/future applicability, Compliant / Partially Compliant / Noncompliant / Not Verified / Not Applicable, evidence, actual verification environment, impact and next-scope gate. Distinguish implemented, partial, planned and unverified capability. Never call untested behavior compliant.
 
@@ -19,3 +19,9 @@ Record exact baseline, target clients/browser versions/input methods, inspected 
 | Regression and device failures    | X54     | Exact executed responsive/browser/input/accessibility/auth/core-flow/network checks; emulation versus physical devices; unavailable checks and owner acceptance of material limits.                                 |
 
 Classify actionable findings using the authorized audit's evidence and severity rules. Do not inflate severity because a future capability is missing. Preserve applied migration history, simulated payments, protected authorization boundaries and release restrictions. Any unsafe or state-changing validation needs its own approved scope; inspect test imports before execution, including helpers that initialize SQL migrations. No comprehensive audit or remediation issues are created by this documentation update.
+
+## Accessibility assessment extension
+
+Assess AC01–AC16 explicitly: applicable WCAG 2.2 A/AA criteria for complete affected processes; semantic headings/landmarks/names/roles/states; keyboard/focus/traps/restoration; screen-reader announcements; contrast/non-color/zoom/reflow/reduced motion; touch/orientation/gesture alternatives; accessible forms/authentication/onboarding errors and summaries; dynamic widgets/status/results; commerce/order/subscription transactions; data alternatives; accessible shared components; and automated/manual regression evidence. Review scoped claims and any exception's impact, mitigation, responsible owner, priority, review date and closure evidence. Use the [verification matrix](accessibility.md#practical-verification-matrix); report unexecuted checks as Not Verified.
+
+Classify actual supported-current behavior separately as a current compliance defect, architectural risk or testing gap; classify optional PWA/native/offline concerns as future-readiness recommendations unless an existing authoritative contract is actually violated. No absence-of-future-app finding should be labeled a present accessibility failure. The earlier 47-standard engineering audit remains historical evidence; this checklist does not add unperformed accessibility checks to its reported results or authorize another audit.

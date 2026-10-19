@@ -4,7 +4,7 @@ Status: proposed for owner review, October 18, 2026 Pacific. Documentation only;
 
 ## Purpose and application models
 
-**Talix must be designed as a device-independent SaaS platform whose core business capabilities can be accessed through supported web and future application clients without duplicating critical server-side business logic.**
+**Talix must remain a device-independent SaaS platform whose core business capabilities can be accessed through supported client experiences without duplicating authoritative business logic or weakening security boundaries.**
 
 The current priority is responsive web access on desktop/laptop, tablet and smartphone environments. An installable Progressive Web App and dedicated iOS/Android clients are future options requiring separately approved scopes. No mobile framework, separate API service, service worker, offline mode, application packaging or infrastructure is selected or authorized here.
 
@@ -74,6 +74,8 @@ IDs X41–X55 map directly to the supplied rule numbers and do not replace A/Q/S
 - **Exceptions / limitations:** A viewport resize alone does not demonstrate touch or assistive-technology support.
 
 ### X44 — Rule 44: Accessibility target
+
+Detailed requirements: [accessibility engineering standard AC01–AC16](accessibility.md), including manual verification, shared controls and exception handling.
 
 - **Level:** L1.
 - **Purpose:** Make WCAG 2.2 Level AA the target for applicable web interfaces.
@@ -201,7 +203,7 @@ Manual review supplies evidence automation cannot establish: physical touch and 
 
 Cross-client security review must cover tenant/account switching, public versus personalized caching, token/link leakage, logout/revocation, stale permissions and uncertain transaction outcomes. Future client contracts must not bypass SQL authority through device identity, user metadata or cached roles. Background/offline work, if approved later, inherits the same security and idempotency requirements. Native apps may use secure platform credential facilities only through a separately reviewed auth design.
 
-For future audits, use the [cross-platform audit checklist](cross-platform-audit.md). Report current defects separately from unimplemented optional capabilities; do not classify absence of PWA/native/offline functionality as a current violation.
+Apply the [dedicated accessibility standard](accessibility.md) for detailed acceptance and the risk-based manual/automated matrix. For future audits, use the [cross-platform audit checklist](cross-platform-audit.md). Report current defects separately from unimplemented optional capabilities; do not classify absence of PWA/native/offline functionality as a current violation.
 
 ## Source references and open decisions
 

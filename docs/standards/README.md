@@ -14,7 +14,7 @@ Read [AGENTS.md](../../AGENTS.md) first, then the relevant standards below. [Arc
 
 ## Cross-platform extension under review
 
-[Cross-platform standards](cross-platform.md) add X41–X55 (attachment rules 41–55), with current web requirements and separately gated future PWA/native/offline/distribution guidance. [Future audit checklist](cross-platform-audit.md) defines assessment evidence. This extension is proposed for review; the previously accepted 47 rules retain their IDs and status. No PWA/native implementation or retrofit is authorized.
+[Cross-platform standards](cross-platform.md) add X41–X55 (attachment rules 41–55), with current web requirements and separately gated future PWA/native/offline/distribution guidance. [Future audit checklist](cross-platform-audit.md) defines assessment evidence. This extension is proposed for review; the previously accepted 47 rules retain their IDs and status. [Accessibility standards](accessibility.md) add AC01–AC16 for semantic, keyboard, screen-reader, visual, form/transaction and verification requirements, with documented temporary-gap handling. No PWA/native implementation or retrofit is authorized.
 
 ## Classification and exceptions
 

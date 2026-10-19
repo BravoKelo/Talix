@@ -1,5 +1,9 @@
 # Talix current state
 
+## Accessibility standards extension proposed — October 18, 2026 Pacific
+
+Owner supplied a further documentation-only attachment before merge. The same scope #60 / [PR #61](https://github.com/BravoKelo/Talix/pull/61) now includes [accessibility standards](standards/accessibility.md), AC01–AC16, linked from X44, AGENTS, the index, test guidance and future audit checklist. It covers semantics, keyboard/focus, screen readers, visuals, touch, forms/dynamic interfaces, critical transactions, data alternatives, shared controls, automated/manual evidence, exceptions and scoped compliance claims. Existing X41–X55 remain; no duplicate competing rule set or architectural change. Standards remain proposed until owner acceptance; no merge, repeated code audit, remediation issues, application change or new tooling. Browser/OS/assistive-technology support and any future tooling/native work remain separately reviewed decisions.
+
 ## Cross-platform standards proposed — October 18, 2026 Pacific
 
 Owner requested documentation-only rules 41–55 on `docs/cross-platform-standards`, from approved main a0dc2b2015a715bb2a8798bcd92b6d06d9538e97. [Cross-platform standards](standards/cross-platform.md) classify X41–X55 and record actual responsive/client/test capabilities; [audit checklist](standards/cross-platform-audit.md) extends future review instructions. Existing standards PR #47 is merged. The independent comprehensive audit is proposed in [PR #59](https://github.com/BravoKelo/Talix/pull/59), with findings #48–#58; its report is not merged or superseded by this standards proposal.
