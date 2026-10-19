@@ -1,5 +1,9 @@
 # Talix Product Vision
 
+## Current direction clarification — October 18, 2026 Pacific
+
+The shared storefront and deferred follow-up are merged; [CURRENT-STATE](CURRENT-STATE.md) owns current implementation and acceptance, superseding older stage/merge wording below. Industry modules and entitlement enforcement remain future capabilities. Owner direction now favors configurable default website templates without an immediate extra recurring website charge, with custom design work potentially carrying a custom website fee. This supersedes the earlier staff/outsource-only initial website direction; exact template limits, hosting/domain support and fee terms remain for proposal/review. The owner journey decision point is part of that upcoming scope, not implemented behavior. [Platform standards](standards/talix-platform.md) preserve these boundaries.
+
 ## Status and authority
 
 **Stage:** Shared core stabilization and controlled integration preparation

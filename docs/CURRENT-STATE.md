@@ -1,5 +1,11 @@
 # Talix current state
 
+## Engineering standards documentation review — October 18, 2026 Pacific
+
+Owner requested documentation-only engineering standards on `docs/engineering-standards`, based on main c71e690e50d635c3bbd7d556e0d802f720928084. [Assessment](standards/assessment.md) and [standards index](standards/README.md) record implemented vs future boundaries, classified rules and tooling limits. Proposed standards await PR approval; do not claim adoption or merge yet. No application, schema, CI, dependencies or service configuration changed.
+
+Owner confirmed manual deletion of the seven merged branches; only main and feature/website-owner-onboarding remained before this separately requested documentation branch. This supersedes earlier review-branch retention instructions. Issues #31/#34/#37 were closed by explicit owner direction; #31 closure retains its documented GitHub-managed history limitation. Next product work is the website/owner setup proposal, not implementation of undefined templates, entitlements, domains or fees.
+
 ## Tracking and industry follow-up accepted and merged — October 18, 2026 Pacific
 
 Owner explicitly authorized merging PR #45 at reviewed head 3e27402604eeb35aec504e63ff484e05c1b3ad28. Merge commit 4373d7bb6c4b0bfbad9a53ae861cb33c88933ebc preserves feature history. Core checks run 39169584904 passed lint, TypeScript, unit/SQL tests, build and desktop/mobile browser tests. Issues #38/#40 are accepted. The two exact reviewed migrations were already activated in development (eighteen recorded) and were not replayed for this merge. No actual demo industry conversion or production release.
