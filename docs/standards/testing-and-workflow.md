@@ -24,3 +24,7 @@ Branch cleanup must follow owner authorization and verify every deleted branch i
 ## Cross-platform evidence
 
 For affected user journeys, apply [X54 and the verification plan](cross-platform.md#verification-plan-and-security-review), the [accessibility verification matrix](accessibility.md#practical-verification-matrix) and the [future audit checklist](cross-platform-audit.md). Record browser/OS/version, viewport/orientation, actual input mode, assistive technology, emulation versus physical-device checks, network method and remaining limits. Existing Chromium desktop/mobile-viewport projects do not certify other engines, touch, physical devices or WCAG conformance. Preserve T01–T04 and existing approval rules; no new CI tooling or device infrastructure is introduced here.
+
+## Integration evidence
+
+For approved integrations, apply [I68 and the validation matrix](integrations.md#proportionate-validation-and-future-audit-coverage): distinguish mocked, sandbox and live-service evidence; cover applicable auth/tenant/entitlement denial, contracts, timeouts/retries, duplicate events and synchronization failures. No real payments or production side effects in routine tests. Any state-changing service test or migration execution requires its own approved scope; documentation updates do not supply that authority.

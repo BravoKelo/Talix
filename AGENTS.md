@@ -43,6 +43,8 @@ Follow the [classified standards](docs/standards/README.md): applicable L1 viola
 
 For new and materially changed user-facing work, follow [cross-platform standards](docs/standards/cross-platform.md) and [accessibility standards](docs/standards/accessibility.md): support the approved device sizes and browser policy, accessibility and mouse/touch/keyboard/assistive input; keep business authority independent of presentation and preserve server-side tenant/entitlement checks. Reuse suitable accessible shared components; review device-specific coupling, storage/session security and suitable responsive/accessibility evidence. Update owning documentation when approved client capabilities change. Preserve reasonable future PWA/mobile compatibility without implementing unapproved clients, service workers, offline behavior or frameworks.
 
+For approved integration work, follow [integration standards](docs/standards/integrations.md): contain provider-specific behavior, verify tenant ownership/authorization and applicable central entitlements server-side, protect credentials, validate external data, isolate provider failures and preserve synchronization integrity with safe retries/idempotency and suitable tests. Use existing boundaries; new integration infrastructure and protected architectural changes require demonstrated need and the established approval process.
+
 ## Core Development Principle
 
 Use evidence-driven development.

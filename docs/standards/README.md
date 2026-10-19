@@ -16,6 +16,10 @@ Read [AGENTS.md](../../AGENTS.md) first, then the relevant standards below. [Arc
 
 [Cross-platform standards](cross-platform.md) add X41–X55 (attachment rules 41–55), with current web requirements and separately gated future PWA/native/offline/distribution guidance. [Future audit checklist](cross-platform-audit.md) defines assessment evidence. This extension is proposed for review; the previously accepted 47 rules retain their IDs and status. [Accessibility standards](accessibility.md) add AC01–AC16 for semantic, keyboard, screen-reader, visual, form/transaction and verification requirements, with documented temporary-gap handling. No PWA/native implementation or retrofit is authorized.
 
+## Integration readiness extension under review
+
+[Integration standards](integrations.md) add I56–I70 for contracts, provider boundaries, credentials, tenant/entitlement authority, lifecycle, events/sync, resilience, quotas, privacy and verification. I70 is future developer-ecosystem guidance. The owner requested this addition before merging the same documentation PR; cross-platform/accessibility references are included together. No connector, framework, new API or integration infrastructure is authorized.
+
 ## Classification and exceptions
 
 Every rule below has an ID, level, purpose, applicability and enforcement expectation. “Review” means a human/agent review gate, not an automated repository check.
