@@ -1,5 +1,26 @@
 # Talix current state
 
+## Operations, lifecycle and Definition of Done proposed — October 18, 2026 Pacific
+
+Owner supplied further documentation-only operational/lifecycle requirements before merge. The same [PR #61](https://github.com/BravoKelo/Talix/pull/61) now adds [O01–O08](standards/operational-readiness.md), [B01–B08](standards/business-lifecycle.md) and [D01–D04](standards/definition-of-done.md), consolidating the nine requested topics into three owning documents and extending AGENTS/index/test/future-audit guidance. No new or modified GitHub issues in this extension. All pending cross-platform/accessibility/integration prerequisites remain in the same PR; original standards PR #47 is merged.
+
+Partial current capabilities and unverified recovery/operational evidence are explicit; full billing, entitlements, offboarding/export, website setup and advanced infrastructure are not claimed implemented. RPO/RTO, retention, incident ownership, performance objectives and concrete lifecycle/commercial decisions need approved business requirements. Documentation checks only; no source, service, dependency, data, schema, migration, release, infrastructure, onboarding/billing implementation or repeated audit. Standards and merge still await owner review/authorization.
+
+## Integration standards extension proposed — October 18, 2026 Pacific
+
+Owner supplied integration-readiness instructions before merge. The same documentation scope #60 / [PR #61](https://github.com/BravoKelo/Talix/pull/61) now adds [I56–I70](standards/integrations.md), concise AGENTS guidance, test expectations and future audit coverage. All cross-platform/accessibility prerequisites are included in this PR, avoiding a separate unmerged dependency. Actual foundation Supabase contracts are distinguished from future connectors/webhooks/sync/entitlements/developer tooling. Private provider credentials are distinguished from approved publishable configuration and end-user session transport. Existing architecture, migration history, simulated payments and deployment limits remain. Documentation review only: no integration, API, Auth, schema, dependency, service/infrastructure or audit implementation, and no merge. Concrete providers, connection/retention/entitlement policies and future infrastructure remain separately approved scopes.
+
+## Accessibility standards extension proposed — October 18, 2026 Pacific
+
+Owner supplied a further documentation-only attachment before merge. The same scope #60 / [PR #61](https://github.com/BravoKelo/Talix/pull/61) now includes [accessibility standards](standards/accessibility.md), AC01–AC16, linked from X44, AGENTS, the index, test guidance and future audit checklist. It covers semantics, keyboard/focus, screen readers, visuals, touch, forms/dynamic interfaces, critical transactions, data alternatives, shared controls, automated/manual evidence, exceptions and scoped compliance claims. Existing X41–X55 remain; no duplicate competing rule set or architectural change. Standards remain proposed until owner acceptance; no merge, repeated code audit, remediation issues, application change or new tooling. Browser/OS/assistive-technology support and any future tooling/native work remain separately reviewed decisions.
+
+## Cross-platform standards proposed — October 18, 2026 Pacific
+
+Owner requested documentation-only rules 41–55 on `docs/cross-platform-standards`, from approved main a0dc2b2015a715bb2a8798bcd92b6d06d9538e97. [Cross-platform standards](standards/cross-platform.md) classify X41–X55 and record actual responsive/client/test capabilities; [audit checklist](standards/cross-platform-audit.md) extends future review instructions. Existing standards PR #47 is merged. The independent comprehensive audit is proposed in [PR #59](https://github.com/BravoKelo/Talix/pull/59), with findings #48–#58; its report is not merged or superseded by this standards proposal.
+
+New standards and concise AGENTS guidance await review/acceptance; no application, API, session, schema, dependency, infrastructure, PWA/native or offline implementation. Browser/OS/version support commitments and physical-device coverage remain an explicit decision; current automated evidence is desktop/mobile-viewport Chromium only. WCAG 2.2 AA is the proposed target, not verified compliance. Documentation link/ID/scope checks are recorded in the PR; application tests are not rerun for this prose change. Next step is owner review, not merge or mobile work. Existing product/architecture and website commercial direction remain intact.
+
+
 ## Engineering standards documentation review — October 18, 2026 Pacific
 
 Owner requested documentation-only engineering standards on `docs/engineering-standards`, based on main c71e690e50d635c3bbd7d556e0d802f720928084. [Assessment](standards/assessment.md) and [standards index](standards/README.md) record implemented vs future boundaries, classified rules and tooling limits. Owner accepted and authorized merge of PR #47 at 38f50e104768c256eb3e349e95a71874a2bcdde2; merged as f96a3d3692a8311ec72762303c875e1b2ef14d1c. Core checks run 39199903149 passed. The 47 classified standards are adopted for future applicable work; this is not a retrospective code-compliance certification or code-audit authorization. No application, schema, CI, dependencies or service configuration changed.

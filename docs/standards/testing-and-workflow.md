@@ -20,3 +20,15 @@ Classification and exceptions: [standards index](README.md). Governance and appr
 Record scope/issue and exact head; affected standards and justified L2 exceptions; behavior and compatibility; applicable tests and actual results; security/privacy/data effects; current deployment/schema compatibility; documentation changes; unresolved risks and approval boundaries. Review the full resulting diff before requesting acceptance. New requirements discovered during review are proposals, not automatic implementation authority.
 
 Branch cleanup must follow owner authorization and verify every deleted branch is merged. Preserve needed commits and document any review-preview dependency. Do not leave obsolete branches solely as an unexplained default.
+
+## Cross-platform evidence
+
+For affected user journeys, apply [X54 and the verification plan](cross-platform.md#verification-plan-and-security-review), the [accessibility verification matrix](accessibility.md#practical-verification-matrix) and the [future audit checklist](cross-platform-audit.md). Record browser/OS/version, viewport/orientation, actual input mode, assistive technology, emulation versus physical-device checks, network method and remaining limits. Existing Chromium desktop/mobile-viewport projects do not certify other engines, touch, physical devices or WCAG conformance. Preserve T01–T04 and existing approval rules; no new CI tooling or device infrastructure is introduced here.
+
+## Integration evidence
+
+For approved integrations, apply [I68 and the validation matrix](integrations.md#proportionate-validation-and-future-audit-coverage): distinguish mocked, sandbox and live-service evidence; cover applicable auth/tenant/entitlement denial, contracts, timeouts/retries, duplicate events and synchronization failures. No real payments or production side effects in routine tests. Any state-changing service test or migration execution requires its own approved scope; documentation updates do not supply that authority.
+
+## Definition of Done and operational evidence
+
+Use the [Definition of Done](definition-of-done.md) to record Applicable / Not Applicable / Deferred criteria, actual exact-head verification and required review/acceptance. [Operations](operational-readiness.md) and [business lifecycle](business-lifecycle.md) add risk-based failure, recovery, data, provisioning, subscription and privileged-action evidence. A documented deferral is not a passing check or automatic L1 waiver. No new CI gate, recovery guarantee, tool installation or operational execution is introduced by this documentation.

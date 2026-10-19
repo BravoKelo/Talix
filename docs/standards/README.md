@@ -12,6 +12,18 @@ Read [AGENTS.md](../../AGENTS.md) first, then the relevant standards below. [Arc
 | [Talix platform rules](talix-platform.md)                 | Core/industry separation, future entitlements and website direction   |
 | [Assessment and follow-ups](assessment.md)                | Verified baseline, tooling gaps and unresolved decisions              |
 
+## Cross-platform extension under review
+
+[Cross-platform standards](cross-platform.md) add X41–X55 (attachment rules 41–55), with current web requirements and separately gated future PWA/native/offline/distribution guidance. [Future audit checklist](cross-platform-audit.md) defines assessment evidence. This extension is proposed for review; the previously accepted 47 rules retain their IDs and status. [Accessibility standards](accessibility.md) add AC01–AC16 for semantic, keyboard, screen-reader, visual, form/transaction and verification requirements, with documented temporary-gap handling. No PWA/native implementation or retrofit is authorized.
+
+## Integration readiness extension under review
+
+[Integration standards](integrations.md) add I56–I70 for contracts, provider boundaries, credentials, tenant/entitlement authority, lifecycle, events/sync, resilience, quotas, privacy and verification. I70 is future developer-ecosystem guidance. The owner requested this addition before merging the same documentation PR; cross-platform/accessibility references are included together. No connector, framework, new API or integration infrastructure is authorized.
+
+## Operational and lifecycle extension under review
+
+[Operational readiness O01–O08](operational-readiness.md) covers diagnostics/incidents, backup/restore/continuity, release/recovery and performance/capacity. [Business lifecycle B01–B08](business-lifecycle.md) covers data portability/offboarding, provisioning/ownership, subscription/billing boundaries and administration/auditability. [Definition of Done D01–D04](definition-of-done.md) records applicability, exact evidence, deferrals, review and approval. These extend the same pending documentation PR, not a new operational architecture. Advanced tooling/automation stays future guidance; no application or operational change authorized.
+
 ## Classification and exceptions
 
 Every rule below has an ID, level, purpose, applicability and enforcement expectation. “Review” means a human/agent review gate, not an automated repository check.
