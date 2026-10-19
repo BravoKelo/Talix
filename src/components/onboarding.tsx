@@ -65,6 +65,19 @@ export function Onboarding({
     parseAddress(draft?.business.location_address ?? ""),
   );
   const request = useRef(draft?.request ?? "");
+  const stepHeading = useRef<HTMLHeadingElement>(null);
+  const errorSummary = useRef<HTMLDivElement>(null);
+  const firstStepRender = useRef(true);
+  useEffect(() => {
+    if (firstStepRender.current) {
+      firstStepRender.current = false;
+      return;
+    }
+    stepHeading.current?.focus();
+  }, [step]);
+  useEffect(() => {
+    if (Object.keys(errors).length) errorSummary.current?.focus();
+  }, [errors]);
   async function loadCatalog() {
     const db = browserClient();
     const [t, o] = await Promise.all([
@@ -280,7 +293,7 @@ export function Onboarding({
       await db.auth
         .updateUser({ data: { talix_onboarding: null } })
         .catch(() => {});
-      router.replace("/workspace");
+      router.replace("/workspace?website=setup");
       router.refresh();
     } catch {
       setMessage("We couldn’t complete signup. Please try again.");
@@ -357,13 +370,40 @@ export function Onboarding({
           Plans and extras do not add new features during this preview.
         </p>
       </div>
-      <ol className="signup-steps" aria-label="Signup progress">
+      <ol
+        className="signup-steps"
+        aria-label="Signup progress"
+        aria-live="polite"
+      >
         {["Your business", "Your plan", "Review & confirm"].map((label, i) => (
           <li key={label} aria-current={step === i + 1 ? "step" : undefined}>
             {i + 1}. {label}
           </li>
         ))}
       </ol>
+      <p className="sr-only" role="status">
+        Step {step} of 3
+      </p>
+      {Object.keys(errors).length > 0 && (
+        <div className="notice" role="alert" tabIndex={-1} ref={errorSummary}>
+          <strong>Please check these details:</strong>
+          <ul>
+            {Object.entries(errors).map(([field, error]) => (
+              <li key={field}>
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() =>
+                    document.getElementById(field.replace(".", "-"))?.focus()
+                  }
+                >
+                  {error}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {step !== 3 && (
         <p role="status" className={message ? "message" : ""}>
           {message}
@@ -396,7 +436,9 @@ export function Onboarding({
                 setStep(2);
               }}
             >
-              <h2>Your business</h2>
+              <h2 ref={stepHeading} tabIndex={-1}>
+                Your business
+              </h2>
               <div className="form-grid">
                 {(
                   [
@@ -412,19 +454,25 @@ export function Onboarding({
                   >
                     {label}
                     <input
+                      id={key}
                       required
                       name={key}
                       autoComplete={auto}
                       maxLength={max}
                       type={key === "phone" ? "tel" : "text"}
                       aria-invalid={!!errors[key]}
+                      aria-describedby={
+                        errors[key] ? `${key}-error` : undefined
+                      }
                       value={business[key]}
                       onChange={(e) =>
                         setBusiness({ ...business, [key]: e.target.value })
                       }
                     />
                     {errors[key] && (
-                      <small className="field-error">{errors[key]}</small>
+                      <small className="field-error" id={`${key}-error`}>
+                        {errors[key]}
+                      </small>
                     )}
                   </label>
                 ))}
@@ -456,7 +504,9 @@ export function Onboarding({
           )}
           {step === 2 && (
             <form className="panel stack" onSubmit={review}>
-              <h2>Choose what works for you.</h2>
+              <h2 ref={stepHeading} tabIndex={-1}>
+                Choose what works for you.
+              </h2>
               <label>
                 Business type
                 <select
@@ -553,7 +603,9 @@ export function Onboarding({
           {step === 3 && quote && (
             <form className="signup-review" onSubmit={confirm}>
               <section className="panel stack">
-                <h2>Review your business</h2>
+                <h2 ref={stepHeading} tabIndex={-1}>
+                  Review your business
+                </h2>
                 <dl className="summary-list">
                   <div>
                     <dt>Business</dt>

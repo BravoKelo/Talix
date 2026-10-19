@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/client";
 import { TaskDialog } from "@/components/order-dialog";
+import { WebsiteTemplateHero } from "@/components/website-template-hero";
 import { money, type Catalog, type CartLine, type Product } from "@/lib/types";
 type Line = CartLine & { name: string; unit: number; optionNames: string[] };
 function ProductCard({
@@ -112,6 +113,21 @@ export function Storefront({
   signedIn?: boolean;
 }) {
   const router = useRouter();
+  const [businessSignedIn, setBusinessSignedIn] = useState(signedIn);
+  useEffect(() => {
+    let alive = true;
+    const client = browserClient();
+    void client.auth.getUser().then(({ data }) => {
+      if (alive) setBusinessSignedIn(!!data.user);
+    });
+    const { data } = client.auth.onAuthStateChange((_event, session) => {
+      if (alive) setBusinessSignedIn(!!session?.user);
+    });
+    return () => {
+      alive = false;
+      data.subscription.unsubscribe();
+    };
+  }, []);
   const [compactHeader, setCompactHeader] = useState(false);
   useEffect(() => {
     const update = () => setCompactHeader(window.scrollY > 48);
@@ -266,9 +282,10 @@ export function Storefront({
   );
   const selectedLocation = catalog.locations.find((l) => l.id === location);
   const itemCount = cart.reduce((sum, line) => sum + line.quantity, 0);
+  const orderingReady = products.length > 0;
   return (
     <main
-      className={`store visual-store figma-store header-${headerLayout(catalog.subscription)}`}
+      className={`store visual-store figma-store header-${headerLayout(catalog.subscription)}${catalog.subscription.website_live_template ? ` website-template template-${catalog.subscription.website_live_template}` : ""}`}
       id="shop-welcome"
       style={storefrontStyle(catalog.subscription)}
     >
@@ -280,7 +297,8 @@ export function Storefront({
           subscription={catalog.subscription}
           location={selectedLocation}
           search={
-            headerLayout(catalog.subscription) === "search" ? (
+            headerLayout(catalog.subscription) === "search" &&
+            (!catalog.subscription.website_live_template || orderingReady) ? (
               <label className="shop-header-search">
                 <span className="sr-only">Search products</span>
                 <input
@@ -302,26 +320,35 @@ export function Storefront({
             >
               <Image width={24} height={24} src="/storefront/user.svg" alt="" />
             </button>
-            <button
-              className="shop-icon shop-cart-link secondary"
-              aria-haspopup="dialog"
-              onClick={() => {
-                setAccountOpen(false);
-                setCheckoutOpen(false);
-                setCartOpen(true);
-              }}
-              aria-label={`Your cart (${itemCount})`}
-            >
-              <Image width={24} height={24} src="/storefront/cart.svg" alt="" />
-              <span className="shop-cart-count" aria-hidden="true">
-                {itemCount}
-              </span>
-            </button>
+            {(!catalog.subscription.website_live_template || orderingReady) && (
+              <button
+                className="shop-icon shop-cart-link secondary"
+                aria-haspopup="dialog"
+                onClick={() => {
+                  setAccountOpen(false);
+                  setCheckoutOpen(false);
+                  setCartOpen(true);
+                }}
+                aria-label={`Your cart (${itemCount})`}
+              >
+                <Image
+                  width={24}
+                  height={24}
+                  src="/storefront/cart.svg"
+                  alt=""
+                />
+                <span className="shop-cart-count" aria-hidden="true">
+                  {itemCount}
+                </span>
+              </button>
+            )}
             {accountOpen && (
               <div className="shop-account-panel">
                 <p>Business account</p>
-                <Link href={signedIn ? "/workspace" : "/login"}>
-                  {signedIn ? "Open business workspace" : "Business sign in"}
+                <Link href={businessSignedIn ? "/workspace" : "/login"}>
+                  {businessSignedIn
+                    ? "Open business workspace"
+                    : "Business sign in"}
                 </Link>
                 <p className="muted">You can shop and check out as a guest.</p>
               </div>
@@ -329,6 +356,13 @@ export function Storefront({
           </div>
         </StorefrontHeader>
       </header>
+      {catalog.subscription.website_live_template && (
+        <WebsiteTemplateHero
+          subscription={catalog.subscription}
+          location={selectedLocation}
+          products={products}
+        />
+      )}
       <section className="shop-toolbar" aria-label="Shopping location">
         <label id="shop-location" className="shop-location-control">
           <span className="sr-only">Choose a location</span>
@@ -356,23 +390,27 @@ export function Storefront({
             ))}
           </select>
         </label>
-        <button
-          className="shop-menu-toggle"
-          aria-expanded={menuOpen}
-          aria-controls="shop-menu"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          Menu
-        </button>
-        <label className="shop-search">
-          <span className="sr-only">Search products</span>
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products"
-          />
-        </label>
+        {(!catalog.subscription.website_live_template || orderingReady) && (
+          <>
+            <button
+              className="shop-menu-toggle"
+              aria-expanded={menuOpen}
+              aria-controls="shop-menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              Menu
+            </button>
+            <label className="shop-search">
+              <span className="sr-only">Search products</span>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search products"
+              />
+            </label>
+          </>
+        )}
       </section>
       {!location ? (
         <div className="empty">

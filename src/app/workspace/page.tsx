@@ -3,7 +3,11 @@ import { configured } from "@/lib/supabase/client";
 import { serverClient } from "@/lib/supabase/server";
 import { Workspace } from "@/components/workspace";
 export const dynamic = "force-dynamic";
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ website?: string }>;
+}) {
   if (!configured())
     return (
       <main className="narrow">
@@ -23,6 +27,10 @@ export default async function Page() {
     .limit(1);
   if (!membership.error && !membership.data?.length) redirect("/onboarding");
   return (
-    <Workspace userId={data.user.id} email={String(data.user.email ?? "")} />
+    <Workspace
+      userId={data.user.id}
+      email={String(data.user.email ?? "")}
+      initialWebsiteSetup={(await searchParams).website === "setup"}
+    />
   );
 }

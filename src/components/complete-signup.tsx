@@ -48,7 +48,7 @@ export function CompleteSignup({ draft }: { draft: Draft }) {
       await db.auth
         .updateUser({ data: { talix_onboarding: null } })
         .catch(() => {});
-      router.replace("/workspace");
+      router.replace("/workspace?website=setup");
       router.refresh();
     } catch {
       setMessage(

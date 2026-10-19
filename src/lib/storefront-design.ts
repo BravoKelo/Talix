@@ -40,13 +40,24 @@ export function headerLayout(s: Partial<Subscription>) {
   return s.header_mode === "standard" ? "centered" : designFor(s).header_layout;
 }
 export function contrastText(hex: string) {
+  return contrastRatio(hex, "#000000") >= contrastRatio(hex, "#ffffff")
+    ? "#000000"
+    : "#ffffff";
+}
+function relativeLuminance(hex: string) {
   const rgb = hex.match(/[a-f\d]{2}/gi)?.map((v) => parseInt(v, 16) / 255) ?? [
     1, 1, 1,
   ];
-  const luminance = rgb
+  return rgb
     .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
     .reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
-  return luminance > 0.179 ? "#000000" : "#ffffff";
+}
+export function contrastRatio(first: string, second: string) {
+  const [light, dark] = [
+    relativeLuminance(first),
+    relativeLuminance(second),
+  ].sort((a, b) => b - a);
+  return (light + 0.05) / (dark + 0.05);
 }
 export function storefrontStyle(s: Partial<Subscription>): React.CSSProperties {
   const d = designFor(s);

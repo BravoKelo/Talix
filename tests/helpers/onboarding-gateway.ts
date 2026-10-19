@@ -306,6 +306,17 @@ export async function onboardingGateway(skipMigrations: string[] = []) {
           "p_addons",
           "p_quote",
         ],
+        save_website_setup: [
+          "p_subscription",
+          "p_path",
+          "p_template",
+          "p_existing_url",
+          "p_mark_complete",
+        ],
+        launch_website_template: [
+          "p_subscription",
+          "p_confirm_empty_catalog",
+        ],
         talix_admin_access: [],
         workspace_permissions: ["p_subscription", "p_location"],
         list_business_users: ["p_subscription"],

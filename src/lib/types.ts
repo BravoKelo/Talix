@@ -38,7 +38,19 @@ export type Subscription = Partial<StorefrontDesign> & {
   header_photo_url?: string | null;
   default_location_id?: string | null;
   description: string;
+  website_path?: WebsitePath;
+  website_template?: WebsiteTemplate | null;
+  website_live_template?: WebsiteTemplate | null;
+  existing_website_url?: string | null;
+  website_setup_completed_at?: string | null;
+  website_template_launched_at?: string | null;
 };
+export type WebsitePath = "deferred" | "existing" | "talix_template";
+export type WebsiteTemplate =
+  | "order_first"
+  | "browse_shop"
+  | "visit_order"
+  | "story_shop";
 export type CartLine = {
   product_id: string;
   quantity: number;

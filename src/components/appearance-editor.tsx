@@ -10,6 +10,7 @@ import {
   headerLayout,
   designFor,
   storefrontStyle,
+  contrastRatio,
   type StorefrontDesign,
 } from "@/lib/storefront-design";
 import { HeaderLinkEditor } from "./header-link-editor";
@@ -124,6 +125,13 @@ export function AppearanceEditor({
               setTab("header");
               setMessage(
                 "A custom navigation link is unfinished. Select Custom header to correct its label and HTTPS website address, or remove it.",
+              );
+              return;
+            }
+            if (contrastRatio(draft.storefront_text, "#ffffff") < 4.5) {
+              setTab("style");
+              setMessage(
+                "Choose a darker product text color so customers can read it on the light background.",
               );
               return;
             }

@@ -65,6 +65,30 @@ async function mockCatalog(
   );
 }
 
+test("launched template without products presents the business without empty commerce controls", async ({
+  page,
+}) => {
+  await mockCatalog(page, {
+    ...catalog,
+    subscription: {
+      ...catalog.subscription,
+      website_live_template: "order_first",
+    },
+    products: [],
+  });
+
+  await page.goto("/shop/example");
+  await expect(
+    page
+      .locator(".website-template-hero")
+      .getByRole("heading", { name: "Example store", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Online ordering is not ready")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Your cart/ })).toHaveCount(0);
+  await expect(page.getByPlaceholder("Search products")).toHaveCount(0);
+  await expect(page.locator(".shop-menu-toggle")).toHaveCount(0);
+});
+
 test("visual shopping: keyboard details, scoped search, cart variants and location reset", async ({
   page,
 }) => {

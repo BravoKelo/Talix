@@ -13,6 +13,7 @@ import { OrderDialog } from "./order-dialog";
 import { Users } from "./users";
 import { type Permission } from "@/lib/permissions";
 import { SubscriptionSummary } from "./subscription-summary";
+import { WebsiteSetup } from "./website-setup";
 import { LocationForm, ProductEditor } from "./product-editor";
 import { browserClient } from "@/lib/supabase/client";
 import {
@@ -84,11 +85,6 @@ const plannedFeatures = [
     description: "Connect the other tools your business uses.",
   },
   {
-    id: "website",
-    label: "Website builder",
-    description: "Tools to create and manage your business website.",
-  },
-  {
     id: "industry",
     label: "Industry tools",
     description: "Business-specific ordering and fulfillment workflows.",
@@ -110,9 +106,11 @@ type Event = {
 export function Workspace({
   userId,
   email,
+  initialWebsiteSetup = false,
 }: {
   userId: string;
   email: string;
+  initialWebsiteSetup?: boolean;
 }) {
   const [compactHeader, setCompactHeader] = useState(false);
   const [headerOpen, setHeaderOpen] = useState(false);
@@ -122,7 +120,9 @@ export function Workspace({
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, []);
-  const [settingsArea, setSettingsArea] = useState("");
+  const [settingsArea, setSettingsArea] = useState(
+    initialWebsiteSetup ? "website" : "",
+  );
   const [productEditor, setProductEditor] = useState<Product | "new" | null>(
     null,
   );
@@ -157,7 +157,7 @@ export function Workspace({
     [orders, setOrders] = useState<Order[]>([]),
     [events, setEvents] = useState<Event[]>([]),
     [selected, setSelected] = useState(""),
-    [tab, setTab] = useState("orders"),
+    [tab, setTab] = useState(initialWebsiteSetup ? "settings" : "orders"),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
     [, setRole] = useState("viewer");
@@ -353,6 +353,17 @@ export function Workspace({
     ...(shared("users.view") ? ["users"] : []),
   ];
   const settingTiles = [
+    ...(owner
+      ? [
+          {
+            id: "website",
+            title: "Website & storefront",
+            description: "Choose, preview and launch your customer experience",
+            icon: "▣",
+            available: true,
+          },
+        ]
+      : []),
     ...(shared("settings.view")
       ? [
           {
@@ -917,7 +928,9 @@ export function Workspace({
                                   const { error } = await browserClient()
                                     .from("products")
                                     .update({ available: !p.available })
-                                    .eq("id", p.id);
+                                    .eq("id", p.id)
+                                    .select("id")
+                                    .single();
                                   if (error) throw error;
                                   setProducts((previous) =>
                                     previous.map((x) =>
@@ -1072,9 +1085,12 @@ export function Workspace({
                   </button>
                 )}
                 {settingsArea &&
-                  !["appearance", "location", "subscription"].includes(
-                    settingsArea,
-                  ) && (
+                  ![
+                    "appearance",
+                    "location",
+                    "subscription",
+                    "website",
+                  ].includes(settingsArea) && (
                     <section className="panel">
                       <h2>
                         {settingTiles.find((t) => t.id === settingsArea)?.title}
@@ -1084,6 +1100,24 @@ export function Workspace({
                   )}
                 <div hidden={settingsArea !== "subscription"}>
                   {owner && <SubscriptionSummary key={sid} id={sid} />}
+                </div>
+                <div hidden={settingsArea !== "website"}>
+                  {owner && (
+                    <WebsiteSetup
+                      key={sub.id}
+                      subscription={sub}
+                      locations={locations}
+                      products={products}
+                      close={() => setSettingsArea("")}
+                      onSaved={(website) =>
+                        setSubs((previous) =>
+                          previous.map((item) =>
+                            item.id === sid ? { ...item, ...website } : item,
+                          ),
+                        )
+                      }
+                    />
+                  )}
                 </div>
                 <div className="settings-tools">
                   <div
@@ -1121,7 +1155,9 @@ export function Workspace({
                         const { error } = await browserClient()
                           .from("subscriptions")
                           .update(payload)
-                          .eq("id", sid);
+                          .eq("id", sid)
+                          .select("id")
+                          .single();
                         if (error) throw error;
                         setSubs((previous) =>
                           previous.map((s) =>
@@ -1158,7 +1194,9 @@ export function Workspace({
                               const { error } = await browserClient()
                                 .from("locations")
                                 .update(v)
-                                .eq("id", lid);
+                                .eq("id", lid)
+                                .select("id")
+                                .single();
                               if (error) throw error;
                               setLocations(
                                 locations.map((l) =>

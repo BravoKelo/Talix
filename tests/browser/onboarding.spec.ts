@@ -12,6 +12,7 @@ for (const changedPrice of [false, true])
         ? [
             "20261018043256_storefront_header_layout.sql",
             "20261018174618_storefront_header_navigation.sql",
+            "20261019183000_website_owner_onboarding.sql",
           ]
         : [],
     );
@@ -263,9 +264,31 @@ for (const changedPrice of [false, true])
           .getByRole("button", { name: "Continue →", exact: true })
           .click();
       }
-      await expect(page).toHaveURL(/\/workspace$/);
+      await expect(page).toHaveURL(/\/workspace\?website=setup$/);
       await expect(
-        page.getByRole("heading", { name: "Independent shop", exact: true }),
+        page.getByRole("heading", { name: "Website & storefront" }),
+      ).toBeVisible();
+      if (!changedPrice) {
+        await page.getByRole("radio", { name: /Use a Talix template/ }).check();
+        await page.getByRole("radio", { name: /Order First/ }).check();
+        const previewButton = page.getByRole("button", {
+          name: "Open customer preview",
+        });
+        await previewButton.click();
+        await expect(
+          page
+            .getByLabel("Order First customer preview")
+            .getByText("Preview — not live"),
+        ).toBeVisible();
+        await page.keyboard.press("Escape");
+        await expect(previewButton).toBeFocused();
+        await page.getByRole("button", { name: "Save draft" }).click();
+        await expect(page.getByRole("status")).toContainText("Draft saved");
+      }
+      await expect(
+        page
+          .locator(".workspace-heading")
+          .getByRole("heading", { name: "Independent shop", exact: true }),
       ).toBeVisible();
       expect(
         (
@@ -1283,7 +1306,7 @@ for (const changedPrice of [false, true])
         await page
           .getByRole("button", { name: "Confirm subscription", exact: true })
           .click();
-        await expect(page).toHaveURL(/\/workspace$/);
+        await expect(page).toHaveURL(/\/workspace\?website=setup$/);
         expect(
           (await gateway.db.query("select * from public.clients")).rows,
         ).toEqual(clientBefore);
