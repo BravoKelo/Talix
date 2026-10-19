@@ -1,5 +1,11 @@
 # Talix current state
 
+## Operations, lifecycle and Definition of Done proposed — October 18, 2026 Pacific
+
+Owner supplied further documentation-only operational/lifecycle requirements before merge. The same [PR #61](https://github.com/BravoKelo/Talix/pull/61) now adds [O01–O08](standards/operational-readiness.md), [B01–B08](standards/business-lifecycle.md) and [D01–D04](standards/definition-of-done.md), consolidating the nine requested topics into three owning documents and extending AGENTS/index/test/future-audit guidance. No new or modified GitHub issues in this extension. All pending cross-platform/accessibility/integration prerequisites remain in the same PR; original standards PR #47 is merged.
+
+Partial current capabilities and unverified recovery/operational evidence are explicit; full billing, entitlements, offboarding/export, website setup and advanced infrastructure are not claimed implemented. RPO/RTO, retention, incident ownership, performance objectives and concrete lifecycle/commercial decisions need approved business requirements. Documentation checks only; no source, service, dependency, data, schema, migration, release, infrastructure, onboarding/billing implementation or repeated audit. Standards and merge still await owner review/authorization.
+
 ## Integration standards extension proposed — October 18, 2026 Pacific
 
 Owner supplied integration-readiness instructions before merge. The same documentation scope #60 / [PR #61](https://github.com/BravoKelo/Talix/pull/61) now adds [I56–I70](standards/integrations.md), concise AGENTS guidance, test expectations and future audit coverage. All cross-platform/accessibility prerequisites are included in this PR, avoiding a separate unmerged dependency. Actual foundation Supabase contracts are distinguished from future connectors/webhooks/sync/entitlements/developer tooling. Private provider credentials are distinguished from approved publishable configuration and end-user session transport. Existing architecture, migration history, simulated payments and deployment limits remain. Documentation review only: no integration, API, Auth, schema, dependency, service/infrastructure or audit implementation, and no merge. Concrete providers, connection/retention/entitlement policies and future infrastructure remain separately approved scopes.

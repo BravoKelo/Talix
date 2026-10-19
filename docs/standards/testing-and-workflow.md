@@ -28,3 +28,7 @@ For affected user journeys, apply [X54 and the verification plan](cross-platform
 ## Integration evidence
 
 For approved integrations, apply [I68 and the validation matrix](integrations.md#proportionate-validation-and-future-audit-coverage): distinguish mocked, sandbox and live-service evidence; cover applicable auth/tenant/entitlement denial, contracts, timeouts/retries, duplicate events and synchronization failures. No real payments or production side effects in routine tests. Any state-changing service test or migration execution requires its own approved scope; documentation updates do not supply that authority.
+
+## Definition of Done and operational evidence
+
+Use the [Definition of Done](definition-of-done.md) to record Applicable / Not Applicable / Deferred criteria, actual exact-head verification and required review/acceptance. [Operations](operational-readiness.md) and [business lifecycle](business-lifecycle.md) add risk-based failure, recovery, data, provisioning, subscription and privileged-action evidence. A documented deferral is not a passing check or automatic L1 waiver. No new CI gate, recovery guarantee, tool installation or operational execution is introduced by this documentation.

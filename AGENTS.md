@@ -45,6 +45,8 @@ For new and materially changed user-facing work, follow [cross-platform standard
 
 For approved integration work, follow [integration standards](docs/standards/integrations.md): contain provider-specific behavior, verify tenant ownership/authorization and applicable central entitlements server-side, protect credentials, validate external data, isolate provider failures and preserve synchronization integrity with safe retries/idempotency and suitable tests. Use existing boundaries; new integration infrastructure and protected architectural changes require demonstrated need and the established approval process.
 
+Apply [operational readiness](docs/standards/operational-readiness.md), [business lifecycle](docs/standards/business-lifecycle.md) and the [Definition of Done](docs/standards/definition-of-done.md) to affected work: preserve tenant/entitlement/data/privileged-access safeguards, plan observable failures and feasible recovery, follow approved release/migration procedures and record applicable evidence, exceptions and deferred requirements. No new infrastructure, onboarding, billing or lifecycle functionality is authorized by these standards.
+
 ## Core Development Principle
 
 Use evidence-driven development.
