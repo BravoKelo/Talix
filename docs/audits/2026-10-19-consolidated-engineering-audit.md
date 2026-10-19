@@ -916,3 +916,9 @@ This is a sequence for review, not authorization to start remediation. No P0/P1 
 All 113 adopted standards have a matrix row; all major codebase areas and new operational/accessibility/lifecycle requirements have documented evidence or explicit limits. Ten distinct new issues #62–#71 were created, eleven existing audit issues retained, and no finding fixed or closed. No framework/native/PWA/integration/entitlement/billing/offboarding feature was added. A documentation-only report PR is prepared for owner review, with no merge or production authorization.
 
 Decisions remaining: approve the remediation batch and exact boundaries; define supported device/browser/AT evidence; choose operational/data/recovery owners/objectives; decide any shared catalog or transaction-recovery UX changes; and approve concrete business-owner website/onboarding requirements separately. Retain current approved architecture and migration history.
+
+## Review evidence correction and acceptance direction
+
+Owner authorized merging audit PRs #59 and #72 on October 18, 2026 Pacific, with remediation remaining in the separate finding issues. PR #59 merged as `347e03b308e417af18b5f5fcfb5fef70be74fa88`; references to its unmerged status above describe the original audit baseline. Report acceptance does not resolve findings or certify compliance.
+
+Review identified that the original harness attached its page-error listener only to the primary page. The tracking page now has its own listener feeding the same recorded error collection. The corrected isolated harness was rerun: all ten observations remained unchanged, including the demonstrated defects, and no page errors occurred across either observed page. The versioned results JSON is byte-identical. This correction narrows the evidence accurately without modifying application behavior or the finding issues.
