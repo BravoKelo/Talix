@@ -1,6 +1,6 @@
 # Website and storefront owner onboarding
 
-Status: approved implementation scope in progress under issue #73. Migration execution, merge, deployment, and production release are not authorized.
+Status: approved implementation scope in progress under issue #73. The migration is applied to development only; merge, deployment, production migration execution, and production release are not authorized.
 
 ## Data classification and lifecycle
 
@@ -34,6 +34,7 @@ Representative business owners must be able to distinguish the four templates by
 - All 71 unit and isolated SQL tests passed, including owner-only save/launch, direct-write denial, unsafe-address rejection, launch gates, idempotency, and public redaction.
 - The production build passed.
 - All 32 existing Chromium desktop/mobile browser scenarios passed after the new handoff and preview coverage was added. This is automated emulation evidence only; it is not the approved multi-browser, physical-device, or assistive-technology acceptance matrix.
-- The additive migration was exercised only by isolated PGlite tests. It has not been applied to development, preview, or production.
+- The additive migration was applied unchanged to development as `20261019201906_website_owner_onboarding`. Live rolled-back owner/outsider checks passed, all nine existing subscriptions retained neutral defaults, private fields remain outside the public catalog, and no synthetic data was retained. It has not been applied to production.
+- The two new authenticated security-definer advisor findings are expected for the owner-gated RPCs. Both use an empty search path, deny anonymous execution, and recheck `private.is_owner`; advisor categories, anonymous findings, and performance findings are otherwise unchanged.
 
-The implementation remains pending full diff review, representative-owner template validation, the approved manual support matrix, exact-head CI, product-owner acceptance, and separate migration execution approval. Stable product/location pages, custom domains, embeds, customizable websites, managed marketing, billing, infrastructure, and production release remain outside this batch.
+The implementation remains pending full diff review, representative-owner template validation, the approved manual support matrix, and product-owner acceptance. Exact-head Core checks passed before the migration-evidence documentation follow-up; the updated head must pass again. Stable product/location pages, custom domains, embeds, customizable websites, managed marketing, billing, infrastructure, production migration execution, and production release remain outside this batch.

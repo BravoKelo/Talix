@@ -1,10 +1,10 @@
 # Talix Architecture
 
-## Prepared website-setup extension (not activated)
+## Website-setup extension activated in development
 
-The approved website-owner onboarding batch prepares an additive subscription-owned state contract in `20261019183000_website_owner_onboarding.sql`. Private path, draft template, existing-site address, and timestamps remain protected by subscription reads; only the active template identifier is added to the explicit public-catalog projection. Dedicated security-definer save and launch operations verify `private.is_owner`, validate constrained input, acknowledge the affected subscription, and make launch atomic. Launch locks the subscription, requires a published location, and requires explicit acknowledgement when no eligible product exists. Existing delegated `settings.manage` authority cannot mutate these fields.
+The approved website-owner onboarding batch adds a subscription-owned state contract in `20261019183000_website_owner_onboarding.sql`, applied to development as service version `20261019201906_website_owner_onboarding`. Private path, draft template, existing-site address, and timestamps remain protected by subscription reads; only the active template identifier is added to the explicit public-catalog projection. Dedicated security-definer save and launch operations verify `private.is_owner`, validate constrained input, acknowledge the affected subscription, and make launch atomic. Launch locks the subscription, requires a published location, and requires explicit acknowledgement when no eligible product exists. Existing delegated `settings.manage` authority cannot mutate these fields.
 
-This is a prepared migration, not current deployed architecture. Applying it, implementing stable public product/location routes, or activating custom domains remains separately approved work. See `WEBSITE-PUBLIC-ROUTES-REVIEW.md` and `OWNER-DOMAIN-ARCHITECTURE-REVIEW.md` for the unresolved architecture decisions.
+This is active development architecture, not production architecture. Production migration execution, stable public product/location routes, and custom-domain activation remain separately approved work. See `WEBSITE-PUBLIC-ROUTES-REVIEW.md` and `OWNER-DOMAIN-ARCHITECTURE-REVIEW.md` for the unresolved architecture decisions.
 
 ## Accepted foundation
 

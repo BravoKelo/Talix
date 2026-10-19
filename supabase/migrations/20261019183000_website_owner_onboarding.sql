@@ -1,6 +1,7 @@
--- PREPARED ONLY: do not apply to a shared or production environment without
--- separate owner approval. Website setup state is private except for the
--- explicitly launched template identifier included in public_catalog below.
+-- Applied to Talix development with owner approval as service migration
+-- 20261019201906_website_owner_onboarding. Production execution still requires
+-- separate approval. Website setup state is private except for the explicitly
+-- launched template identifier included in public_catalog below.
 alter table public.subscriptions
  add column website_path text not null default 'deferred'
   check(website_path in ('deferred','existing','talix_template')),
