@@ -1,6 +1,8 @@
 # Engineering Definition of Done
 
-Status: proposed for owner review, October 18, 2026 Pacific, as an owner-requested extension of PR #61. Documentation only; no code, service, migration, dependency, infrastructure, audit, issue-creation, deployment or merge authority. A working happy path alone is not “done.” This document applies the existing [governance](../../AGENTS.md), [classified standards](README.md) and [testing/workflow](testing-and-workflow.md); it does not replace owner acceptance, invent new automatic CI gates or authorize production release.
+Status: Accepted by the owner and merged through [PR #61](https://github.com/BravoKelo/Talix/pull/61) on October 18, 2026 Pacific. Reviewed head `6bb42acf0ce4845d915fedcd4189d6bde299cd19`; merge `a1499537e2269608799c336e225fb7a0ab8a7b92`; Core checks run 39203796995 passed. This supersedes proposal/pending-acceptance wording below. Adoption governs applicable future work; it does not certify existing compliance or authorize implementation, new infrastructure, remediation, migration execution or production release.
+
+Historical proposal context: proposed for owner review, October 18, 2026 Pacific, as an owner-requested extension of PR #61. Documentation only; no code, service, migration, dependency, infrastructure, audit, issue-creation, deployment or merge authority. A working happy path alone is not “done.” This document applies the existing [governance](../../AGENTS.md), [classified standards](README.md) and [testing/workflow](testing-and-workflow.md); it does not replace owner acceptance, invent new automatic CI gates or authorize production release.
 
 ## D01 — Explicit applicability and approved outcomes (L1)
 

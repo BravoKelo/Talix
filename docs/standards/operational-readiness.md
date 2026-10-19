@@ -1,6 +1,8 @@
 # Operational readiness standards
 
-Status: proposed for owner review, October 18, 2026 Pacific, as an owner-requested extension of PR #61. Documentation only; no code, service, migration, dependency, infrastructure, audit, issue-creation, deployment or merge authority. The same documentation PR includes the pending cross-platform/accessibility/integration prerequisites; original standards PR #47 is merged. Approved main baseline remains `a0dc2b2015a715bb2a8798bcd92b6d06d9538e97`.
+Status: Accepted by the owner and merged through [PR #61](https://github.com/BravoKelo/Talix/pull/61) on October 18, 2026 Pacific. Reviewed head `6bb42acf0ce4845d915fedcd4189d6bde299cd19`; merge `a1499537e2269608799c336e225fb7a0ab8a7b92`; Core checks run 39203796995 passed. This supersedes proposal/pending-acceptance wording below. Adoption governs applicable future work; it does not certify existing compliance or authorize implementation, new infrastructure, remediation, migration execution or production release.
+
+Historical proposal context: proposed for owner review, October 18, 2026 Pacific, as an owner-requested extension of PR #61. Documentation only; no code, service, migration, dependency, infrastructure, audit, issue-creation, deployment or merge authority. The same documentation PR includes the pending cross-platform/accessibility/integration prerequisites; original standards PR #47 is merged. Approved main baseline remains `a0dc2b2015a715bb2a8798bcd92b6d06d9538e97`.
 
 ## Principle and scope
 

@@ -1,6 +1,8 @@
 # Accessibility engineering standard
 
-Status: proposed for owner review, October 18, 2026 Pacific; extension of documentation scope #60 and PR #61. No implementation, audit, dependency, CI or merge authorization. See [governance and exceptions](README.md#classification-and-exceptions), [cross-platform rules X41–X55](cross-platform.md), [Q07](architecture-and-code.md), [testing/workflow](testing-and-workflow.md) and [platform constraints](talix-platform.md).
+Status: Accepted by the owner and merged through [PR #61](https://github.com/BravoKelo/Talix/pull/61) on October 18, 2026 Pacific. Reviewed head `6bb42acf0ce4845d915fedcd4189d6bde299cd19`; merge `a1499537e2269608799c336e225fb7a0ab8a7b92`; Core checks run 39203796995 passed. This supersedes proposal/pending-acceptance wording below. Adoption governs applicable future work; it does not certify existing compliance or authorize implementation, new infrastructure, remediation, migration execution or production release.
+
+Historical proposal context: proposed for owner review, October 18, 2026 Pacific; extension of documentation scope #60 and PR #61. No implementation, audit, dependency, CI or merge authorization. See [governance and exceptions](README.md#classification-and-exceptions), [cross-platform rules X41–X55](cross-platform.md), [Q07](architecture-and-code.md), [testing/workflow](testing-and-workflow.md) and [platform constraints](talix-platform.md).
 
 ## Target, scope and authority
 

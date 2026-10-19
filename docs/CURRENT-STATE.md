@@ -1,5 +1,11 @@
 # Talix current state
 
+## Extended standards accepted and merged — October 18, 2026 Pacific
+
+Accepted by the owner and merged through [PR #61](https://github.com/BravoKelo/Talix/pull/61) on October 18, 2026 Pacific. Reviewed head `6bb42acf0ce4845d915fedcd4189d6bde299cd19`; merge `a1499537e2269608799c336e225fb7a0ab8a7b92`; Core checks run 39203796995 passed. This supersedes proposal/pending-acceptance wording below. Adoption governs applicable future work; it does not certify existing compliance or authorize implementation, new infrastructure, remediation, migration execution or production release.
+
+The adopted framework includes X41–X55, AC01–AC16, I56–I70, O01–O08, B01–B08 and D01–D04. Prior proposal sections below are historical. Existing operational and browser/support decisions remain explicitly scoped future decisions. Main automatic deployment remains disabled. Audit PR #59 is separate and remains unmerged; its findings are not fixed by this documentation acceptance.
+
 ## Operations, lifecycle and Definition of Done proposed — October 18, 2026 Pacific
 
 Owner supplied further documentation-only operational/lifecycle requirements before merge. The same [PR #61](https://github.com/BravoKelo/Talix/pull/61) now adds [O01–O08](standards/operational-readiness.md), [B01–B08](standards/business-lifecycle.md) and [D01–D04](standards/definition-of-done.md), consolidating the nine requested topics into three owning documents and extending AGENTS/index/test/future-audit guidance. No new or modified GitHub issues in this extension. All pending cross-platform/accessibility/integration prerequisites remain in the same PR; original standards PR #47 is merged.
