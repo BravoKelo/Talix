@@ -32,9 +32,14 @@ Before planning, implementing, or resuming meaningful work:
 6. read `docs/PRODUCT-DESIGN.md` when customer-facing behavior is relevant;
 7. read relevant accepted ADRs;
 8. read the active GitHub issue and relevant recent history;
-9. inspect the relevant implementation, tests, configuration, schema, migrations, and dependencies as applicable.
+9. read [engineering standards](docs/standards/README.md) and applicable detailed rules;
+10. inspect the relevant implementation, tests, configuration, schema, migrations, and dependencies as applicable.
 
 Repository evidence outranks remembered conversation.
+
+## Engineering standards
+
+Follow the [classified standards](docs/standards/README.md): applicable L1 violations block approval/merge; justify L2 exceptions explicitly in the PR; apply L3 guidance with judgment. Inspect existing conventions and reusable components before adding patterns. Preserve core/industry boundaries, authoritative tenant authorization and server-enforced entitlements when restricted features are introduced; do not claim future mechanisms already exist. Add suitable behavior/regression tests, run relevant available checks and report actual results, limitations and unresolved issues. Update owning architecture/contracts when behavior changes. These rules do not authorize unrelated refactoring or protected changes.
 
 ## Core Development Principle
 
@@ -152,7 +157,7 @@ Do not prematurely merge or bypass review because automated validation passes.
 
 Validation must match the change and the implemented technology.
 
-As Talix gains tooling, CI should become the authoritative automated validation path for checks such as:
+Existing Core checks run lint, TypeScript, unit/SQL tests, build and browser tests. See [testing and workflow](docs/standards/testing-and-workflow.md) for commands and evidence limits. CI is the authoritative automated validation path for its configured checks, including:
 
 - dependency installation;
 - lint;
