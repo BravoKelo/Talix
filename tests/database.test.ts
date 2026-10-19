@@ -343,7 +343,7 @@ describe.sequential("schema and business boundaries", () => {
     const tables = await db.query<{ relrowsecurity: boolean }>(
       "select relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r'",
     );
-    expect(tables.rows).toHaveLength(13);
+    expect(tables.rows).toHaveLength(14);
     expect(tables.rows.every((t) => t.relrowsecurity)).toBe(true);
   });
   it("supports multiple subscriptions for a single client without tenant leakage", async () => {

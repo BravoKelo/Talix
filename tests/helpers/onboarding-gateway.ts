@@ -280,6 +280,23 @@ export async function onboardingGateway(skipMigrations: string[] = []) {
       const functions: Record<string, string[]> = {
         advance_order: ["p_order", "p_status"],
         refund_simulated: ["p_order", "p_request", "p_amount", "p_reason"],
+        subscription_change_state: ["p_subscription"],
+        subscription_change_quote: [
+          "p_subscription",
+          "p_type",
+          "p_plan",
+          "p_addons",
+          "p_version",
+        ],
+        confirm_subscription_change: [
+          "p_subscription",
+          "p_request",
+          "p_type",
+          "p_plan",
+          "p_addons",
+          "p_quote",
+          "p_version",
+        ],
         subscription_quote: ["p_type", "p_plan", "p_addons"],
         start_subscription: [
           "p_request",

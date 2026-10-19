@@ -74,7 +74,11 @@ export type PublicOrder = Pick<
   | "status"
   | "items"
   | "created_at"
-> & { location_name: string; business_name: string };
+> & {
+  location_name: string;
+  business_name: string;
+  storefront?: Partial<Subscription> & { name: string; slug: string };
+};
 export type Catalog = {
   subscription: Subscription;
   locations: Location[];

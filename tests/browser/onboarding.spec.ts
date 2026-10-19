@@ -288,7 +288,9 @@ for (const changedPrice of [false, true])
         staff.getByText("newowner@example.invalid", { exact: false }),
       ).toBeVisible();
       await expect(
-        staff.getByText(changedPrice ? /\$59.00 \/ month/ : /\$39.00 \/ month/),
+        staff
+          .locator(".subscription-summary")
+          .getByText(changedPrice ? /\$59.00 \/ month/ : /\$39.00 \/ month/),
       ).toBeVisible();
       await staff
         .getByRole("button", { name: "Offerings", exact: true })

@@ -1,4 +1,7 @@
 "use client";
+import Image from "next/image";
+import { displayImageUrl } from "@/lib/demo-image";
+import { storefrontStyle } from "@/lib/storefront-design";
 import { useEffect, useState } from "react";
 import { browserClient } from "@/lib/supabase/client";
 import { orderReference, money, type PublicOrder } from "@/lib/types";
@@ -6,6 +9,7 @@ export function OrderTracking({ token }: { token: string }) {
   const [order, setOrder] = useState<PublicOrder | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [failedLogo, setFailedLogo] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState<string | null>(null);
   async function load() {
     const { data, error } = await browserClient().rpc("track_order", {
@@ -63,7 +67,42 @@ export function OrderTracking({ token }: { token: string }) {
     }
   }
   return (
-    <main className="narrow">
+    <main
+      className={`narrow order-tracking${!order ? " tracking-loading" : order.storefront ? " business-tracking" : ""}`}
+      data-text-size={order?.storefront?.storefront_text_size}
+      style={order?.storefront ? storefrontStyle(order.storefront) : undefined}
+    >
+      {order?.storefront && (
+        <header className="tracking-header">
+          <div className="tracking-identity">
+            {order.storefront.logo_url &&
+            order.storefront.logo_url !== failedLogo ? (
+              <Image
+                src={displayImageUrl(order.storefront.logo_url)}
+                width={56}
+                height={56}
+                unoptimized
+                alt={`${order.business_name} logo`}
+                onError={() =>
+                  setFailedLogo(order.storefront?.logo_url ?? null)
+                }
+              />
+            ) : (
+              <span className="tracking-initial" aria-hidden="true">
+                {order.business_name.slice(0, 1).toUpperCase()}
+              </span>
+            )}
+            <strong>{order.business_name}</strong>
+          </div>
+          <a
+            className="button secondary"
+            referrerPolicy="no-referrer"
+            href={`/shop/${encodeURIComponent(order.storefront.slug)}`}
+          >
+            ← Return to storefront
+          </a>
+        </header>
+      )}
       {!order ? (
         <>
           <h1>Your order</h1>
