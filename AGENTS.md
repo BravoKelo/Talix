@@ -41,6 +41,8 @@ Repository evidence outranks remembered conversation.
 
 Follow the [classified standards](docs/standards/README.md): applicable L1 violations block approval/merge; justify L2 exceptions explicitly in the PR; apply L3 guidance with judgment. Inspect existing conventions and reusable components before adding patterns. Preserve core/industry boundaries, authoritative tenant authorization and server-enforced entitlements when restricted features are introduced; do not claim future mechanisms already exist. Add suitable behavior/regression tests, run relevant available checks and report actual results, limitations and unresolved issues. Update owning architecture/contracts when behavior changes. These rules do not authorize unrelated refactoring or protected changes.
 
+For new and materially changed user-facing work, follow [cross-platform standards](docs/standards/cross-platform.md): support the approved device sizes and browser policy, accessibility and mouse/touch/keyboard/assistive input; keep business authority independent of presentation and preserve server-side tenant/entitlement checks. Review device-specific coupling, storage/session security and suitable responsive/accessibility evidence. Preserve reasonable future PWA/mobile compatibility without implementing unapproved clients, service workers, offline behavior or frameworks.
+
 ## Core Development Principle
 
 Use evidence-driven development.

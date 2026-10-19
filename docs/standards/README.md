@@ -12,6 +12,10 @@ Read [AGENTS.md](../../AGENTS.md) first, then the relevant standards below. [Arc
 | [Talix platform rules](talix-platform.md)                 | Core/industry separation, future entitlements and website direction   |
 | [Assessment and follow-ups](assessment.md)                | Verified baseline, tooling gaps and unresolved decisions              |
 
+## Cross-platform extension under review
+
+[Cross-platform standards](cross-platform.md) add X41–X55 (attachment rules 41–55), with current web requirements and separately gated future PWA/native/offline/distribution guidance. [Future audit checklist](cross-platform-audit.md) defines assessment evidence. This extension is proposed for review; the previously accepted 47 rules retain their IDs and status. No PWA/native implementation or retrofit is authorized.
+
 ## Classification and exceptions
 
 Every rule below has an ID, level, purpose, applicability and enforcement expectation. “Review” means a human/agent review gate, not an automated repository check.

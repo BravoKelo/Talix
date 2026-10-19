@@ -20,3 +20,7 @@ Classification and exceptions: [standards index](README.md). Governance and appr
 Record scope/issue and exact head; affected standards and justified L2 exceptions; behavior and compatibility; applicable tests and actual results; security/privacy/data effects; current deployment/schema compatibility; documentation changes; unresolved risks and approval boundaries. Review the full resulting diff before requesting acceptance. New requirements discovered during review are proposals, not automatic implementation authority.
 
 Branch cleanup must follow owner authorization and verify every deleted branch is merged. Preserve needed commits and document any review-preview dependency. Do not leave obsolete branches solely as an unexplained default.
+
+## Cross-platform evidence
+
+For affected user journeys, apply [X54 and the verification plan](cross-platform.md#verification-plan-and-security-review) and the [future audit checklist](cross-platform-audit.md). Record browser/OS/version, viewport/orientation, actual input mode, assistive technology, emulation versus physical-device checks, network method and remaining limits. Existing Chromium desktop/mobile-viewport projects do not certify other engines, touch, physical devices or WCAG conformance. Preserve T01–T04 and existing approval rules; no new CI tooling or device infrastructure is introduced here.
