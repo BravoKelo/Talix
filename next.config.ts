@@ -1,4 +1,13 @@
 import type { NextConfig } from "next";
+import { missingDeploymentAuthConfig } from "./src/lib/deployment-config";
+
+const missingAuthConfig = missingDeploymentAuthConfig();
+if (missingAuthConfig.length) {
+  throw new Error(
+    `Refusing to build a deployed Talix site without ${missingAuthConfig.join(", ")}.`,
+  );
+}
+
 const config: NextConfig = {
   poweredByHeader: false,
   agentRules: false,
