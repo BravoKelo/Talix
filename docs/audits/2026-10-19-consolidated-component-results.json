@@ -1,0 +1,74 @@
+{
+  "environment": "Isolated real React components + repository CSS; Supabase/Next boundary stubs; Chromium only; no SQL or provider calls",
+  "checks": [
+    {
+      "name": "navigation dialog changes menu to About",
+      "focus": {
+        "tag": "BODY",
+        "text": "Skip to location selectionEExample businessHomeShopAboutContact☰Open navigation ",
+        "insideDialog": false
+      }
+    },
+    {
+      "name": "allowed white product text",
+      "value": {
+        "color": "rgb(255, 255, 255)",
+        "mainBackground": "rgb(255, 255, 255)"
+      }
+    },
+    {
+      "name": "storefront fixture viewport 320",
+      "overflow": false
+    },
+    {
+      "name": "storefront fixture viewport 390",
+      "overflow": false
+    },
+    {
+      "name": "storefront fixture viewport 768",
+      "overflow": false
+    },
+    {
+      "name": "storefront fixture viewport 1280",
+      "overflow": false
+    },
+    {
+      "name": "appearance accepts low contrast without warning",
+      "validation": {
+        "valid": true,
+        "value": "#ffffff"
+      },
+      "warningText": "Unsaved changes — only shown in this preview."
+    },
+    {
+      "name": "invalid contact field association/summary",
+      "field": {
+        "invalid": "true",
+        "describedby": null,
+        "errorMessage": null
+      },
+      "summaryLinks": 0,
+      "focus": "BUTTON"
+    },
+    {
+      "name": "onboarding step transition",
+      "focus": {
+        "tag": "BODY",
+        "text": "CancelYOUR BUSINESS, CONNECTEDBring your"
+      }
+    },
+    {
+      "name": "tracking overlapping replies",
+      "newerText": {
+        "text": "completed",
+        "aria": null
+      },
+      "afterLateOlderReply": {
+        "text": "received",
+        "aria": null
+      },
+      "calls": 2
+    }
+  ],
+  "pageErrors": []
+}
