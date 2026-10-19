@@ -1,5 +1,11 @@
 # Talix current state
 
+## Tracking and industry follow-up accepted and merged — October 18, 2026 Pacific
+
+Owner explicitly authorized merging PR #45 at reviewed head 3e27402604eeb35aec504e63ff484e05c1b3ad28. Merge commit 4373d7bb6c4b0bfbad9a53ae861cb33c88933ebc preserves feature history. Core checks run 39169584904 passed lint, TypeScript, unit/SQL tests, build and desktop/mobile browser tests. Issues #38/#40 are accepted. The two exact reviewed migrations were already activated in development (eighteen recorded) and were not replayed for this merge. No actual demo industry conversion or production release.
+
+Corrected review preview https://talix-6vm0uyt1q-bravokelo.vercel.app is READY at the accepted head. Disabled sign-in was caused by development connection variables being scoped only to older branches; the existing public URL/publishable key are now scoped to feature/tracking-industry-followup preview. The earlier immutable preview lacks configuration and should not be used. Agent live sign-in/owner UI saving remains unverified behind Vercel protection; owner acceptance does not invent that coverage. Main auto-deployment remains disabled in vercel.json; retain the feature branch for its review preview. This acceptance supersedes pending acceptance/merge wording below.
+
 ## Tracking and industry activated in development — October 18, 2026 Pacific
 
 Owner approved the PR #44 application batch and linked tracking/industry proposals. The application batch is merged; issues #36/#41/#42/#43 are closed. New work for #38/#40 is on `feature/tracking-industry-followup` from main cf02e4791123a884d908708b761e0ac0cad71490. Prepared changes add private-token business branding/public return navigation and Owner-reviewed industry/plan changes with immutable original purchases and versioned, idempotent change history. Talix staff can read current terms/history and original purchases separately; employees cannot change industries. No real billing or industry modules.

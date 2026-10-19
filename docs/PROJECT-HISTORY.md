@@ -172,3 +172,11 @@ The concrete design/persistence boundaries in DEFERRED-FOLLOWUP-REVIEW.md for #3
 ## October 18, 2026 — development tracking/industry activation
 
 Owner explicitly authorized the two reviewed PR #45 migrations. Exact SQL at 68ee60d11979f9ae486770bc0b5f7f332bb229d9 applied successfully as 20261018214821 and 20261018214826, bringing development to eighteen migrations. Rolled-back live fixtures verified the principal transaction, authority, preservation and privacy boundaries. Repository filenames/exclusions align with service history. No actual demo industry conversion, merge or production release.
+
+
+## Tracking and industry follow-up accepted and merged — October 18, 2026 Pacific
+
+Owner explicitly authorized merging PR #45 at reviewed head 3e27402604eeb35aec504e63ff484e05c1b3ad28. Merge commit 4373d7bb6c4b0bfbad9a53ae861cb33c88933ebc preserves feature history. Core checks run 39169584904 passed lint, TypeScript, unit/SQL tests, build and desktop/mobile browser tests. Issues #38/#40 are accepted. The two exact reviewed migrations were already activated in development (eighteen recorded) and were not replayed for this merge. No actual demo industry conversion or production release.
+
+Corrected review preview https://talix-6vm0uyt1q-bravokelo.vercel.app is READY at the accepted head. Disabled sign-in was caused by development connection variables being scoped only to older branches; the existing public URL/publishable key are now scoped to feature/tracking-industry-followup preview. The earlier immutable preview lacks configuration and should not be used. Agent live sign-in/owner UI saving remains unverified behind Vercel protection; owner acceptance does not invent that coverage. Main auto-deployment remains disabled in vercel.json; retain the feature branch for its review preview. This acceptance supersedes pending acceptance/merge wording below.
+
