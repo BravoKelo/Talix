@@ -1,5 +1,12 @@
 # Talix current state
 
+## Audit reports accepted and merged — October 18, 2026 Pacific
+
+Owner accepted both audit reports for documentation, with fixes to proceed separately by issue priority. PR #59 merged as `347e03b308e417af18b5f5fcfb5fef70be74fa88` after exact-head Core checks run 39201898014 passed. PR #72 merged as `34b39ebf8a93a64d7e1b18dff87e46a39c94dad5` after corrected head `349a8854c3dc4a59f83eaa461a84a61c501ae96f` passed run 39206007772. The harness review thread is resolved; the corrected rerun captured errors from both pages and preserved all ten observations with no captured runtime errors.
+
+[Audit index](audits/README.md) links the initial and consolidated reports. The consolidated matrix covers all 113 adopted standards. Findings #48–#58 and #62–#71 remain open for separate remediation: 19 P2 and 2 P3; no demonstrated P0/P1. Report acceptance does not resolve findings, certify compliance or waive applicable L1 requirements. Use the consolidated report's onboarding and production gates when approving the next bounded work scope. No application, dependency, live-data, migration, infrastructure or production release changes; main automatic deployment remains disabled. Earlier pending/unmerged audit statements below are historical and superseded by this record.
+
+
 ## Extended standards accepted and merged — October 18, 2026 Pacific
 
 Accepted by the owner and merged through [PR #61](https://github.com/BravoKelo/Talix/pull/61) on October 18, 2026 Pacific. Reviewed head `6bb42acf0ce4845d915fedcd4189d6bde299cd19`; merge `a1499537e2269608799c336e225fb7a0ab8a7b92`; Core checks run 39203796995 passed. This supersedes proposal/pending-acceptance wording below. Adoption governs applicable future work; it does not certify existing compliance or authorize implementation, new infrastructure, remediation, migration execution or production release.
