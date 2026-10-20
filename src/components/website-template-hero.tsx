@@ -113,6 +113,11 @@ function TrustStrip() {
   );
 }
 
+function introductionFrom(description: string) {
+  const firstSentence = description.match(/^.*?[.!?](?:\s|$)/)?.[0]?.trim();
+  return firstSentence || description;
+}
+
 export function WebsiteTemplateFooter({
   subscription,
   location,
@@ -191,6 +196,7 @@ export function WebsiteTemplateHero({
   const description =
     subscription.description ||
     "Discover useful products and personal service from a local business.";
+  const introduction = introductionFrom(description);
   const locationLine = [location?.name, location?.address]
     .filter(Boolean)
     .join(" · ");
@@ -207,7 +213,7 @@ export function WebsiteTemplateHero({
           <div className="website-template-copy">
             <p className="eyebrow">{locationLine || templateName}</p>
             <h2>{subscription.name}</h2>
-            <p>{description}</p>
+            <p>{introduction}</p>
             <div className="website-template-actions">
               <TemplateAction preview={preview}>
                 Shop available products
@@ -238,7 +244,7 @@ export function WebsiteTemplateHero({
           <div className="website-template-copy">
             <p className="eyebrow">EXPLORE {subscription.name.toUpperCase()}</p>
             <h2>Find something made for your day.</h2>
-            <p>{description}</p>
+            <p>{introduction}</p>
             <TemplateAction preview={preview}>
               Browse the collection
             </TemplateAction>
@@ -290,7 +296,7 @@ export function WebsiteTemplateHero({
               OUR STORY · {location?.name || "LOCAL BUSINESS"}
             </p>
             <h2>Made personal. Chosen with care.</h2>
-            <p>{description}</p>
+            <p>{introduction}</p>
             <blockquote>
               “The details matter—from what we offer to how we welcome every
               customer.”
