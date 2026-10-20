@@ -69,13 +69,13 @@ set logo_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.ver
     tile_corners = v.corners,
     tile_spacing = v.spacing
 from (values
-  ('restaurant-demo','/demo-showcase/cedar-stone-mark.svg','left','#34251f','#302821','#8f3d2c','serif','subtle','comfortable'),
-  ('equipment-rental-demo','/demo-showcase/northline-mark.svg','search','#17242d','#20272b','#c65f27','sans','subtle','compact'),
-  ('hospitality-demo','/demo-showcase/harborlight-mark.svg','minimal','#eef3f1','#23363d','#326b78','serif','subtle','comfortable'),
-  ('hair-salon-demo','/demo-showcase/marlow-finch-mark.svg','left','#332a28','#342b29','#8f5848','serif','subtle','comfortable'),
-  ('marina-demo','/demo-showcase/bluewater-mark.svg','centered','#153f4c','#1f3540','#23667a','sans','subtle','comfortable'),
-  ('retail-demo','/demo-showcase/field-found-mark.svg','centered','#25463f','#25332f','#25463f','serif','subtle','compact'),
-  ('new-business-demo','/demo-showcase/juniper-mark.svg','left','#294b3a','#28362f','#3f6f58','sans','subtle','comfortable')
+  ('restaurant-demo','/demo-showcase/cedar-stone-identity.png','left','#34251f','#302821','#8f3d2c','serif','subtle','comfortable'),
+  ('equipment-rental-demo','/demo-showcase/northline-identity.png','search','#17242d','#20272b','#c65f27','sans','subtle','compact'),
+  ('hospitality-demo','/demo-showcase/harborlight-identity.png','minimal','#eef3f1','#23363d','#326b78','serif','subtle','comfortable'),
+  ('hair-salon-demo','/demo-showcase/marlow-finch-identity.png','left','#332a28','#342b29','#8f5848','serif','subtle','comfortable'),
+  ('marina-demo','/demo-showcase/bluewater-identity.png','centered','#153f4c','#1f3540','#23667a','sans','subtle','comfortable'),
+  ('retail-demo','/demo-showcase/field-found-identity.png','centered','#25463f','#25332f','#25463f','serif','subtle','compact'),
+  ('new-business-demo','/demo-showcase/juniper-identity.png','left','#294b3a','#28362f','#3f6f58','sans','subtle','comfortable')
 ) as v(slug,logo,layout,header_background,storefront_text,storefront_button,font,corners,spacing)
 where s.slug = v.slug;
 
