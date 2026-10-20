@@ -12,16 +12,16 @@ set name = v.name,
     website_live_template = v.template,
     header_photo_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app' || v.hero,
     logo_url = null,
-    header_identity = 'name',
+    header_identity = 'photo',
     accent = v.accent
 from (values
-  ('restaurant-demo', 'Cedar & Stone Kitchen', 'Cedar & Stone Kitchen began around a shared table and a simple idea: neighborhood food should feel generous, seasonal, and unhurried. Our kitchen turns familiar ingredients into comforting breakfasts, bright lunches, fresh bakery favorites, and easy pickup meals made for everyday life.', 'order_first', '/demo-showcase/cedar-stone-kitchen-hero.webp', '#a6482f'),
-  ('equipment-rental-demo', 'Northline Tool Rental', 'Northline Tool Rental helps homeowners, tradespeople, and small crews get the right equipment without buying what they only need for a day. Every rental is inspected between jobs, and our counter team can help match tools, safety gear, and consumables to the work ahead.', 'browse_shop', '/demo-showcase/northline-tool-rental-hero.webp', '#c66a2b'),
-  ('hospitality-demo', 'Harborlight Guest House', 'Harborlight Guest House is a relaxed coastal stay shaped by quiet mornings, thoughtful details, and genuinely local hospitality. Our guest shop brings together the practical essentials, welcome gifts, and waterside comforts visitors most often want during their stay.', 'visit_order', '/demo-showcase/harborlight-guest-house-hero.webp', '#326b78'),
-  ('hair-salon-demo', 'Marlow & Finch Salon', 'Marlow & Finch Salon pairs considered cuts and color with practical care that works beyond the appointment. Our stylists choose every cleanser, treatment, finishing product, and accessory for healthy hair, effortless routines, and results clients can recreate at home.', 'story_shop', '/demo-showcase/marlow-finch-salon-hero.webp', '#8f5848'),
-  ('marina-demo', 'Bluewater Marina Supply', 'Bluewater Marina Supply serves boaters with dependable dockside gear, safety essentials, and practical advice from people who know the harbor. Whether preparing for a weekend cruise or handling routine maintenance, customers can find the basics they need before leaving the dock.', 'visit_order', '/demo-showcase/bluewater-marina-hero.webp', '#23667a'),
-  ('retail-demo', 'Field & Found', 'Field & Found is a neighborhood shop for useful objects with lasting character. We choose tactile stationery, thoughtful home accents, dependable bags, and easy gifts that earn a place in daily routines rather than adding clutter.', 'browse_shop', '/demo-showcase/field-found-hero.webp', '#8a5b38'),
-  ('new-business-demo', 'Juniper Pet Supply', 'Juniper Pet Supply makes everyday care simpler with durable walking gear, wholesome treats, well-designed feeding essentials, and playful enrichment for dogs and cats. Our team favors practical products, honest materials, and friendly guidance for every stage of life.', 'browse_shop', '/demo-showcase/juniper-pet-supply-hero.webp', '#3f6f58')
+  ('restaurant-demo', 'Cedar & Stone Kitchen', 'Cedar & Stone Kitchen began around a shared table and a simple idea: neighborhood food should feel generous, seasonal, and unhurried. Our kitchen turns familiar ingredients into comforting breakfasts, bright lunches, fresh bakery favorites, and easy pickup meals made for everyday life.', 'order_first', '/demo-showcase/cedar-stone-header-identity.webp', '#a6482f'),
+  ('equipment-rental-demo', 'Northline Tool Rental', 'Northline Tool Rental helps homeowners, tradespeople, and small crews get the right equipment without buying what they only need for a day. Every rental is inspected between jobs, and our counter team can help match tools, safety gear, and consumables to the work ahead.', 'browse_shop', '/demo-showcase/northline-header-identity.webp', '#c66a2b'),
+  ('hospitality-demo', 'Harborlight Guest House', 'Harborlight Guest House is a relaxed coastal stay shaped by quiet mornings, thoughtful details, and genuinely local hospitality. Our guest shop brings together the practical essentials, welcome gifts, and waterside comforts visitors most often want during their stay.', 'visit_order', '/demo-showcase/harborlight-header-identity.webp', '#326b78'),
+  ('hair-salon-demo', 'Marlow & Finch Salon', 'Marlow & Finch Salon pairs considered cuts and color with practical care that works beyond the appointment. Our stylists choose every cleanser, treatment, finishing product, and accessory for healthy hair, effortless routines, and results clients can recreate at home.', 'story_shop', '/demo-showcase/marlow-finch-header-identity.webp', '#8f5848'),
+  ('marina-demo', 'Bluewater Marina Supply', 'Bluewater Marina Supply serves boaters with dependable dockside gear, safety essentials, and practical advice from people who know the harbor. Whether preparing for a weekend cruise or handling routine maintenance, customers can find the basics they need before leaving the dock.', 'visit_order', '/demo-showcase/bluewater-header-identity.webp', '#23667a'),
+  ('retail-demo', 'Field & Found', 'Field & Found is a neighborhood shop for useful objects with lasting character. We choose tactile stationery, thoughtful home accents, dependable bags, and easy gifts that earn a place in daily routines rather than adding clutter.', 'browse_shop', '/demo-showcase/field-found-header-identity.webp', '#8a5b38'),
+  ('new-business-demo', 'Juniper Pet Supply', 'Juniper Pet Supply makes everyday care simpler with durable walking gear, wholesome treats, well-designed feeding essentials, and playful enrichment for dogs and cats. Our team favors practical products, honest materials, and friendly guidance for every stage of life.', 'browse_shop', '/demo-showcase/juniper-header-identity.webp', '#3f6f58')
 ) as v(slug, name, description, template, hero, accent)
 where s.slug = v.slug;
 
@@ -60,7 +60,7 @@ update public.subscriptions s
 set logo_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app' || v.logo,
     header_mode = 'custom',
     header_layout = v.layout,
-    header_identity = 'name',
+    header_identity = 'photo',
     header_background = v.header_background,
     storefront_text = v.storefront_text,
     storefront_button = v.storefront_button,
