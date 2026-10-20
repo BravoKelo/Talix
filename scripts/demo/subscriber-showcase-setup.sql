@@ -10,7 +10,7 @@ set name = v.name,
     website_path = 'talix_template',
     website_template = v.template,
     website_live_template = v.template,
-    header_photo_url = v.hero,
+    header_photo_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app' || v.hero,
     logo_url = null,
     header_identity = 'name',
     accent = v.accent
@@ -62,28 +62,29 @@ set description = case
   when s.slug = 'restaurant-demo' and p.category = 'Bakery' then p.name || ' baked in small batches for a tender crumb, rich flavor, and an easy addition to breakfast or an afternoon coffee.'
   when s.slug = 'restaurant-demo' and p.category = 'Drinks' then p.name || ' served chilled or freshly brewed and ready to round out a meal or brighten the middle of the day.'
   when s.slug = 'equipment-rental-demo' and p.category = 'Workshop' then p.name || ' maintained and inspected between rentals for dependable performance on repairs, renovations, and weekend projects.'
-  when s.slug = 'equipment-rental-demo' and p.category = 'Site essentials' then p.name || ' selected for a safer, better-organized work area and reliable everyday use on residential and light commercial jobs.'
+  when s.slug = 'equipment-rental-demo' and p.category = 'Site Essentials' then p.name || ' selected for a safer, better-organized work area and reliable everyday use on residential and light commercial jobs.'
   when s.slug = 'equipment-rental-demo' and p.category = 'Safety' then p.name || ' chosen for practical protection and comfortable wear while cutting, sanding, drilling, and handling materials.'
   when s.slug = 'equipment-rental-demo' and p.category = 'Consumables' then p.name || ' sized for common workshop tasks and stocked to keep projects moving without a second supply run.'
-  when s.slug = 'hospitality-demo' and p.category = 'Guest essentials' then p.name || ' selected for comfort and convenience when a traveler needs one more useful item during their stay.'
-  when s.slug = 'hospitality-demo' and p.category = 'Welcome gifts' then p.name || ' thoughtfully presented as an easy arrival surprise, host gift, or small reminder of time by the water.'
-  when s.slug = 'hospitality-demo' and p.category = 'Pool & leisure' then p.name || ' made for unhurried afternoons at the beach, pool, and along the harbor walk.'
-  when s.slug = 'hair-salon-demo' and p.category = 'Hair care' then p.name || ' chosen by our stylists to support healthy hair, manageable texture, and a reliable at-home routine.'
+  when s.slug = 'hospitality-demo' and p.category = 'Guest Essentials' then p.name || ' selected for comfort and convenience when a traveler needs one more useful item during their stay.'
+  when s.slug = 'hospitality-demo' and p.category = 'Welcome Gifts' then p.name || ' thoughtfully presented as an easy arrival surprise, host gift, or small reminder of time by the water.'
+  when s.slug = 'hospitality-demo' and p.category = 'Pool & Leisure' then p.name || ' made for unhurried afternoons at the beach, pool, and along the harbor walk.'
+  when s.slug = 'hair-salon-demo' and p.category = 'Hair Care' then p.name || ' chosen by our stylists to support healthy hair, manageable texture, and a reliable at-home routine.'
   when s.slug = 'hair-salon-demo' and p.category = 'Styling' then p.name || ' for flexible control, touchable finish, and polished results without unnecessary weight or stiffness.'
   when s.slug = 'hair-salon-demo' and p.category = 'Accessories' then p.name || ' designed to make daily styling gentler, quicker, and easier to repeat at home.'
   when s.slug = 'marina-demo' and p.category = 'Onboard' then p.name || ' built for practical storage and easy handling during a day on the water.'
   when s.slug = 'marina-demo' and p.category = 'Dockside' then p.name || ' selected for dependable everyday use while securing, protecting, and preparing a boat at the dock.'
-  when s.slug = 'marina-demo' and p.category = 'Boat care' then p.name || ' suited to routine cleaning and upkeep in a marine environment.'
+  when s.slug = 'marina-demo' and p.category = 'Boat Care' then p.name || ' suited to routine cleaning and upkeep in a marine environment.'
   when s.slug = 'marina-demo' and p.category = 'Safety' then p.name || ' chosen as a straightforward addition to a well-prepared onboard safety kit.'
-  when s.slug = 'marina-demo' and p.category = 'Harbor shop' then p.name || ' made for comfortable days around the marina and easy weekends on the water.'
-  else replace(replace(p.description, 'This demo item is intentionally unavailable online.', 'Currently available in store only.'), 'Available at the Market Annex demo location.', 'Available at our Market Annex location.')
+  when s.slug = 'marina-demo' and p.category = 'Harbor Shop' then p.name || ' made for comfortable days around the marina and easy weekends on the water.'
+  else replace(replace(replace(p.description, 'This demo item is intentionally unavailable online.', 'Currently available in store only.'), 'Available at the Market Annex demo location.', 'Available at our Market Annex location.'), 'This item intentionally has no image so the storefront fallback can be reviewed.', 'Made on softly textured stock and left blank inside for a personal note.')
 end
 from public.subscriptions s
 where p.subscription_id = s.id
   and s.slug in ('restaurant-demo','equipment-rental-demo','hospitality-demo','hair-salon-demo','marina-demo','retail-demo');
 
 -- Feature photography used above the fold and in previews.
-update public.products p set image_url = v.image
+update public.products p
+set image_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app' || v.image
 from (values
   ('07aa9755-2e27-49c5-a19c-279cb3c83c5c'::uuid,'/demo-showcase/cedar-stone-breakfast-sandwich.webp'),
   ('159c84ea-17d5-46ea-8f5b-17765b4f5e94'::uuid,'/demo-showcase/cedar-stone-butter-croissant.webp'),
@@ -114,7 +115,7 @@ update public.products p
 set name = 'Braided Walking Leash',
     description = 'A soft but durable forest-green rope leash with a comfortable leather handle and solid brass hardware for everyday walks.',
     price_cents = 4200,
-    image_url = '/demo-showcase/juniper-braided-walking-leash.webp',
+    image_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app/demo-showcase/juniper-braided-walking-leash.webp',
     available = true,
     category = 'Walking'
 where p.id = '5025545b-630f-4399-9b5c-8b4f2c2b07c5';
@@ -123,13 +124,15 @@ update public.products p
 set name = 'Ceramic Food Bowl',
     description = 'A low, weighty stoneware bowl with a durable sage glaze that stays put through breakfast and dinner.',
     price_cents = 3600,
-    image_url = '/demo-showcase/juniper-ceramic-food-bowl.webp',
+    image_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app/demo-showcase/juniper-ceramic-food-bowl.webp',
     available = true,
     category = 'Feeding'
 where p.id = 'f19c014d-e429-4304-863e-17d3ff1b4881';
 
 insert into public.products (subscription_id, location_id, name, description, price_cents, image_url, available, options, category)
-select s.id, l.id, v.name, v.description, v.price_cents, v.image_url, v.available, '[]'::jsonb, v.category
+select s.id, l.id, v.name, v.description, v.price_cents,
+       case when v.image_url is null then null else 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app' || v.image_url end,
+       v.available, '[]'::jsonb, v.category
 from public.subscriptions s
 join public.locations l on l.subscription_id=s.id and l.published=true
 cross join (values
