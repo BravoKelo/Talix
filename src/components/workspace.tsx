@@ -357,7 +357,7 @@ export function Workspace({
       ? [
           {
             id: "website",
-            title: "Website & storefront",
+            title: "Website Appearance",
             description: "Choose, preview and launch your customer experience",
             icon: "▣",
             available: true,
@@ -1109,6 +1109,7 @@ export function Workspace({
                       locations={locations}
                       products={products}
                       close={() => setSettingsArea("")}
+                      openAppearance={() => setSettingsArea("appearance")}
                       onSaved={(website) =>
                         setSubs((previous) =>
                           previous.map((item) =>

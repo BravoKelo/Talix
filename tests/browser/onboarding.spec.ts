@@ -266,11 +266,33 @@ for (const changedPrice of [false, true])
       }
       await expect(page).toHaveURL(/\/workspace\?website=setup$/);
       await expect(
-        page.getByRole("heading", { name: "Website & storefront" }),
+        page.getByRole("heading", { name: "Build your website" }),
       ).toBeVisible();
       if (!changedPrice) {
+        await gateway.db.query(
+          "update public.locations set published=true where subscription_id=(select id from public.subscriptions limit 1)",
+        );
+        await page.reload();
+        await expect(
+          page.getByRole("heading", { name: "Build your website" }),
+        ).toBeVisible();
         await page.getByRole("radio", { name: /Use a Talix template/ }).check();
+        await page.getByRole("button", { name: "Save and continue" }).click();
+        await expect(
+          page.getByRole("heading", { name: "Business identity" }),
+        ).toBeFocused();
+        expect(
+          (
+            await gateway.db.query<{ default_location_id: string | null }>(
+              "select default_location_id from public.subscriptions",
+            )
+          ).rows[0].default_location_id,
+        ).not.toBeNull();
+        await page
+          .getByRole("button", { name: "Template & appearance" })
+          .click();
         await page.getByRole("radio", { name: /Order First/ }).check();
+        await page.getByRole("button", { name: "Go live" }).click();
         const previewButton = page.getByRole("button", {
           name: "Open customer preview",
         });
@@ -279,6 +301,11 @@ for (const changedPrice of [false, true])
           page
             .getByLabel("Order First customer preview")
             .getByText("Preview — not live"),
+        ).toBeVisible();
+        await expect(
+          page
+            .getByLabel("Order First customer preview")
+            .getByText("Featured products"),
         ).toBeVisible();
         await page.keyboard.press("Escape");
         await expect(previewButton).toBeFocused();
@@ -1317,9 +1344,14 @@ for (const changedPrice of [false, true])
             )
           ).rows,
         ).toEqual([{ name: "Independent shop" }, { name: "Second business" }]);
-        await page
-          .getByLabel("Subscription", { exact: true })
-          .selectOption({ label: "Second business" });
+        const subscriptionPicker = page.getByLabel("Subscription", {
+          exact: true,
+        });
+        if (!(await subscriptionPicker.isVisible()))
+          await page
+            .getByRole("button", { name: "Business & account" })
+            .click();
+        await subscriptionPicker.selectOption({ label: "Second business" });
         await expect(
           page.getByRole("heading", { name: "Second business", exact: true }),
         ).toBeVisible();

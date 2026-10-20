@@ -84,6 +84,14 @@ test("launched template without products presents the business without empty com
       .getByRole("heading", { name: "Example store", exact: true }),
   ).toBeVisible();
   await expect(page.getByText("Online ordering is not ready")).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Business commitments" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "A business customers can know and trust.",
+    }),
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: /Your cart/ })).toHaveCount(0);
   await expect(page.getByPlaceholder("Search products")).toHaveCount(0);
   await expect(page.locator(".shop-menu-toggle")).toHaveCount(0);

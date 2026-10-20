@@ -6,6 +6,8 @@ The approved website-owner onboarding batch adds a subscription-owned state cont
 
 This is active development architecture, not production architecture. Production migration execution, stable public product/location routes, and custom-domain activation remain separately approved work. See `WEBSITE-PUBLIC-ROUTES-REVIEW.md` and `OWNER-DOMAIN-ARCHITECTURE-REVIEW.md` for the unresolved architecture decisions.
 
+The corrective implementation server-loads the existing explicit public catalog projection for launched business-homepage metadata while retaining the browser load as a failure-tolerant fallback. The business shop page is canonical. Only an explicitly launched template is indexable and emits LocalBusiness plus visible Product JSON-LD and its one-URL sitemap response; unavailable, deferred, existing-site and unlaunched states are noindex and emit no structured business graph. The same public contract supplies metadata, structured data, initial storefront content and the client storefront. No service key, new anonymous table access, schema change, public product/location route, redirect store or cache infrastructure is added.
+
 ## Accepted foundation
 
 The owner approved a bounded business-neutral commerce and fulfillment core, followed by explicitly selecting Next.js, Supabase and Vercel on October 7, 2026. Restaurants remain the first audience, not the core domain model. [Issue #1](https://github.com/BravoKelo/Talix/issues/1) owns implementation scope.

@@ -79,6 +79,18 @@ export function validExistingWebsite(value: string) {
   }
 }
 
+export function websiteProductsForLocation(
+  products: Product[],
+  locationId: string | null | undefined,
+) {
+  if (!locationId) return [];
+  return products.filter(
+    (product) =>
+      product.available &&
+      (product.location_id === null || product.location_id === locationId),
+  );
+}
+
 export function websiteReadiness(
   subscription: Subscription,
   locations: Location[],

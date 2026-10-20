@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { validExistingWebsite, websiteReadiness } from "../src/lib/website";
+import {
+  validExistingWebsite,
+  websiteProductsForLocation,
+  websiteReadiness,
+} from "../src/lib/website";
 import type { Location, Product, Subscription } from "../src/lib/types";
 
 describe("website setup helpers", () => {
@@ -58,5 +62,33 @@ describe("website setup helpers", () => {
         (item) => item.ready,
       ),
     ).toBe(true);
+  });
+
+  it("limits website products to general and selected-location inventory", () => {
+    const product = {
+      subscription_id: "s",
+      description: "Useful details",
+      price_cents: 100,
+      image_url: "https://example.com/item.png",
+      available: true,
+      options: [],
+    } satisfies Omit<Product, "id" | "location_id" | "name">;
+    const products = [
+      { ...product, id: "general", location_id: null, name: "General" },
+      { ...product, id: "main", location_id: "main", name: "Main" },
+      { ...product, id: "other", location_id: "other", name: "Other" },
+      {
+        ...product,
+        id: "unavailable",
+        location_id: "main",
+        name: "Unavailable",
+        available: false,
+      },
+    ] satisfies Product[];
+
+    expect(
+      websiteProductsForLocation(products, "main").map((item) => item.id),
+    ).toEqual(["general", "main"]);
+    expect(websiteProductsForLocation(products, null)).toEqual([]);
   });
 });
