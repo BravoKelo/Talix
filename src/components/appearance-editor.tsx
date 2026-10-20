@@ -356,7 +356,7 @@ export function AppearanceEditor({
                     }
                   >
                     <option value="name">Business name</option>
-                    <option value="photo">Uploaded photo</option>
+                    <option value="photo">Business logo</option>
                   </select>
                 </label>
                 <p className="muted">
@@ -379,8 +379,8 @@ export function AppearanceEditor({
                   }}
                 />
                 <p className="muted">
-                  JPEG, PNG or WebP, up to 5 MB. Displayed in your header
-                  identity area; the photo is public.
+                  JPEG, PNG or WebP, up to 5 MB. Used as the featured image on
+                  your Talix website; the photo is public.
                 </p>
                 {photo.preview && (
                   <button
