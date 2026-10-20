@@ -55,6 +55,30 @@ from public.subscriptions s,
 ) as v(slug, old_name, new_name, address, phone, hours)
 where s.slug = v.slug and l.subscription_id = s.id and l.name = v.old_name;
 
+-- Distinct, production-quality brand systems for each subscriber showcase.
+update public.subscriptions s
+set logo_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app' || v.logo,
+    header_mode = 'custom',
+    header_layout = v.layout,
+    header_identity = 'name',
+    header_background = v.header_background,
+    storefront_text = v.storefront_text,
+    storefront_button = v.storefront_button,
+    storefront_font = v.font,
+    storefront_text_size = 'standard',
+    tile_corners = v.corners,
+    tile_spacing = v.spacing
+from (values
+  ('restaurant-demo','/demo-showcase/cedar-stone-mark.svg','left','#34251f','#302821','#8f3d2c','serif','subtle','comfortable'),
+  ('equipment-rental-demo','/demo-showcase/northline-mark.svg','search','#17242d','#20272b','#c65f27','sans','subtle','compact'),
+  ('hospitality-demo','/demo-showcase/harborlight-mark.svg','minimal','#eef3f1','#23363d','#326b78','serif','subtle','comfortable'),
+  ('hair-salon-demo','/demo-showcase/marlow-finch-mark.svg','left','#332a28','#342b29','#8f5848','serif','subtle','comfortable'),
+  ('marina-demo','/demo-showcase/bluewater-mark.svg','centered','#153f4c','#1f3540','#23667a','sans','subtle','comfortable'),
+  ('retail-demo','/demo-showcase/field-found-mark.svg','centered','#25463f','#25332f','#25463f','serif','subtle','compact'),
+  ('new-business-demo','/demo-showcase/juniper-mark.svg','left','#294b3a','#28362f','#3f6f58','sans','subtle','comfortable')
+) as v(slug,logo,layout,header_background,storefront_text,storefront_button,font,corners,spacing)
+where s.slug = v.slug;
+
 -- Replace fixture language with useful, customer-facing catalog copy.
 update public.products p
 set description = case
@@ -146,5 +170,17 @@ cross join (values
 where s.slug='new-business-demo'
   and not exists (select 1 from public.products p where p.subscription_id=s.id and p.name=v.name)
   and l.id=(select l2.id from public.locations l2 where l2.subscription_id=s.id and l2.published=true order by l2.id limit 1);
+
+update public.products p
+set image_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app' || v.image
+from (values
+  ('1dee7cd0-cdf4-4c85-a051-d540933fca1c'::uuid,'/demo-showcase/juniper-canvas-treat-pouch.webp'),
+  ('1b6e7683-4133-4a9a-80e4-f9d1c4bdbc63'::uuid,'/demo-showcase/juniper-coat-paw-balm.webp'),
+  ('cda63d6d-8c2a-458a-9290-b63ccb04525b'::uuid,'/demo-showcase/juniper-everyday-collar.webp'),
+  ('449514bc-9c1d-4822-ae9b-7e92d2cbfb16'::uuid,'/demo-showcase/juniper-slow-feeder-insert.webp'),
+  ('76225564-8277-411c-bee7-3b87c7592f73'::uuid,'/demo-showcase/juniper-wool-tug-toy.webp'),
+  ('89c1cb4e-5eda-4e8d-a9ea-7cc060957fbf'::uuid,'/demo-showcase/field-found-simple-greeting-card.webp')
+) as v(id,image)
+where p.id = v.id;
 
 commit;
