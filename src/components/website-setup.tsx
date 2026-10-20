@@ -86,6 +86,7 @@ export function WebsiteSetup({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const stepHeading = useRef<HTMLHeadingElement>(null);
+  const previewTrigger = useRef<HTMLButtonElement>(null);
   const initialStep = useRef(true);
   const selectedLocation =
     published.find((location) => location.id === locationId) ?? published[0];
@@ -188,6 +189,11 @@ export function WebsiteSetup({
 
   async function editAppearance() {
     if (await save(false)) openAppearance();
+  }
+
+  function closePreview() {
+    setPreviewOpen(false);
+    window.requestAnimationFrame(() => previewTrigger.current?.focus());
   }
 
   async function launch() {
@@ -620,6 +626,7 @@ export function WebsiteSetup({
                     </p>
                     <strong>{liveTemplate ? "Live" : "Private draft"}</strong>
                     <button
+                      ref={previewTrigger}
                       type="button"
                       className="secondary"
                       disabled={!template}
@@ -763,7 +770,7 @@ export function WebsiteSetup({
         <TaskDialog
           title={`${websiteTemplates.find((item) => item.id === template)?.title} customer preview`}
           closeLabel="Exit preview"
-          close={() => setPreviewOpen(false)}
+          close={closePreview}
           className="website-preview-dialog"
           backdropClose
         >

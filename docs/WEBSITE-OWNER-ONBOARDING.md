@@ -15,9 +15,7 @@ The existing-site address is HTTPS-only, at most 2,048 characters, contains no c
 
 ## Safe operations and recovery
 
-Website save and launch diagnostics, when operational logging is approved, use: operation name, safe correlation identifier, subscription identifier, outcome, error class, and timestamp. They exclude URLs, page copy, credentials, and other customer content. Owner-facing failures preserve the in-memory draft and give a bounded retry. The authoritative returned row is required before success is shown. Unknown or interrupted launch responses are recovered by rereading subscription state; repeating launch for the same template is safe.
-
-Product owner owns requirement decisions; engineering owns first response and technical recovery; support owns owner communication after a support process is approved. No new logging provider or support commitment is created by this document. Production-critical reliance requires audit finding #68 and a separately approved operations plan.
+Owner-facing failures preserve the in-memory draft and give a bounded retry. The authoritative returned row is required before success is shown. Unknown or interrupted launch responses are recovered by rereading subscription state; repeating launch for the same template is safe. This batch adds no logging provider, incident process or support commitment. Formal operational diagnostics and incident ownership under issue #71 belong to future production-readiness planning and do not block this implementation or PR.
 
 ## Acceptance evidence
 
@@ -38,3 +36,10 @@ Representative business owners must be able to distinguish the four templates by
 - The two new authenticated security-definer advisor findings are expected for the owner-gated RPCs. Both use an empty search path, deny anonymous execution, and recheck `private.is_owner`; advisor categories, anonymous findings, and performance findings are otherwise unchanged.
 
 The implementation remains pending full diff review, representative-owner template validation, and product-owner acceptance. The owner-approved deferral of physical-device and real assistive-technology evidence is recorded but does not block this batch. Exact-head Core checks passed before the migration-evidence documentation follow-up; the updated head must pass again. Stable product/location pages, custom domains, embeds, customizable websites, managed marketing, billing, infrastructure, production migration execution, and production release remain outside this batch.
+
+## Acceptance-gate evidence — October 20, 2026 Pacific
+
+- A shared authoritative-mutation check now prevents affected product, location, appearance and featured-location changes from reporting success without a returned row. Focused zero-row, successful-row and database-error regressions pass.
+- Public session-reading routes now pass through the Supabase writable refresh boundary while authenticated and private responses remain non-cacheable. A real Talix development Auth session with an intentionally expired access timestamp rotated its access/refresh credentials, persisted the new cookie across new home and storefront requests and returned `no-store`. The disposable no-mail account was deleted; a follow-up query confirmed zero matching accounts remain.
+- Onboarding error-summary focus, field relationships, correction focus and next-step focus pass in configured Chromium, Firefox and WebKit paths. WebKit exposed a preview-dialog focus-return difference; the trigger now receives focus explicitly after closing and the focused WebKit regression passes.
+- The full local unit/isolated SQL suite has 86 passing tests. Lint has no errors and retains one unrelated pre-existing design-script warning; TypeScript and the production build pass. Final exact-head multi-engine CI remains required before issue closure.

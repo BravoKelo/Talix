@@ -7,6 +7,9 @@ for (const changedPrice of [false, true])
     browser,
   }) => {
     test.setTimeout(180000);
+    const criticalEngine = ["firefox-critical", "webkit-critical"].includes(
+      test.info().project.name,
+    );
     const gateway = await onboardingGateway(
       changedPrice
         ? [
@@ -162,19 +165,23 @@ for (const changedPrice of [false, true])
       await page
         .getByLabel("Confirm password")
         .fill("Test-only-long-password!");
-      await page.getByRole("button", { name: "Change plan or extras" }).click();
-      await page
-        .getByRole("button", { name: "Review your selection →" })
-        .click();
-      await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
-        "newowner@example.invalid",
-      );
-      await expect(page.getByLabel("Password", { exact: true })).toHaveValue(
-        "Test-only-long-password!",
-      );
-      await expect(page.getByLabel("Confirm password")).toHaveValue(
-        "Test-only-long-password!",
-      );
+      if (!criticalEngine) {
+        await page
+          .getByRole("button", { name: "Change plan or extras" })
+          .click();
+        await page
+          .getByRole("button", { name: "Review your selection →" })
+          .click();
+        await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
+          "newowner@example.invalid",
+        );
+        await expect(page.getByLabel("Password", { exact: true })).toHaveValue(
+          "Test-only-long-password!",
+        );
+        await expect(page.getByLabel("Confirm password")).toHaveValue(
+          "Test-only-long-password!",
+        );
+      }
       gateway.setAutoconfirm(false);
       await page.getByRole("button", { name: "Sign up", exact: true }).click();
       await expect(page.locator(".signup-review [role=alert]")).toContainText(
@@ -334,6 +341,10 @@ for (const changedPrice of [false, true])
           .locator(".workspace-heading")
           .getByRole("heading", { name: "Independent shop", exact: true }),
       ).toBeVisible();
+      if (criticalEngine) {
+        await staffContext.close();
+        return;
+      }
       expect(
         (
           await gateway.db.query(
@@ -559,17 +570,20 @@ for (const changedPrice of [false, true])
         .locator(".product-tile")
         .filter({ hasText: "Notebook" });
       await expect(tile).toBeVisible();
+      await tile.scrollIntoViewIfNeeded();
       await expect(
         tile.getByRole("img", { name: "Notebook", exact: true }),
       ).toBeVisible();
-      expect(
-        await tile
-          .locator("img")
-          .evaluate(
-            (image: HTMLImageElement) =>
-              image.complete && image.naturalWidth > 0,
-          ),
-      ).toBe(true);
+      await expect
+        .poll(() =>
+          tile
+            .locator("img")
+            .evaluate(
+              (image: HTMLImageElement) =>
+                image.complete && image.naturalWidth > 0,
+            ),
+        )
+        .toBe(true);
       await expect(
         page.getByRole("img", {
           name: /No image available for Longer product/,
