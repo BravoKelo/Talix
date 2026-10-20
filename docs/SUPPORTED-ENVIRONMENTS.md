@@ -1,6 +1,6 @@
 # Talix supported environments and verification matrix
 
-Status: approved by the owner on October 20, 2026 Pacific. Physical-device testing is scheduled at the owner's discretion and remains pending until results are recorded. This policy does not itself certify compatibility, accessibility, WCAG conformance or legal compliance.
+Status: approved by the owner on October 20, 2026 Pacific. Physical-device and real assistive-technology testing is scheduled at the owner's discretion. The owner explicitly accepted that evidence limitation for the current batch; it does not block this sprint, PR acceptance or merge. This policy does not itself certify compatibility, accessibility, WCAG conformance or legal compliance.
 
 ## Browser and operating-system window
 
@@ -32,6 +32,6 @@ Manual evidence records exact browser, operating system and assistive-technology
 
 Affected flows also require visible and unobscured focus, text zoom and 200% page zoom/reflow checks, plus correction and recovery from validation or denied saves. Browser emulation is recorded as emulation and never substituted for physical touch, mobile screen-reader or soft-keyboard evidence.
 
-## Current acceptance limit
+## Deferred physical evidence
 
-Physical-device and real assistive-technology checks are pending at the owner's discretion. Their deferral does not mark them passed and does not support a public claim of complete device coverage or WCAG conformance. Any material defect found during that testing must be recorded and resolved or receive an explicit exception under AC15 before the affected journey is accepted for that environment.
+Physical-device and real assistive-technology checks will occur at the owner's leisure and are not a blocker for the current batch, PR acceptance or merge. Their deferral does not mark them passed and does not support a public claim that Talix completed physical-device coverage or established WCAG conformance. Review the deferral by January 20, 2027 so it cannot renew by silence. Any material defect found during later testing must be recorded and resolved or receive an explicit exception under AC15 before Talix claims verified support for the affected environment.
