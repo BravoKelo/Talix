@@ -12,6 +12,7 @@ import { AppearanceEditor } from "./appearance-editor";
 import { OrderDialog } from "./order-dialog";
 import { Users } from "./users";
 import { type Permission } from "@/lib/permissions";
+import { confirmedMutation } from "@/lib/persistence";
 import { SubscriptionSummary } from "./subscription-summary";
 import { WebsiteSetup } from "./website-setup";
 import { LocationForm, ProductEditor } from "./product-editor";
@@ -925,13 +926,16 @@ export function Workspace({
                               disabled={busy}
                               onClick={() =>
                                 void run(async () => {
-                                  const { error } = await browserClient()
+                                  const result = await browserClient()
                                     .from("products")
                                     .update({ available: !p.available })
                                     .eq("id", p.id)
                                     .select("id")
                                     .single();
-                                  if (error) throw error;
+                                  confirmedMutation(
+                                    result,
+                                    "The product was not updated. Your access may have changed.",
+                                  );
                                   setProducts((previous) =>
                                     previous.map((x) =>
                                       x.id === p.id
@@ -971,12 +975,15 @@ export function Workspace({
                   save={async (value) => {
                     const db = browserClient();
                     if (productEditor === "new") {
-                      const { data, error } = await db
+                      const result = await db
                         .from("products")
                         .insert(value)
                         .select("*")
                         .single();
-                      if (error) throw error;
+                      const data = confirmedMutation(
+                        result,
+                        "The new product was not returned.",
+                      );
                       setProducts((previous) =>
                         [...previous, data].sort((a, b) =>
                           a.name.localeCompare(b.name),
@@ -985,13 +992,16 @@ export function Workspace({
                     } else {
                       const { subscription_id: ignored, ...updates } = value;
                       void ignored;
-                      const { data, error } = await db
+                      const result = await db
                         .from("products")
                         .update(updates)
                         .eq("id", productEditor.id)
                         .select("*")
                         .single();
-                      if (error) throw error;
+                      const data = confirmedMutation(
+                        result,
+                        "The product was not updated. Your access may have changed.",
+                      );
                       setProducts((previous) =>
                         previous.map((x) => (x.id === data.id ? data : x)),
                       );
@@ -1001,13 +1011,16 @@ export function Workspace({
                     productEditor === "new"
                       ? undefined
                       : async () => {
-                          const { error } = await browserClient()
+                          const result = await browserClient()
                             .from("products")
                             .delete()
                             .eq("id", productEditor.id)
                             .select("id")
                             .single();
-                          if (error) throw error;
+                          confirmedMutation(
+                            result,
+                            "The product was not deleted. Your access may have changed.",
+                          );
                           setProducts((previous) =>
                             previous.filter((p) => p.id !== productEditor.id),
                           );
@@ -1153,13 +1166,16 @@ export function Workspace({
                           delete (payload as Partial<typeof v>).header_links;
                         if (!("header_layout" in sub))
                           delete (payload as Partial<typeof v>).header_layout;
-                        const { error } = await browserClient()
+                        const result = await browserClient()
                           .from("subscriptions")
                           .update(payload)
                           .eq("id", sid)
                           .select("id")
                           .single();
-                        if (error) throw error;
+                        confirmedMutation(
+                          result,
+                          "Your appearance was not saved. Your access may have changed.",
+                        );
                         setSubs((previous) =>
                           previous.map((s) =>
                             s.id === sid
@@ -1192,13 +1208,16 @@ export function Workspace({
                           cancel={() => setSettingsArea("")}
                           save={(v) =>
                             run(async () => {
-                              const { error } = await browserClient()
+                              const result = await browserClient()
                                 .from("locations")
                                 .update(v)
                                 .eq("id", lid)
                                 .select("id")
                                 .single();
-                              if (error) throw error;
+                              confirmedMutation(
+                                result,
+                                "The location was not saved. Your access may have changed.",
+                              );
                               setLocations(
                                 locations.map((l) =>
                                   l.id === lid ? { ...l, ...v } : l,
@@ -1217,7 +1236,7 @@ export function Workspace({
                           e.preventDefault();
                           const f = new FormData(e.currentTarget);
                           void run(async () => {
-                            const { data, error } = await browserClient()
+                            const result = await browserClient()
                               .from("locations")
                               .insert({
                                 subscription_id: sid,
@@ -1225,7 +1244,10 @@ export function Workspace({
                               })
                               .select()
                               .single();
-                            if (error) throw error;
+                            const data = confirmedMutation(
+                              result,
+                              "The new location was not returned.",
+                            );
                             setLocations([...locations, data]);
                             setLid(data.id);
                           });

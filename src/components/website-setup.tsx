@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { browserClient } from "@/lib/supabase/client";
+import { confirmedMutation } from "@/lib/persistence";
 import type {
   Location,
   Product,
@@ -145,14 +146,17 @@ export function WebsiteSetup({
         selectedLocation &&
         selectedLocation.id !== savedLocationId
       ) {
-        const { data: locationData, error: locationError } =
+        const locationData = confirmedMutation<{
+          default_location_id: string | null;
+        }>(
           await browserClient()
             .from("subscriptions")
             .update({ default_location_id: selectedLocation.id })
             .eq("id", subscription.id)
             .select("default_location_id")
-            .single();
-        if (locationError) throw locationError;
+            .single(),
+          "The featured location was not saved. Your access may have changed.",
+        );
         persistedLocationId = locationData.default_location_id ?? "";
         setSavedLocationId(persistedLocationId);
       }

@@ -101,7 +101,7 @@ for (const changedPrice of [false, true])
       await page
         .getByLabel("Business name", { exact: true })
         .fill("Independent shop");
-      await page.getByLabel("Your full name").fill("Alex Owner");
+      await page.getByLabel("Your full name").fill("Alex123");
       await page.getByLabel("Business phone").fill("5551234567");
 
       await page.getByLabel("First location name").fill("Main shop");
@@ -121,6 +121,23 @@ for (const changedPrice of [false, true])
       }
       await expect(page.getByLabel("Your online store address")).toHaveCount(0);
       await page.getByRole("button", { name: "Choose your plan →" }).click();
+      const errorSummary = page.getByRole("alert").filter({
+        hasText: "Please check these details",
+      });
+      await expect(errorSummary).toBeFocused();
+      const contactName = page.getByLabel("Your full name");
+      await expect(contactName).toHaveAttribute("aria-invalid", "true");
+      await expect(contactName).toHaveAttribute(
+        "aria-describedby",
+        "contact_name-error",
+      );
+      await errorSummary.getByRole("button").first().click();
+      await expect(contactName).toBeFocused();
+      await contactName.fill("Alex Owner");
+      await page.getByRole("button", { name: "Choose your plan →" }).click();
+      await expect(
+        page.getByRole("heading", { name: "Choose what works for you." }),
+      ).toBeFocused();
       await page
         .getByRole("combobox", { name: "Business type", exact: true })
         .selectOption({ label: "Retail" });
