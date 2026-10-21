@@ -60,6 +60,7 @@ where s.slug = v.slug and l.subscription_id = s.id and l.name = v.old_name;
 update public.subscriptions s
 set logo_url = 'https://talix-git-feature-website-owner-onboarding-bravokelo.vercel.app' || v.logo,
     header_mode = 'custom',
+    header_links = '[{"label":"Home","destination":"home","url":""},{"label":"Shop","destination":"shop","url":""},{"label":"About","destination":"about","url":""},{"label":"Contact","destination":"contact","url":""}]'::jsonb,
     header_layout = v.layout,
     header_identity = 'photo',
     header_background = v.header_background,
