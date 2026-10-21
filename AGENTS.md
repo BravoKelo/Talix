@@ -175,6 +175,8 @@ Existing Core checks run lint, TypeScript, unit/SQL tests, build and browser tes
 
 Never claim a validation step passed without reviewing its actual result.
 
+A product-owner-observed failure outranks passing tests. Reproduce and verify the exact reported journey before declaring it resolved. A known customer-facing defect blocks completion and merge unless the product owner explicitly accepts that specific defect for release. “Approved with issues” is not merge approval.
+
 A failed check is evidence to diagnose, not justification for an unrelated architectural change.
 
 ## CI and Automation Security
