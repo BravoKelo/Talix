@@ -18,6 +18,7 @@ import {
   websiteTemplates,
 } from "@/lib/website";
 import { TaskDialog } from "./order-dialog";
+import { StorefrontHeader } from "./storefront-header";
 import { WebsiteTemplateHero } from "./website-template-hero";
 
 type WebsiteState = Pick<
@@ -31,14 +32,28 @@ type WebsiteState = Pick<
   | "default_location_id"
 >;
 
-const setupSteps = [
-  "Website setup",
-  "Business identity",
-  "Locations & ordering",
-  "Template & appearance",
-  "Web address",
-  "Go live",
-] as const;
+type SetupStep = {
+  id: "setup" | "identity" | "locations" | "template" | "address" | "review";
+  label: string;
+};
+const templateSteps: SetupStep[] = [
+  { id: "setup", label: "Website setup" },
+  { id: "identity", label: "Business identity" },
+  { id: "locations", label: "Locations & ordering" },
+  { id: "template", label: "Template & appearance" },
+  { id: "address", label: "Web address" },
+  { id: "review", label: "Go live" },
+];
+function stepsFor(path: WebsitePath): SetupStep[] {
+  if (path === "existing")
+    return [
+      { id: "setup", label: "Website setup" },
+      { id: "address", label: "Existing website" },
+      { id: "review", label: "Review connection" },
+    ];
+  if (path === "deferred") return [{ id: "setup", label: "Website setup" }];
+  return templateSteps;
+}
 
 export function WebsiteSetup({
   subscription,
@@ -59,11 +74,16 @@ export function WebsiteSetup({
   const [path, setPath] = useState<WebsitePath>(
     subscription.website_path ?? "deferred",
   );
+  const setupSteps = useMemo(() => stepsFor(path), [path]);
+  const activeStep = setupSteps[step] ?? setupSteps[0];
   const [template, setTemplate] = useState<WebsiteTemplate | null>(
     subscription.website_template ?? null,
   );
   const [liveTemplate, setLiveTemplate] = useState<WebsiteTemplate | null>(
     subscription.website_live_template ?? null,
+  );
+  const [launchedAt, setLaunchedAt] = useState(
+    subscription.website_template_launched_at ?? null,
   );
   const [existingUrl, setExistingUrl] = useState(
     subscription.existing_website_url ?? "",
@@ -85,6 +105,19 @@ export function WebsiteSetup({
   const [confirmLaunch, setConfirmLaunch] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [completion, setCompletion] = useState<
+    "deferred" | "existing" | "template" | null
+  >(
+    subscription.website_setup_completed_at
+      ? subscription.website_path === "existing"
+        ? "existing"
+        : subscription.website_path === "deferred"
+          ? "deferred"
+          : subscription.website_live_template
+            ? "template"
+            : null
+      : null,
+  );
   const stepHeading = useRef<HTMLHeadingElement>(null);
   const previewTrigger = useRef<HTMLButtonElement>(null);
   const initialStep = useRef(true);
@@ -112,7 +145,7 @@ export function WebsiteSetup({
       return;
     }
     stepHeading.current?.focus();
-  }, [step]);
+  }, [step, path]);
 
   async function save(markComplete: boolean) {
     if (
@@ -163,8 +196,23 @@ export function WebsiteSetup({
       }
       const saved = data as WebsiteState;
       setLiveTemplate(saved.website_live_template ?? null);
+      setLaunchedAt(saved.website_template_launched_at ?? null);
       onSaved({ ...saved, default_location_id: persistedLocationId || null });
-      setMessage(markComplete ? "Website setup saved." : "Draft saved.");
+      if (markComplete && path === "deferred") {
+        setCompletion("deferred");
+        setMessage(
+          saved.website_live_template
+            ? "Saved for later. Your existing live Talix website was not changed."
+            : "Saved for later. No website was published.",
+        );
+      } else if (markComplete && path === "existing") {
+        setCompletion("existing");
+        setMessage(
+          "Existing website saved. It remains your primary website, and your Talix ordering page remains available.",
+        );
+      } else {
+        setMessage("Draft saved.");
+      }
       return true;
     } catch (error) {
       setMessage(
@@ -178,12 +226,14 @@ export function WebsiteSetup({
   }
 
   async function continueFromStep() {
-    if (step === 3 && path === "talix_template" && !template) {
+    if (activeStep.id === "template" && !template) {
       setMessage("Choose a template before continuing.");
       return;
     }
-    const needsSave = step === 0 || step === 2 || step === 3 || step === 4;
-    if (needsSave && !(await save(step === 4))) return;
+    const needsSave = ["setup", "locations", "template", "address"].includes(
+      activeStep.id,
+    );
+    if (needsSave && !(await save(false))) return;
     setStep((current) => Math.min(current + 1, setupSteps.length - 1));
   }
 
@@ -223,11 +273,13 @@ export function WebsiteSetup({
       if (!data) throw new Error("The launch result was not returned.");
       const saved = data as WebsiteState;
       setLiveTemplate(saved.website_live_template ?? null);
+      setLaunchedAt(saved.website_template_launched_at ?? null);
       onSaved({
         ...saved,
         default_location_id: selectedLocation?.id ?? (savedLocationId || null),
       });
       setConfirmLaunch(false);
+      setCompletion("template");
       setMessage(
         eligibleProducts.length
           ? "Your Talix website is live."
@@ -256,8 +308,8 @@ export function WebsiteSetup({
         </div>
         <nav aria-label="Website setup progress">
           <ol>
-            {setupSteps.map((label, index) => (
-              <li key={label}>
+            {setupSteps.map(({ id, label }, index) => (
+              <li key={id}>
                 <button
                   type="button"
                   className={index === step ? "active" : ""}
@@ -285,14 +337,63 @@ export function WebsiteSetup({
             STEP {step + 1} OF {setupSteps.length}
           </p>
           <h2 ref={stepHeading} tabIndex={-1}>
-            {setupSteps[step]}
+            {activeStep.label}
           </h2>
           <p className="sr-only" aria-live="polite" aria-atomic="true">
-            Step {step + 1} of {setupSteps.length}: {setupSteps[step]}
+            Step {step + 1} of {setupSteps.length}: {activeStep.label}
           </p>
         </header>
 
-        {step === 0 && (
+        {completion && (
+          <section
+            className="website-callout"
+            aria-label="Website setup status"
+          >
+            <strong>
+              {completion === "template"
+                ? "Website published successfully"
+                : completion === "existing"
+                  ? "Existing website connection saved"
+                  : "Website setup saved for later"}
+            </strong>
+            <p>
+              {completion === "template"
+                ? `${subscription.name} is published at its Talix website address.`
+                : completion === "existing"
+                  ? "Your existing website remains primary. Open storefront still opens the Talix ordering page."
+                  : liveTemplate
+                    ? "Setup is deferred. Your previously published Talix website remains unchanged."
+                    : "No marketing website was published. Your Talix ordering page remains available."}
+            </p>
+            {completion !== "deferred" && (
+              <div className="website-template-actions">
+                {completion === "existing" &&
+                  validExistingWebsite(existingUrl) && (
+                    <a
+                      className="secondary"
+                      href={existingUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open existing website
+                    </a>
+                  )}
+                <a
+                  className="secondary"
+                  href={`/shop/${subscription.slug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {completion === "template"
+                    ? "Open website"
+                    : "Open Talix ordering page"}
+                </a>
+              </div>
+            )}
+          </section>
+        )}
+
+        {activeStep.id === "setup" && (
           <div className="website-step-body">
             <div className="website-intro">
               <h3>How would you like customers to find you online?</h3>
@@ -312,7 +413,9 @@ export function WebsiteSetup({
                       checked={path === item.id}
                       onChange={() => {
                         setPath(item.id);
+                        setStep(0);
                         setMessage("");
+                        setCompletion(null);
                         setConfirmLaunch(false);
                       }}
                     />
@@ -328,14 +431,15 @@ export function WebsiteSetup({
             <div className="website-callout">
               <strong>Your choice is flexible</strong>
               <p>
-                Start with the best fit today. Nothing publishes until you
-                review the final Go live step.
+                {path === "deferred"
+                  ? "Save this choice and return to Website Appearance whenever you are ready."
+                  : "Start with the best fit today. Nothing publishes until you complete the final review."}
               </p>
             </div>
           </div>
         )}
 
-        {step === 1 && (
+        {activeStep.id === "identity" && (
           <div className="website-step-body">
             <div className="website-intro">
               <h3>Review the identity customers will see</h3>
@@ -383,24 +487,11 @@ export function WebsiteSetup({
                   Edit business appearance
                 </button>
               </section>
-              <section className="website-identity-preview">
-                <span className="website-card-label">CUSTOMER PREVIEW</span>
-                <div
-                  className="website-brand-swatch"
-                  style={{ backgroundColor: subscription.accent }}
-                />
-                <h3>{subscription.name}</h3>
-                <p>
-                  {subscription.description ||
-                    "Your introduction appears here."}
-                </p>
-                <span className="button">Browse products</span>
-              </section>
             </div>
           </div>
         )}
 
-        {step === 2 && (
+        {activeStep.id === "locations" && (
           <div className="website-step-body">
             <div className="website-intro">
               <h3>Choose the location featured on your website</h3>
@@ -456,7 +547,7 @@ export function WebsiteSetup({
           </div>
         )}
 
-        {step === 3 && (
+        {activeStep.id === "template" && (
           <div className="website-step-body">
             {path === "talix_template" ? (
               <>
@@ -532,7 +623,7 @@ export function WebsiteSetup({
           </div>
         )}
 
-        {step === 4 && (
+        {activeStep.id === "address" && (
           <div className="website-step-body">
             {path === "existing" ? (
               <>
@@ -607,7 +698,7 @@ export function WebsiteSetup({
           </div>
         )}
 
-        {step === 5 && (
+        {activeStep.id === "review" && (
           <div className="website-step-body">
             <div className="website-intro">
               <h3>Review before customers see it</h3>
@@ -630,6 +721,11 @@ export function WebsiteSetup({
                       Featured location: {selectedLocation?.name ?? "Not ready"}
                     </p>
                     <strong>{liveTemplate ? "Live" : "Private draft"}</strong>
+                    {launchedAt && (
+                      <small>
+                        Published {new Date(launchedAt).toLocaleString()}
+                      </small>
+                    )}
                     <button
                       ref={previewTrigger}
                       type="button"
@@ -705,6 +801,18 @@ export function WebsiteSetup({
                     ? `Customers can continue using ${existingUrl || "your existing website"}, with a normal link to Talix ordering.`
                     : "Nothing will be published, and you can return at any time."}
                 </p>
+                {path === "existing" && (
+                  <dl>
+                    <div>
+                      <dt>Primary website</dt>
+                      <dd>{existingUrl || "Website address needed"}</dd>
+                    </div>
+                    <div>
+                      <dt>Talix ordering page</dt>
+                      <dd>talix.app/shop/{subscription.slug}</dd>
+                    </div>
+                  </dl>
+                )}
               </div>
             )}
           </div>
@@ -756,13 +864,21 @@ export function WebsiteSetup({
                     ? "Update live website"
                     : "Make website live"}
               </button>
+            ) : path === "existing" ? (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => void save(true)}
+              >
+                Save website connection
+              </button>
             ) : (
               <button
                 type="button"
                 disabled={busy}
                 onClick={() => void save(true)}
               >
-                Finish setup
+                Save for later
               </button>
             )}
           </div>
@@ -798,6 +914,11 @@ export function WebsiteSetup({
             ))}
           </div>
           <div className={`website-inline-preview preview-device-${device}`}>
+            <StorefrontHeader
+              subscription={previewSubscription}
+              location={selectedLocation}
+              preview
+            />
             <WebsiteTemplateHero
               subscription={previewSubscription}
               location={selectedLocation}

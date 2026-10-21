@@ -1,6 +1,12 @@
 import type { HeaderLink } from "./types";
 
 export const maxHeaderLinks = 8;
+export const standardHeaderLinks: HeaderLink[] = [
+  { label: "Home", destination: "home", url: "" },
+  { label: "Shop", destination: "shop", url: "" },
+  { label: "About", destination: "about", url: "" },
+  { label: "Contact", destination: "contact", url: "" },
+];
 export function validWebsiteUrl(value: string) {
   try {
     const url = new URL(value);
@@ -23,7 +29,9 @@ export function validHeaderLinks(links: HeaderLink[]) {
       (link) =>
         !!link.label.trim() &&
         link.label.length <= 32 &&
-        (link.destination === "storefront"
+        (["home", "shop", "about", "contact", "storefront"].includes(
+          link.destination,
+        )
           ? link.url === ""
           : link.destination === "website" && validWebsiteUrl(link.url)),
     )

@@ -14,7 +14,7 @@ import {
   type StorefrontDesign,
 } from "@/lib/storefront-design";
 import { HeaderLinkEditor } from "./header-link-editor";
-import { validHeaderLinks } from "@/lib/header-navigation";
+import { standardHeaderLinks, validHeaderLinks } from "@/lib/header-navigation";
 import type { HeaderLink, Location, Subscription } from "@/lib/types";
 
 type Branding = StorefrontDesign & {
@@ -81,17 +81,24 @@ export function AppearanceEditor({
     hero.dirty ||
     image.dirty ||
     JSON.stringify(draft) !== JSON.stringify(saved);
+  const websiteAppearance = subscription.website_path === "talix_template";
   return (
     <section
       id="storefront-appearance"
       className="panel appearance-editor"
-      aria-label="Storefront appearance"
+      aria-label={
+        websiteAppearance ? "Website appearance" : "Storefront appearance"
+      }
     >
       <div className="section-heading">
         <p className="eyebrow">MAKE IT YOURS</p>
-        <h2>Storefront appearance</h2>
+        <h2>
+          {websiteAppearance ? "Website appearance" : "Storefront appearance"}
+        </h2>
         <p className="muted">
-          One look for every location in this subscription.
+          {websiteAppearance
+            ? "One source of truth for your Talix website and ordering experience."
+            : "One look for every location in this subscription."}
         </p>
       </div>
       <PageTabs
@@ -287,11 +294,28 @@ export function AppearanceEditor({
                   </p>
                 )}
                 {draft.header_mode === "standard" ? (
-                  <p className="muted">
-                    Home returns to the top, Shop opens your products, About
-                    shows your business introduction, and Contact shows the
-                    shopper’s selected location.
-                  </p>
+                  <div className="stack">
+                    <p className="muted">
+                      Home returns to the top, Shop opens your products, About
+                      shows your business introduction, and Contact shows the
+                      shopper’s selected location.
+                    </p>
+                    <button
+                      type="button"
+                      className="secondary"
+                      onClick={() =>
+                        setDraft({
+                          ...draft,
+                          header_mode: "custom",
+                          header_links: standardHeaderLinks.map((link) => ({
+                            ...link,
+                          })),
+                        })
+                      }
+                    >
+                      Customize these links
+                    </button>
+                  </div>
                 ) : null}
                 <div
                   hidden={
@@ -352,6 +376,19 @@ export function AppearanceEditor({
                       setDraft({ ...draft, header_links: links })
                     }
                   />
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() =>
+                      setDraft({
+                        ...draft,
+                        header_mode: "standard",
+                        header_links: [],
+                      })
+                    }
+                  >
+                    Restore Home, Shop, About and Contact
+                  </button>
                 </div>
                 <label>
                   Header identity

@@ -1,6 +1,14 @@
 # Website and storefront owner onboarding
 
-Status: approved implementation scope in progress under issue #73. The migration is applied to development only; merge, deployment, production migration execution, and production release are not authorized.
+Status: owner-approved implementation with conditional corrections under issues #75–#79. Migrations are applied to development only; merge, production migration execution, and production release are not authorized.
+
+## Final owner paths
+
+- **Use a Talix template** follows Website setup, Business identity, Locations & ordering, Template & appearance, Web address and Go live. Business identity is a details review, not a partial preview. Go live contains the complete private customer preview and an explicit publish action and confirmation.
+- **Use my existing website** follows Website setup, Existing website and Review connection. It stores a validated HTTPS address, omits all template controls, keeps the external site primary and keeps Open storefront pointed at Talix ordering. Saving this path does not publish or unpublish a Talix marketing website.
+- **Decide later** is a one-step save-and-return path. It does not present template, readiness or launch controls and confirms that no new website was published. If a Talix website was already live, saving this choice leaves that site unchanged.
+
+Website Appearance is the single owner entry for shared presentation controls when a Talix template is selected. The standalone Storefront appearance entry remains for the existing-site and deferred paths. Every template begins with Home, Shop, About and Contact. Owners can copy those defaults into an editable list, rename, reorder, delete or add supported links, and restore the standard set without rebuilding it.
 
 ## Data classification and lifecycle
 

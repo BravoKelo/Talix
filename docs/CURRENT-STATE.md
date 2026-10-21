@@ -1,5 +1,11 @@
 # Talix current state
 
+## Owner-review corrections for website setup — October 20, 2026 Pacific
+
+The owner conditionally approved the website samples subject to resolving the already-recorded issues #75–#79. The existing-website path now uses a three-step connection journey with no template controls; Decide Later is a one-step save-and-return path; both outcomes provide explicit, non-publishing confirmation while preserving any previously launched Talix site. Business identity no longer contains a partial false-affordance preview. Go Live contains the complete private preview, including the storefront header, navigation, hero, products, business story and location details, followed by distinct publication confirmation and a working website action.
+
+Talix-template owners use Website Appearance as the single entry for shared website/storefront presentation controls; the separate Storefront appearance tile remains available for owners who use an existing website or defer the website decision. Standard navigation remains Home, Shop, About and Contact. Owners can copy those defaults into editable navigation, rename, reorder, remove or add supported links, and restore the standard set. Additive development migration `20261021011154_editable_standard_navigation` expands only the existing bounded navigation validator for the four internal destinations while preserving HTTPS-only external links, tenant settings authority and the explicit public catalog. Twenty-one development migrations are recorded. Post-migration security and performance advisor categories and counts are unchanged. Production migration execution and production deployment remain unapproved.
+
 ## Website owner onboarding implementation in progress — October 19, 2026 Pacific
 
 Issue #73 records the owner-approved bounded first batch on `feature/website-owner-onboarding`, based on main `60f5ea9b17538db50dd181e9397700c025b34d54`. Work prepares the owner-only three-choice setup hub, four included template concepts, private preview, launch gates, plain-language findability guidance, audit corrections, documentation, tests, and an additive migration. No merge, deployment, production launch, domain activation, billing, infrastructure, embed, Customizable Website add-on, or Marketing add-on is authorized.

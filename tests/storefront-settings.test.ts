@@ -283,6 +283,8 @@ it("persists standard/custom mode, preserves ordered custom links, and redacts i
       url: "https://business.example/about?from=shop#story",
     },
     { label: "Order online", destination: "storefront", url: "" },
+    { label: "About", destination: "about", url: "" },
+    { label: "Contact", destination: "contact", url: "" },
   ];
   await db.query(
     "update public.subscriptions set header_mode='custom',header_links=$2::jsonb where id=$1",
@@ -352,6 +354,7 @@ it("rejects malformed navigation and unsafe destinations at the database boundar
       "https://",
     ].map((url) => [{ label: "Unsafe", destination: "website", url }]),
     [{ label: "Shop", destination: "storefront", url: "https://example.com" }],
+    [{ label: "About", destination: "about", url: "https://example.com" }],
     [{ label: "Shop", destination: "storefront", url: "", extra: true }],
   ]) {
     await expect(

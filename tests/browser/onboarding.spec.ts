@@ -300,11 +300,47 @@ for (const changedPrice of [false, true])
         await expect(
           page.getByRole("heading", { name: "Build your website" }),
         ).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "Template & appearance" }),
+        ).toHaveCount(0);
+        await expect(
+          page.getByRole("button", { name: "Save for later" }),
+        ).toBeVisible();
+        await page
+          .getByRole("radio", { name: /Use my existing website/ })
+          .check();
+        await expect(
+          page.getByRole("button", { name: "Template & appearance" }),
+        ).toHaveCount(0);
+        await page.getByRole("button", { name: "Save and continue" }).click();
+        await expect(
+          page.getByRole("heading", { name: "Existing website" }),
+        ).toBeFocused();
+        await page
+          .getByLabel("Existing website address")
+          .fill("example.com/business");
+        await page.getByRole("button", { name: "Save and continue" }).click();
+        await expect(
+          page.getByRole("heading", { name: "Review connection" }),
+        ).toBeFocused();
+        await page
+          .getByRole("button", { name: "Save website connection" })
+          .click();
+        await expect(page.getByRole("status")).toContainText(
+          "Existing website saved",
+        );
+        await page.getByRole("button", { name: "Website setup" }).click();
+        await page.getByRole("radio", { name: /Decide later/ }).check();
+        await page.getByRole("button", { name: "Save for later" }).click();
+        await expect(page.getByRole("status")).toContainText(
+          "No website was published",
+        );
         await page.getByRole("radio", { name: /Use a Talix template/ }).check();
         await page.getByRole("button", { name: "Save and continue" }).click();
         await expect(
           page.getByRole("heading", { name: "Business identity" }),
         ).toBeFocused();
+        await expect(page.getByText("CUSTOMER PREVIEW")).toHaveCount(0);
         expect(
           (
             await gateway.db.query<{ default_location_id: string | null }>(
@@ -330,6 +366,11 @@ for (const changedPrice of [false, true])
           page
             .getByLabel("Order First customer preview")
             .getByText("Featured products"),
+        ).toBeVisible();
+        await expect(
+          page
+            .getByLabel("Order First customer preview")
+            .getByRole("navigation", { name: "Navigation preview" }),
         ).toBeVisible();
         await page.keyboard.press("Escape");
         await expect(previewButton).toBeFocused();
@@ -773,12 +814,19 @@ for (const changedPrice of [false, true])
       await expect(
         page.getByText("No settings match your search. Try another word."),
       ).toBeVisible();
-      await page.getByLabel("Search settings", { exact: true }).fill("logo");
-      await page
-        .getByRole("button", { name: /Storefront appearance Business logo/ })
-        .click();
+      await page.getByLabel("Search settings", { exact: true }).fill("website");
+      async function openWebsiteAppearance() {
+        await page.getByRole("button", { name: /Website Appearance/ }).click();
+        await page
+          .getByRole("button", { name: "Template & appearance" })
+          .click();
+        await page
+          .getByRole("button", { name: "Open appearance editor" })
+          .click();
+      }
+      await openWebsiteAppearance();
       const appearance = page.getByRole("region", {
-        name: "Storefront appearance",
+        name: "Website appearance",
       });
       if (test.info().project.name === "mobile")
         await appearance
@@ -862,9 +910,7 @@ for (const changedPrice of [false, true])
         .getByRole("button", { name: "Cancel changes", exact: true })
         .click();
       await expect(appearance).toBeHidden();
-      await page
-        .getByRole("button", { name: /Storefront appearance Business logo/ })
-        .click();
+      await openWebsiteAppearance();
       await expect(
         appearance.getByLabel("Introduction", { exact: true }),
       ).toHaveValue("");
@@ -930,9 +976,7 @@ for (const changedPrice of [false, true])
         .click();
       await expect(appearance).toBeHidden();
       expect(gateway.imageUploads).toBe(1);
-      await page
-        .getByRole("button", { name: /Storefront appearance Business logo/ })
-        .click();
+      await openWebsiteAppearance();
       await appearance
         .getByLabel("Business logo", { exact: true })
         .setInputFiles(png);
@@ -965,9 +1009,7 @@ for (const changedPrice of [false, true])
           )
         ).rows[0].logo_url,
       ).toBeTruthy();
-      await page
-        .getByRole("button", { name: /Storefront appearance Business logo/ })
-        .click();
+      await openWebsiteAppearance();
       await appearance
         .getByRole("button", { name: "Delete image", exact: true })
         .click();
@@ -1104,7 +1146,7 @@ for (const changedPrice of [false, true])
         expect(savedNavigation).toEqual({
           header_mode: "custom",
           header_links: [
-            { label: "Order online", destination: "storefront", url: "" },
+            { label: "Order online", destination: "shop", url: "" },
             {
               label: "Our website",
               destination: "website",
@@ -1144,9 +1186,7 @@ for (const changedPrice of [false, true])
           .getByRole("button", { name: "Cancel changes", exact: true })
           .click();
         await expect(appearance).toBeHidden();
-        await page
-          .getByRole("button", { name: /Storefront appearance Business logo/ })
-          .click();
+        await openWebsiteAppearance();
         await appearance
           .getByRole("tab", { name: "Header", exact: true })
           .click();
@@ -1160,7 +1200,7 @@ for (const changedPrice of [false, true])
           }),
         ).toBeVisible();
         const orderLink = appearance.getByRole("button", {
-          name: "Order online This storefront",
+          name: "Order online Shop",
           exact: true,
         });
         if ((await orderLink.getAttribute("aria-expanded")) !== "true")
@@ -1171,15 +1211,13 @@ for (const changedPrice of [false, true])
         await appearance
           .getByRole("button", { name: "Cancel changes", exact: true })
           .click();
-        await page
-          .getByRole("button", { name: /Storefront appearance Business logo/ })
-          .click();
+        await openWebsiteAppearance();
         await appearance
           .getByRole("tab", { name: "Header", exact: true })
           .click();
         await expect(
           appearance.getByRole("button", {
-            name: "Order online This storefront",
+            name: "Order online Shop",
             exact: true,
           }),
         ).toBeVisible();
@@ -1382,6 +1420,7 @@ for (const changedPrice of [false, true])
           await page
             .getByRole("button", { name: "Business & account" })
             .click();
+        await expect(subscriptionPicker).toBeVisible();
         await subscriptionPicker.selectOption({ label: "Second business" });
         await expect(
           page.getByRole("heading", { name: "Second business", exact: true }),

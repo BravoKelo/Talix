@@ -359,13 +359,21 @@ export function Workspace({
           {
             id: "website",
             title: "Website Appearance",
-            description: "Choose, preview and launch your customer experience",
+            description:
+              sub?.website_path === "deferred"
+                ? "Setup deferred — resume whenever you are ready"
+                : sub?.website_path === "existing"
+                  ? "Existing website connected to Talix ordering"
+                  : sub?.website_live_template
+                    ? "Talix website live — review or update it"
+                    : "Choose, preview and launch your customer experience",
             icon: "▣",
             available: true,
           },
         ]
       : []),
-    ...(shared("settings.view")
+    ...(shared("settings.view") &&
+    (!owner || sub?.website_path !== "talix_template")
       ? [
           {
             id: "appearance",

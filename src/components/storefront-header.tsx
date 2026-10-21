@@ -12,7 +12,7 @@ export function StorefrontHeader({
   location,
 }: {
   subscription: Partial<Subscription>;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   search?: React.ReactNode;
   preview?: boolean;
   location?: Location;

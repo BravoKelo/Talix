@@ -1,6 +1,6 @@
 export type HeaderLink = {
   label: string;
-  destination: "storefront" | "website";
+  destination: "home" | "shop" | "about" | "contact" | "storefront" | "website";
   url: string;
 };
 import type { StorefrontDesign } from "./storefront-design";
