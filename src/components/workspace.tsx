@@ -496,7 +496,7 @@ export function Workspace({
               target="_blank"
               rel="noreferrer"
             >
-              Open storefront ↗
+              {sub.website_live_template ? "Open website" : "Open storefront"} ↗
             </a>
           )}
           {members.some((m) => m.role === "owner") && (

@@ -1,5 +1,11 @@
 # Talix current state
 
+## Overnight onboarding corrections — October 20, 2026 Pacific
+
+Sprint #89 follows main `a7d4fc7` (PR #80 merged). The existing onboarding feature branch now prepares #86/#87/#85/#82/#88 for review with its existing Talix-development Vercel preview settings. Public action labels follow live state; choice-save feedback is prominent; identity assets/color are clear; Web address loses the redundant card; Go Live uses an inline responsive draft preview and database-timestamp publication confirmation. No schema, security, infrastructure, migration, main or production changes. Exact commit, CI and live preview evidence are recorded in #89 and the new PR after validation; implementation alone is not review-ready acceptance.
+
+`WEBSITE-ONBOARDING-SPRINT-89.md` records precise #83/#84 protected decisions and manual review steps. Both remain unimplemented; saving deferred still preserves a live website. Older statements below that PR #74/#80 work is unmerged are historical; current main includes both. No new merge is authorized.
+
 ## Owner-review corrections for website setup — October 20, 2026 Pacific
 
 The owner conditionally approved the website samples subject to resolving the already-recorded issues #75–#79. The existing-website path now uses a three-step connection journey with no template controls; Decide Later is a one-step save-and-return path; both outcomes provide explicit, non-publishing confirmation while preserving any previously launched Talix site. Business identity no longer contains a partial false-affordance preview. Go Live contains the complete private preview, including the storefront header, navigation, hero, products, business story and location details, followed by distinct publication confirmation and a working website action.

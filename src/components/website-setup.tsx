@@ -17,7 +17,7 @@ import {
   websiteReadiness,
   websiteTemplates,
 } from "@/lib/website";
-import { TaskDialog } from "./order-dialog";
+import { headerLayout, storefrontStyle } from "@/lib/storefront-design";
 import { StorefrontHeader } from "./storefront-header";
 import { WebsiteTemplateHero } from "./website-template-hero";
 
@@ -101,10 +101,11 @@ export function WebsiteSetup({
   const [device, setDevice] = useState<"mobile" | "tablet" | "desktop">(
     "desktop",
   );
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [confirmLaunch, setConfirmLaunch] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageKind, setMessageKind] = useState<"success" | "error">("error");
+  const feedback = useRef<HTMLDivElement>(null);
   const [completion, setCompletion] = useState<
     "deferred" | "existing" | "template" | null
   >(
@@ -119,7 +120,6 @@ export function WebsiteSetup({
       : null,
   );
   const stepHeading = useRef<HTMLHeadingElement>(null);
-  const previewTrigger = useRef<HTMLButtonElement>(null);
   const initialStep = useRef(true);
   const selectedLocation =
     published.find((location) => location.id === locationId) ?? published[0];
@@ -140,6 +140,17 @@ export function WebsiteSetup({
   const readyCount = readiness.filter((item) => item.ready).length;
 
   useEffect(() => {
+    if (
+      messageKind === "success" &&
+      (message.startsWith("Saved for later") ||
+        message.startsWith("Website published successfully"))
+    ) {
+      feedback.current?.focus();
+      feedback.current?.scrollIntoView({ block: "nearest" });
+    }
+  }, [message, messageKind]);
+
+  useEffect(() => {
     if (initialStep.current) {
       initialStep.current = false;
       return;
@@ -148,6 +159,7 @@ export function WebsiteSetup({
   }, [step, path]);
 
   async function save(markComplete: boolean) {
+    setMessageKind("error");
     if (
       path === "existing" &&
       (markComplete || existingUrl) &&
@@ -198,6 +210,7 @@ export function WebsiteSetup({
       setLiveTemplate(saved.website_live_template ?? null);
       setLaunchedAt(saved.website_template_launched_at ?? null);
       onSaved({ ...saved, default_location_id: persistedLocationId || null });
+      setMessageKind("success");
       if (markComplete && path === "deferred") {
         setCompletion("deferred");
         setMessage(
@@ -226,6 +239,7 @@ export function WebsiteSetup({
   }
 
   async function continueFromStep() {
+    setMessageKind("error");
     if (activeStep.id === "template" && !template) {
       setMessage("Choose a template before continuing.");
       return;
@@ -241,12 +255,8 @@ export function WebsiteSetup({
     if (await save(false)) openAppearance();
   }
 
-  function closePreview() {
-    setPreviewOpen(false);
-    window.requestAnimationFrame(() => previewTrigger.current?.focus());
-  }
-
   async function launch() {
+    setMessageKind("error");
     if (!published.length) {
       setMessage("Publish at least one location before launching.");
       return;
@@ -261,6 +271,8 @@ export function WebsiteSetup({
     if (!(await save(true))) return;
     setBusy(true);
     setMessage("");
+    setCompletion(null);
+    setMessageKind("error");
     try {
       const { data, error } = await browserClient().rpc(
         "launch_website_template",
@@ -272,6 +284,15 @@ export function WebsiteSetup({
       if (error) throw error;
       if (!data) throw new Error("The launch result was not returned.");
       const saved = data as WebsiteState;
+      if (
+        !saved.website_live_template ||
+        !saved.website_template_launched_at ||
+        Number.isNaN(Date.parse(saved.website_template_launched_at))
+      ) {
+        throw new Error(
+          "Publication could not be confirmed. Reload setup to check the current website status before trying again.",
+        );
+      }
       setLiveTemplate(saved.website_live_template ?? null);
       setLaunchedAt(saved.website_template_launched_at ?? null);
       onSaved({
@@ -280,10 +301,9 @@ export function WebsiteSetup({
       });
       setConfirmLaunch(false);
       setCompletion("template");
+      setMessageKind("success");
       setMessage(
-        eligibleProducts.length
-          ? "Your Talix website is live."
-          : "Live — online ordering not ready.",
+        `Website published successfully, ${subscription.name} has been published at ${new Date(saved.website_template_launched_at).toLocaleString()}.${eligibleProducts.length ? "" : " Live — online ordering not ready."}`,
       );
     } catch (error) {
       setMessage(
@@ -360,7 +380,7 @@ export function WebsiteSetup({
               {completion === "template"
                 ? `${subscription.name} is published at its Talix website address.`
                 : completion === "existing"
-                  ? "Your existing website remains primary. Open storefront still opens the Talix ordering page."
+                  ? "Your existing website connection is saved. The public Talix experience remains unchanged."
                   : liveTemplate
                     ? "Setup is deferred. Your previously published Talix website remains unchanged."
                     : "No marketing website was published. Your Talix ordering page remains available."}
@@ -379,14 +399,12 @@ export function WebsiteSetup({
                     </a>
                   )}
                 <a
-                  className="secondary"
+                  className="button website-gold-action"
                   href={`/shop/${subscription.slug}`}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {completion === "template"
-                    ? "Open website"
-                    : "Open Talix ordering page"}
+                  {liveTemplate ? "Open website" : "Open storefront"}
                 </a>
               </div>
             )}
@@ -459,32 +477,66 @@ export function WebsiteSetup({
                 <dl>
                   <div>
                     <dt>Logo</dt>
-                    <dd>{subscription.logo_url ? "Added" : "Not added"}</dd>
+                    <dd
+                      className={
+                        subscription.logo_url
+                          ? "website-asset-added"
+                          : "website-asset-optional"
+                      }
+                    >
+                      {subscription.logo_url
+                        ? "✓ Added"
+                        : "Optional — using business initial"}
+                    </dd>
                   </div>
                   <div>
                     <dt>Header identity</dt>
-                    <dd>
-                      {subscription.header_photo_url ? "Added" : "Not added"}
+                    <dd
+                      className={
+                        subscription.header_photo_url
+                          ? "website-asset-added"
+                          : "website-asset-optional"
+                      }
+                    >
+                      {subscription.header_photo_url
+                        ? subscription.header_identity === "photo"
+                          ? "✓ Added — displayed in header"
+                          : "✓ Added — business name displayed"
+                        : "Optional — using business name"}
                     </dd>
                   </div>
                   <div>
                     <dt>Hero image</dt>
-                    <dd>
-                      {subscription.website_hero_url ? "Added" : "Not added"}
+                    <dd
+                      className={
+                        subscription.website_hero_url
+                          ? "website-asset-added"
+                          : "website-asset-optional"
+                      }
+                    >
+                      {subscription.website_hero_url
+                        ? "✓ Added"
+                        : "Optional — no hero image added"}
                     </dd>
                   </div>
                   <div>
                     <dt>Brand color</dt>
-                    <dd>{subscription.accent.toUpperCase()}</dd>
+                    <dd className="website-brand-color">
+                      <span
+                        aria-hidden="true"
+                        style={{ backgroundColor: subscription.accent }}
+                      />
+                      {subscription.accent.toUpperCase()}
+                    </dd>
                   </div>
                 </dl>
                 <button
                   type="button"
-                  className="secondary"
+                  className="website-gold-action"
                   disabled={busy}
                   onClick={() => void editAppearance()}
                 >
-                  Edit business appearance
+                  Edit Website Branding
                 </button>
               </section>
             </div>
@@ -673,18 +725,10 @@ export function WebsiteSetup({
                   <strong>talix.app/shop/{subscription.slug}</strong>
                   <small>Included with your Talix website template</small>
                 </div>
-                <section className="website-future-option">
-                  <span>FUTURE OPTION</span>
-                  <h4>Use a domain you already own</h4>
-                  <p>
-                    Custom-domain activation will be offered after its security,
-                    support, and operations review. Domain masking is not
-                    supported because it can weaken trust and search quality.
-                  </p>
-                  <button type="button" disabled>
-                    Not available yet
-                  </button>
-                </section>
+                <p className="muted">
+                  Custom domains are not available yet. Use your included Talix
+                  address; domain masking is not supported.
+                </p>
               </>
             ) : (
               <div className="website-callout">
@@ -710,64 +754,124 @@ export function WebsiteSetup({
             {path === "talix_template" ? (
               <>
                 <div className="website-go-live-grid">
-                  <section className="website-launch-summary">
-                    <span className="website-card-label">YOUR WEBSITE</span>
-                    <h4>
-                      {websiteTemplates.find((item) => item.id === template)
-                        ?.title ?? "Choose a template"}
-                    </h4>
-                    <p>talix.app/shop/{subscription.slug}</p>
-                    <p>
-                      Featured location: {selectedLocation?.name ?? "Not ready"}
-                    </p>
-                    <strong>{liveTemplate ? "Live" : "Private draft"}</strong>
-                    {launchedAt && (
-                      <small>
-                        Published {new Date(launchedAt).toLocaleString()}
-                      </small>
-                    )}
-                    <button
-                      ref={previewTrigger}
-                      type="button"
-                      className="secondary"
-                      disabled={!template}
-                      onClick={() => setPreviewOpen(true)}
-                    >
-                      Open customer preview
-                    </button>
-                  </section>
-                  <section className="website-checklist">
-                    <div className="website-checklist-heading">
-                      <div>
-                        <span className="website-card-label">
-                          GO-LIVE CHECK
+                  <div className="website-launch-details">
+                    <section className="website-checklist">
+                      <div className="website-checklist-heading">
+                        <div>
+                          <span className="website-card-label">
+                            GO-LIVE CHECK
+                          </span>
+                          <h4>
+                            {readyCount} of {readiness.length} content checks
+                            ready
+                          </h4>
+                        </div>
+                        <span className="website-score">
+                          {readyCount}/{readiness.length}
                         </span>
-                        <h4>
-                          {readyCount} of {readiness.length} content checks
-                          ready
-                        </h4>
                       </div>
-                      <span className="website-score">
-                        {readyCount}/{readiness.length}
-                      </span>
+                      <ul>
+                        {readiness.map((item) => (
+                          <li key={item.label}>
+                            <span
+                              className={
+                                item.ready ? "status-ready" : "status-attention"
+                              }
+                            >
+                              {item.ready ? "Ready" : "Review"}
+                            </span>
+                            <span>
+                              <strong>{item.label}</strong>
+                              <small>{item.action}</small>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                    <section
+                      className="website-launch-summary"
+                      aria-label="Live website details"
+                    >
+                      <span className="website-card-label">PUBLIC WEBSITE</span>
+                      <strong>
+                        {liveTemplate
+                          ? "Live"
+                          : "Not published — private draft"}
+                      </strong>
+                      <a
+                        href={`/shop/${subscription.slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {liveTemplate ? "Open website" : "Open storefront"} ↗
+                      </a>
+                      <small>/shop/{subscription.slug}</small>
+                      {liveTemplate && launchedAt && (
+                        <small>
+                          Published {new Date(launchedAt).toLocaleString()}
+                        </small>
+                      )}
+                      <p>
+                        Draft featured location:{" "}
+                        {selectedLocation?.name ?? "Not ready"}
+                      </p>
+                    </section>
+                  </div>
+                  <section
+                    className="website-review-preview"
+                    aria-label="Your website preview"
+                  >
+                    <div className="preview-label">
+                      YOUR WEBSITE <span>Private draft</span>
                     </div>
-                    <ul>
-                      {readiness.map((item) => (
-                        <li key={item.label}>
-                          <span
-                            className={
-                              item.ready ? "status-ready" : "status-attention"
-                            }
+                    <div
+                      className="preview-devices"
+                      role="group"
+                      aria-label="Preview size"
+                    >
+                      {(["mobile", "tablet", "desktop"] as const).map(
+                        (size) => (
+                          <button
+                            key={size}
+                            type="button"
+                            className="secondary"
+                            aria-pressed={device === size}
+                            onClick={() => setDevice(size)}
                           >
-                            {item.ready ? "Ready" : "Review"}
-                          </span>
-                          <span>
-                            <strong>{item.label}</strong>
-                            <small>{item.action}</small>
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                            {size[0].toUpperCase() + size.slice(1)}
+                          </button>
+                        ),
+                      )}
+                    </div>
+                    {template ? (
+                      <div
+                        className={`website-inline-preview appearance-live-preview header-${headerLayout(previewSubscription)} preview-device-${device}`}
+                        style={storefrontStyle(previewSubscription)}
+                        tabIndex={0}
+                        role="region"
+                        aria-label="Scrollable website preview"
+                      >
+                        <div className="preview-header shop-header">
+                          <StorefrontHeader
+                            subscription={previewSubscription}
+                            location={selectedLocation}
+                            preview
+                          />
+                        </div>
+                        <WebsiteTemplateHero
+                          subscription={previewSubscription}
+                          location={selectedLocation}
+                          products={eligibleProducts}
+                          preview
+                        />
+                      </div>
+                    ) : (
+                      <p>Choose a template to preview your website.</p>
+                    )}
+                    <p className="preview-note">
+                      Ordering is disabled in preview. Publishing is a separate
+                      action.
+                    </p>
                   </section>
                 </div>
                 {!eligibleProducts.length && published.length > 0 && (
@@ -883,55 +987,36 @@ export function WebsiteSetup({
             )}
           </div>
         </footer>
-        <p role="status" className={message ? "message" : "sr-only"}>
-          {message}
-        </p>
-      </div>
-
-      {previewOpen && template && (
-        <TaskDialog
-          title={`${websiteTemplates.find((item) => item.id === template)?.title} customer preview`}
-          closeLabel="Exit preview"
-          close={closePreview}
-          className="website-preview-dialog"
-          backdropClose
+        <div
+          ref={feedback}
+          tabIndex={-1}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className={message ? `website-feedback ${messageKind}` : "sr-only"}
         >
-          <div
-            className="preview-devices"
-            role="group"
-            aria-label="Preview size"
-          >
-            {(["mobile", "tablet", "desktop"] as const).map((size) => (
-              <button
-                key={size}
-                type="button"
-                className="secondary"
-                aria-pressed={device === size}
-                onClick={() => setDevice(size)}
-              >
-                {size[0].toUpperCase() + size.slice(1)}
-              </button>
-            ))}
-          </div>
-          <div className={`website-inline-preview preview-device-${device}`}>
-            <StorefrontHeader
-              subscription={previewSubscription}
-              location={selectedLocation}
-              preview
-            />
-            <WebsiteTemplateHero
-              subscription={previewSubscription}
-              location={selectedLocation}
-              products={eligibleProducts}
-              preview
-            />
-          </div>
-          <p className="muted">
-            Ordering is disabled in preview. Nothing here changes your live
-            website.
-          </p>
-        </TaskDialog>
-      )}
+          {message && (
+            <>
+              <strong>
+                {messageKind === "success" ? "✓ " : ""}
+                {message}
+              </strong>
+              {messageKind === "success" &&
+                message.startsWith("Website published successfully") &&
+                liveTemplate && (
+                  <a
+                    className="button website-gold-action"
+                    href={`/shop/${subscription.slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open website
+                  </a>
+                )}
+            </>
+          )}
+        </div>
+      </div>
     </section>
   );
 }

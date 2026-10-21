@@ -4620,7 +4620,9 @@ body:has(.business-tracking) > footer {
 }
 .website-choice-number {
   color: #9a6d0a;
-  font: 700 1.15rem Georgia, serif;
+  font:
+    700 1.15rem Georgia,
+    serif;
 }
 .website-choice strong,
 .template-choice strong {
@@ -4903,6 +4905,8 @@ body:has(.business-tracking) > footer {
   background: #fff;
 }
 .website-inline-preview {
+  container-name: website-preview;
+  container-type: inline-size;
   width: 100%;
   margin-inline: auto;
   overflow: hidden;
@@ -5300,8 +5304,159 @@ body:has(.business-tracking) > footer {
   color: #233b67;
   background: #e3edff;
 }
-.website-preview-dialog {
-  width: min(1000px, calc(100vw - 32px));
+.website-identity-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.website-summary-card dl {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.website-summary-card .website-asset-added {
+  color: #124b2b;
+  background: #dff4e7;
+}
+.website-summary-card .website-asset-optional {
+  color: #233b67;
+  background: #e3edff;
+}
+.website-asset-added,
+.website-asset-optional {
+  padding: 8px;
+  border-radius: 6px;
+}
+.website-brand-color {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.website-brand-color > span {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #667085;
+  border-radius: 6px;
+}
+.website-feedback {
+  margin: 20px;
+  padding: 20px;
+  border: 2px solid #855f12;
+  border-radius: 12px;
+  background: #fff8e7;
+  color: #17294d;
+  overflow-wrap: anywhere;
+}
+.website-feedback.success {
+  border-color: #287a55;
+  background: #e8f6ee;
+  color: #124b2b;
+}
+.website-feedback .button {
+  display: flex;
+  width: fit-content;
+  margin-top: 16px;
+}
+.website-go-live-grid {
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+  align-items: start;
+}
+.website-launch-details {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.website-launch-summary {
+  overflow-wrap: anywhere;
+}
+.website-review-preview {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #d9e0eb;
+  border-radius: 14px;
+  background: #fff;
+}
+.website-review-preview .preview-devices {
+  flex-wrap: wrap;
+  margin-block: 12px;
+}
+.website-onboarding .website-gold-action {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #17294d;
+}
+.website-step-content:has(.website-review-preview) > .website-step-body {
+  padding-inline: 20px;
+}
+.website-review-preview .website-inline-preview {
+  max-height: 680px;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  scrollbar-gutter: stable;
+}
+.website-go-live-grid .website-checklist {
+  padding: 20px;
+}
+.website-go-live-grid .website-launch-summary {
+  padding: 20px;
+}
+@media (max-width: 1200px) {
+  .website-go-live-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@container website-preview (max-width: 760px) {
+  .website-inline-preview .shop-header:has(.shop-navigation) .shop-nav {
+    grid-template-columns: 40px 48px minmax(0, 1fr);
+  }
+  .website-template-hero h2,
+  .website-template-about h2,
+  .website-template-section-heading h3 {
+    font-size: clamp(1.35rem, 8cqi, 2.5rem);
+  }
+  .website-template-products,
+  .website-template-trust,
+  .website-template-footer,
+  .website-template-location-card {
+    padding: 24px;
+  }
+  .website-template-ordering-status {
+    flex-wrap: wrap;
+    text-align: left;
+  }
+  .website-template-feature-card {
+    right: 0;
+  }
+  .website-template-hero,
+  .website-template-about,
+  .website-template-product-grid,
+  .website-template-trust {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .website-template-hero {
+    min-height: 0;
+    padding: 24px;
+    gap: 24px;
+  }
+  .website-template-media,
+  .website-template-media > img,
+  .website-template-image-placeholder {
+    min-height: 240px;
+  }
+  .website-browse-hero .website-template-media,
+  .website-visit-hero .website-template-media {
+    order: initial;
+    margin-left: 0;
+  }
+  .website-browse-categories {
+    position: static;
+    grid-column: 1;
+  }
+  .website-template-about {
+    padding: 24px;
+    gap: 24px;
+  }
+  .website-template-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 @media (max-width: 760px) {
   .website-onboarding {
