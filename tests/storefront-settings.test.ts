@@ -91,6 +91,12 @@ it("reuses settings authority and rejects cross-business defaults and unsafe val
       [sid],
     ),
   ).rejects.toThrow();
+  await expect(
+    db.query(
+      "update public.subscriptions set website_hero_url='javascript:bad' where id=$1",
+      [sid],
+    ),
+  ).rejects.toThrow();
 });
 it("does not grant appearance writes to outsiders or anonymous callers", async () => {
   await as(other);
@@ -171,6 +177,34 @@ it("protects saved header photos through existing cleanup authorization", async 
       )
     ).rows[0].ok,
   ).toBe(false);
+});
+it("protects saved website hero images through existing cleanup authorization", async () => {
+  await as(editor);
+  const url = `https://example.invalid/storage/v1/object/public/business-logos/${sid}/hero.webp`;
+  await db.query(
+    "update public.subscriptions set website_hero_url=$2 where id=$1",
+    [sid, url],
+  );
+  expect(
+    (
+      await db.query<{ ok: boolean }>(
+        "select private.can_delete_business_image('business-logos',$1) as ok",
+        [sid + "/hero.webp"],
+      )
+    ).rows[0].ok,
+  ).toBe(false);
+  await db.query(
+    "update public.subscriptions set website_hero_url=null where id=$1",
+    [sid],
+  );
+  expect(
+    (
+      await db.query<{ ok: boolean }>(
+        "select private.can_delete_business_image('business-logos',$1) as ok",
+        [sid + "/hero.webp"],
+      )
+    ).rows[0].ok,
+  ).toBe(true);
 });
 it("keeps collection labels under existing product-management authority", async () => {
   await as(editor);

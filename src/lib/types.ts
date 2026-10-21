@@ -36,6 +36,7 @@ export type Subscription = Partial<StorefrontDesign> & {
   header_links?: HeaderLink[];
   logo_url?: string | null;
   header_photo_url?: string | null;
+  website_hero_url?: string | null;
   default_location_id?: string | null;
   description: string;
   website_path?: WebsitePath;

@@ -9,6 +9,7 @@ it("upgrades existing header choices without resetting custom layouts", async ()
     await initializeDatabase(db, [
       migration,
       "20261019183000_website_owner_onboarding.sql",
+      "20261020224059_separate_website_hero_image.sql",
     ]);
     const owner = crypto.randomUUID();
     await db.query(

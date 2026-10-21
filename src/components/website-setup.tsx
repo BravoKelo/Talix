@@ -358,9 +358,15 @@ export function WebsiteSetup({
                     <dd>{subscription.logo_url ? "Added" : "Not added"}</dd>
                   </div>
                   <div>
-                    <dt>Hero image</dt>
+                    <dt>Header identity</dt>
                     <dd>
                       {subscription.header_photo_url ? "Added" : "Not added"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Hero image</dt>
+                    <dd>
+                      {subscription.website_hero_url ? "Added" : "Not added"}
                     </dd>
                   </div>
                   <div>
@@ -621,8 +627,7 @@ export function WebsiteSetup({
                     </h4>
                     <p>talix.app/shop/{subscription.slug}</p>
                     <p>
-                      Featured location:{" "}
-                      {selectedLocation?.name ?? "Not ready"}
+                      Featured location: {selectedLocation?.name ?? "Not ready"}
                     </p>
                     <strong>{liveTemplate ? "Live" : "Private draft"}</strong>
                     <button
@@ -642,7 +647,8 @@ export function WebsiteSetup({
                           GO-LIVE CHECK
                         </span>
                         <h4>
-                          {readyCount} of {readiness.length} content checks ready
+                          {readyCount} of {readiness.length} content checks
+                          ready
                         </h4>
                       </div>
                       <span className="website-score">

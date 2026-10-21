@@ -18,48 +18,42 @@ export function StorefrontHeader({
   location?: Location;
 }) {
   const design = designFor(subscription);
-  const centeredLogo =
-    design.header_identity === "photo"
-      ? subscription.logo_url ?? subscription.header_photo_url
-      : null;
+  const centeredPhoto =
+    design.header_identity === "photo" ? subscription.header_photo_url : null;
   return (
     <div
       className={`shop-nav header-nav-${headerLayout(subscription)}`}
       role={preview ? undefined : "navigation"}
       aria-label={preview ? undefined : "Storefront"}
     >
-      {centeredLogo ? (
-        <span className="shop-logo" aria-hidden="true" />
-      ) : (
-        <a
-          className="shop-logo"
-          href={preview ? undefined : "#shop-products"}
-          aria-label={`${subscription.name} products`}
-        >
-          {subscription.logo_url ? (
-            <Image
-              width={72}
-              height={56}
-              unoptimized
-              src={displayImageUrl(subscription.logo_url)}
-              alt={`${subscription.name} logo`}
-            />
-          ) : (
-            <span className="shop-initial" aria-hidden="true">
-              {subscription.name?.slice(0, 1) || "B"}
-            </span>
-          )}
-        </a>
-      )}
+      <a
+        className="shop-logo"
+        href={preview ? undefined : "#shop-products"}
+        aria-label={`${subscription.name} products`}
+      >
+        {subscription.logo_url ? (
+          <Image
+            width={72}
+            height={56}
+            unoptimized
+            src={displayImageUrl(subscription.logo_url)}
+            alt={`${subscription.name} logo`}
+          />
+        ) : (
+          <span className="shop-initial" aria-hidden="true">
+            {subscription.name?.slice(0, 1) || "B"}
+          </span>
+        )}
+      </a>
       <div className="shop-centered-identity">
-        {centeredLogo ? (
+        {centeredPhoto ? (
           <>
             <Image
               width={300}
               height={56}
               unoptimized
-              src={displayImageUrl(centeredLogo)}
-              alt={`${subscription.name || "Business"} logo`}
+              src={displayImageUrl(centeredPhoto)}
+              alt={`${subscription.name || "Business"} header identity`}
             />
             {preview ? (
               <span className="sr-only">{subscription.name}</span>

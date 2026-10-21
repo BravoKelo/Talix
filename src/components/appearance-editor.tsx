@@ -21,6 +21,7 @@ type Branding = StorefrontDesign & {
   header_mode: "standard" | "custom";
   header_links: HeaderLink[];
   header_photo_url: string | null;
+  website_hero_url: string | null;
   default_location_id: string | null;
 } & Pick<Subscription, "name" | "description" | "accent" | "logo_url">;
 export function AppearanceEditor({
@@ -49,6 +50,7 @@ export function AppearanceEditor({
       ("header_layout" in subscription ? "custom" : "standard"),
     header_links: subscription.header_links ?? [],
     header_photo_url: subscription.header_photo_url ?? null,
+    website_hero_url: subscription.website_hero_url ?? null,
     default_location_id: subscription.default_location_id ?? null,
     name: subscription.name,
     description: subscription.description,
@@ -65,12 +67,18 @@ export function AppearanceEditor({
     "business-logos",
     subscription.id,
   );
+  const hero = useImageDraft(
+    subscription.website_hero_url ?? null,
+    "business-logos",
+    subscription.id,
+  );
   const [draft, setDraft] = useState<Branding>(original);
   const [saved, setSaved] = useState<Branding>(original);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const dirty =
     photo.dirty ||
+    hero.dirty ||
     image.dirty ||
     JSON.stringify(draft) !== JSON.stringify(saved);
   return (
@@ -140,15 +148,18 @@ export function AppearanceEditor({
             try {
               const url = await image.prepare();
               const photoUrl = await photo.prepare();
+              const heroUrl = await hero.prepare();
               const value = {
                 ...draft,
                 logo_url: url,
                 header_photo_url: photoUrl,
+                website_hero_url: heroUrl,
               };
               await save(value);
               const old = [
                 ...image.committed(url),
                 ...photo.committed(photoUrl),
+                ...hero.committed(heroUrl),
               ];
               setDraft(value);
               setSaved(value);
@@ -356,7 +367,7 @@ export function AppearanceEditor({
                     }
                   >
                     <option value="name">Business name</option>
-                    <option value="photo">Business logo</option>
+                    <option value="photo">Uploaded photo</option>
                   </select>
                 </label>
                 <p className="muted">
@@ -379,8 +390,8 @@ export function AppearanceEditor({
                   }}
                 />
                 <p className="muted">
-                  JPEG, PNG or WebP, up to 5 MB. Used as the featured image on
-                  your Talix website; the photo is public.
+                  JPEG, PNG or WebP, up to 5 MB. Displayed in the centered
+                  header identity area; the photo is public.
                 </p>
                 {photo.preview && (
                   <button
@@ -389,6 +400,34 @@ export function AppearanceEditor({
                     onClick={() => photo.clear()}
                   >
                     Delete header photo
+                  </button>
+                )}
+                <ImagePicker
+                  label="Website hero image"
+                  filename={hero.filename}
+                  disabled={!("website_hero_url" in subscription)}
+                  choose={(file) => {
+                    try {
+                      hero.choose(file);
+                      setMessage(
+                        "Hero image selected. Save branding to upload it.",
+                      );
+                    } catch (e) {
+                      setMessage((e as Error).message);
+                    }
+                  }}
+                />
+                <p className="muted">
+                  JPEG, PNG or WebP, up to 5 MB. Used as the large featured
+                  image in your Talix website template; the image is public.
+                </p>
+                {hero.preview && (
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => hero.clear()}
+                  >
+                    Delete website hero image
                   </button>
                 )}
                 <label>

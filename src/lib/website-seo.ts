@@ -61,6 +61,7 @@ export function websiteStructuredData(catalog: Catalog, canonical: string) {
         url: canonical,
         description: websiteDescription(catalog),
         image:
+          catalog.subscription.website_hero_url ||
           catalog.subscription.header_photo_url ||
           catalog.subscription.logo_url ||
           undefined,

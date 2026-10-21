@@ -321,7 +321,9 @@ test("published-location fallback and saved photo/appearance render without an a
       header_identity: "photo",
       logo_url: "http://127.0.0.1:3100/test-product.svg?identity=logo",
       header_photo_url:
-        "http://127.0.0.1:3100/test-product.svg?identity=hero",
+        "http://127.0.0.1:3100/test-product.svg?identity=header",
+      website_hero_url: "http://127.0.0.1:3100/test-product.svg?identity=hero",
+      website_live_template: "order_first",
       header_background: "#000000",
       storefront_button: "#ffffff",
       storefront_font: "serif",
@@ -330,9 +332,17 @@ test("published-location fallback and saved photo/appearance render without an a
   });
   await page.goto("/shop/example");
   await expect(page.getByLabel("Choose a location")).toHaveValue("Empty");
-  await expect(page.locator(".shop-centered-identity img")).toHaveAttribute(
+  await expect(page.locator(".shop-logo img")).toHaveAttribute(
     "src",
     /identity=logo/,
+  );
+  await expect(page.locator(".shop-centered-identity img")).toHaveAttribute(
+    "src",
+    /identity=header/,
+  );
+  await expect(page.locator(".website-template-media img")).toHaveAttribute(
+    "src",
+    /identity=hero/,
   );
   await expect(page.locator(".figma-store")).toHaveCSS(
     "font-family",

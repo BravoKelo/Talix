@@ -24,6 +24,7 @@ export async function generateMetadata({
     ? websiteDescription(catalog)
     : "This Talix business page is not currently available.";
   const image =
+    catalog?.subscription.website_hero_url ||
     catalog?.subscription.header_photo_url ||
     catalog?.subscription.logo_url ||
     undefined;

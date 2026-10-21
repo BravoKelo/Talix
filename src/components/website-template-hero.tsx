@@ -39,7 +39,7 @@ function HeroImage({
   subscription: Subscription;
   products: Product[];
 }) {
-  const source = subscription.header_photo_url ?? products[0]?.image_url;
+  const source = subscription.website_hero_url ?? products[0]?.image_url;
   return source ? (
     <Image
       width={960}
@@ -49,7 +49,7 @@ function HeroImage({
       fetchPriority="high"
       src={displayImageUrl(source)}
       alt={
-        subscription.header_photo_url
+        subscription.website_hero_url
           ? subscription.name + " featured image"
           : products[0].name
       }
@@ -314,7 +314,9 @@ export function WebsiteTemplateHero({
       {!products.length && (
         <div className="website-template-ordering-status">
           <strong>Online ordering is not ready</strong>
-          <span>Published products will appear here when they are available.</span>
+          <span>
+            Published products will appear here when they are available.
+          </span>
         </div>
       )}
 

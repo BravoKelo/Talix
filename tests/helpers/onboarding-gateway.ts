@@ -250,7 +250,12 @@ export async function onboardingGateway(skipMigrations: string[] = []) {
       }
       // Test gateway is HTTP; stored image URLs still obey production HTTPS constraints.
       // Translate only our own fixture Storage origin at this transport boundary.
-      for (const field of ["image_url", "logo_url", "header_photo_url"]) {
+      for (const field of [
+        "image_url",
+        "logo_url",
+        "header_photo_url",
+        "website_hero_url",
+      ]) {
         if (
           typeof input[field] === "string" &&
           input[field].startsWith(
@@ -313,10 +318,7 @@ export async function onboardingGateway(skipMigrations: string[] = []) {
           "p_existing_url",
           "p_mark_complete",
         ],
-        launch_website_template: [
-          "p_subscription",
-          "p_confirm_empty_catalog",
-        ],
+        launch_website_template: ["p_subscription", "p_confirm_empty_catalog"],
         talix_admin_access: [],
         workspace_permissions: ["p_subscription", "p_location"],
         list_business_users: ["p_subscription"],

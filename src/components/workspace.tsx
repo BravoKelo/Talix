@@ -1166,6 +1166,9 @@ export function Workspace({
                           delete (payload as Partial<typeof v>).header_links;
                         if (!("header_layout" in sub))
                           delete (payload as Partial<typeof v>).header_layout;
+                        if (!("website_hero_url" in sub))
+                          delete (payload as Partial<typeof v>)
+                            .website_hero_url;
                         const result = await browserClient()
                           .from("subscriptions")
                           .update(payload)
