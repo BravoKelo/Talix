@@ -65,6 +65,38 @@ async function mockCatalog(
   );
 }
 
+test("launched template without products presents the business without empty commerce controls", async ({
+  page,
+}) => {
+  await mockCatalog(page, {
+    ...catalog,
+    subscription: {
+      ...catalog.subscription,
+      website_live_template: "order_first",
+    },
+    products: [],
+  });
+
+  await page.goto("/shop/example");
+  await expect(
+    page
+      .locator(".website-template-hero")
+      .getByRole("heading", { name: "Example store", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Online ordering is not ready")).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Business commitments" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "A business customers can know and trust.",
+    }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: /Your cart/ })).toHaveCount(0);
+  await expect(page.getByPlaceholder("Search products")).toHaveCount(0);
+  await expect(page.locator(".shop-menu-toggle")).toHaveCount(0);
+});
+
 test("visual shopping: keyboard details, scoped search, cart variants and location reset", async ({
   page,
 }) => {
@@ -287,7 +319,11 @@ test("published-location fallback and saved photo/appearance render without an a
       ...catalog.subscription,
       default_location_id: "missing",
       header_identity: "photo",
-      header_photo_url: "http://127.0.0.1:3100/test-product.svg",
+      logo_url: "http://127.0.0.1:3100/test-product.svg?identity=logo",
+      header_photo_url:
+        "http://127.0.0.1:3100/test-product.svg?identity=header",
+      website_hero_url: "http://127.0.0.1:3100/test-product.svg?identity=hero",
+      website_live_template: "order_first",
       header_background: "#000000",
       storefront_button: "#ffffff",
       storefront_font: "serif",
@@ -296,7 +332,18 @@ test("published-location fallback and saved photo/appearance render without an a
   });
   await page.goto("/shop/example");
   await expect(page.getByLabel("Choose a location")).toHaveValue("Empty");
-  await expect(page.locator(".shop-centered-identity img")).toBeVisible();
+  await expect(page.locator(".shop-logo img")).toHaveAttribute(
+    "src",
+    /identity=logo/,
+  );
+  await expect(page.locator(".shop-centered-identity img")).toHaveAttribute(
+    "src",
+    /identity=header/,
+  );
+  await expect(page.locator(".website-template-media img")).toHaveAttribute(
+    "src",
+    /identity=hero/,
+  );
   await expect(page.locator(".figma-store")).toHaveCSS(
     "font-family",
     "Georgia, serif",

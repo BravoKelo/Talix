@@ -1,11 +1,32 @@
 # Talix current state
 
+## Owner-review corrections for website setup — October 20, 2026 Pacific
+
+The owner conditionally approved the website samples subject to resolving the already-recorded issues #75–#79. The existing-website path now uses a three-step connection journey with no template controls; Decide Later is a one-step save-and-return path; both outcomes provide explicit, non-publishing confirmation while preserving any previously launched Talix site. Business identity no longer contains a partial false-affordance preview. Go Live contains the complete private preview, including the storefront header, navigation, hero, products, business story and location details, followed by distinct publication confirmation and a working website action.
+
+Talix-template owners use Website Appearance as the single entry for shared website/storefront presentation controls; the separate Storefront appearance tile remains available for owners who use an existing website or defer the website decision. Standard navigation remains Home, Shop, About and Contact. Owners can copy those defaults into editable navigation, rename, reorder, remove or add supported links, and restore the standard set. Additive development migration `20261021011154_editable_standard_navigation` expands only the existing bounded navigation validator for the four internal destinations while preserving HTTPS-only external links, tenant settings authority and the explicit public catalog. Twenty-one development migrations are recorded. Post-migration security and performance advisor categories and counts are unchanged. Production migration execution and production deployment remain unapproved.
+
+## Website owner onboarding implementation in progress — October 19, 2026 Pacific
+
+Issue #73 records the owner-approved bounded first batch on `feature/website-owner-onboarding`, based on main `60f5ea9b17538db50dd181e9397700c025b34d54`. Work prepares the owner-only three-choice setup hub, four included template concepts, private preview, launch gates, plain-language findability guidance, audit corrections, documentation, tests, and an additive migration. No merge, deployment, production launch, domain activation, billing, infrastructure, embed, Customizable Website add-on, or Marketing add-on is authorized.
+
+The current branch contains an unaccepted corrective implementation following the owner's review: the selected published default location is persisted through the existing subscription-settings authority; the four template choices render distinct full-page compositions in preview and the launched storefront; launched business shop pages receive business-specific metadata, canonical and robots controls, visible-content JSON-LD, and a single-homepage sitemap response; and wizard step changes move focus and announce the new step. The branch now also requires an authoritative returned row before affected workspace saves report success, covers session-reading public routes with the Supabase refresh boundary, and adds direct onboarding validation/focus regression checks. This is branch evidence, not product-owner acceptance or merge authorization.
+
+On October 20, 2026 Pacific, the owner approved the rolling browser/device/assistive-technology matrix in [SUPPORTED-ENVIRONMENTS.md](SUPPORTED-ENVIRONMENTS.md), with physical-device and real assistive-technology testing to occur at the owner's leisure. That future evidence is not a blocker for this batch, PR acceptance or merge, but cannot be reported as passed. Existing Playwright coverage is being extended to critical Firefox and WebKit paths without a new testing vendor. Issue #67 may close when that approved automated coverage passes, retaining the recorded evidence limitation. Priority issues #48, #50 and #63 remain subject to their issue-specific evidence. Issue #71 is a future production-readiness gate, not a blocker for this implementation or PR; no operational system or support process is introduced here.
+
+Gate verification on October 20 confirms the real Talix development Auth service rotates an intentionally expired public-entry session and persists its new cookie across home and storefront requests with `no-store`; the disposable no-mail account was deleted and zero matching accounts remain. Focused Chromium, Firefox and WebKit onboarding checks now cover validation/step focus and preview focus return. A WebKit focus-return difference was corrected. Exact-head CI must still pass before #48, #50, #63 and #67 are closed.
+
+The owner separately approved development migration execution on October 19. The reviewed SQL from commit `22b86338bcbf49d3fc219d501c47393296da4fad` was applied unchanged to Talix development as `20261019201906_website_owner_onboarding`; nineteen migrations are recorded. All nine existing subscriptions retained deferred/null defaults. Live rolled-back checks passed owner save and outsider denial without retaining test data. Anonymous save/launch execution is denied, authenticated execution is limited by the functions' internal `private.is_owner` check, both functions use an empty search path, and the public catalog exposes only `website_live_template`. Advisor categories are unchanged: the authenticated security-definer count increased from 16 to 18 for these two intentional owner-gated RPCs; anonymous findings remain five, with no new anonymous exposure. Performance findings are unchanged. Production migration execution remains unapproved.
+
+On October 20, the owner directed correction to the approved Figma header contract: compact logo at left, business name or uploaded identity centered, and website hero photography below. Additive development migration `20261020224425_separate_website_hero_image` adds only nullable `website_hero_url`, preserves `logo_url` and `header_photo_url` in their approved roles, includes the hero in the explicit public catalog, and protects all three saved references during image cleanup. Twenty migrations are recorded. The schema column and unchanged advisor categories were verified; production migration execution remains unapproved.
+
+The approved custom-domain direction remains a separately gated future implementation. Stable server-rendered product/location routes are also an approved requirement whose exact URL, slug, redirect, cache, and data contract awaits a later bounded decision. The implemented homepage search foundation does not create those routes or their redirect/backfill model. See `WEBSITE-PUBLIC-ROUTES-REVIEW.md` and `WEBSITE-OWNER-ONBOARDING.md` for current boundaries and acceptance limits.
+
 ## Audit reports accepted and merged — October 18, 2026 Pacific
 
 Owner accepted both audit reports for documentation, with fixes to proceed separately by issue priority. PR #59 merged as `347e03b308e417af18b5f5fcfb5fef70be74fa88` after exact-head Core checks run 39201898014 passed. PR #72 merged as `34b39ebf8a93a64d7e1b18dff87e46a39c94dad5` after corrected head `349a8854c3dc4a59f83eaa461a84a61c501ae96f` passed run 39206007772. The harness review thread is resolved; the corrected rerun captured errors from both pages and preserved all ten observations with no captured runtime errors.
 
 [Audit index](audits/README.md) links the initial and consolidated reports. The consolidated matrix covers all 113 adopted standards. Findings #48–#58 and #62–#71 remain open for separate remediation: 19 P2 and 2 P3; no demonstrated P0/P1. Report acceptance does not resolve findings, certify compliance or waive applicable L1 requirements. Use the consolidated report's onboarding and production gates when approving the next bounded work scope. No application, dependency, live-data, migration, infrastructure or production release changes; main automatic deployment remains disabled. Earlier pending/unmerged audit statements below are historical and superseded by this record.
-
 
 ## Extended standards accepted and merged — October 18, 2026 Pacific
 
@@ -33,7 +54,6 @@ Owner requested documentation-only rules 41–55 on `docs/cross-platform-standar
 
 New standards and concise AGENTS guidance await review/acceptance; no application, API, session, schema, dependency, infrastructure, PWA/native or offline implementation. Browser/OS/version support commitments and physical-device coverage remain an explicit decision; current automated evidence is desktop/mobile-viewport Chromium only. WCAG 2.2 AA is the proposed target, not verified compliance. Documentation link/ID/scope checks are recorded in the PR; application tests are not rerun for this prose change. Next step is owner review, not merge or mobile work. Existing product/architecture and website commercial direction remain intact.
 
-
 ## Engineering standards documentation review — October 18, 2026 Pacific
 
 Owner requested documentation-only engineering standards on `docs/engineering-standards`, based on main c71e690e50d635c3bbd7d556e0d802f720928084. [Assessment](standards/assessment.md) and [standards index](standards/README.md) record implemented vs future boundaries, classified rules and tooling limits. Owner accepted and authorized merge of PR #47 at 38f50e104768c256eb3e349e95a71874a2bcdde2; merged as f96a3d3692a8311ec72762303c875e1b2ef14d1c. Core checks run 39199903149 passed. The 47 classified standards are adopted for future applicable work; this is not a retrospective code-compliance certification or code-audit authorization. No application, schema, CI, dependencies or service configuration changed.
@@ -52,18 +72,15 @@ Owner approved the PR #44 application batch and linked tracking/industry proposa
 
 Owner authorized the two reviewed migrations from PR #45 head 68ee60d11979f9ae486770bc0b5f7f332bb229d9. Applied unchanged SQL as 20261018214821_shopper_tracking_branding and 20261018214826_subscription_industry_changes; development now records eighteen migrations. Live rolled-back fixtures passed owner change/retry/stale review, outsider denial, purchase/product/location preservation, tracking privacy and grant checks. See TRACKING-INDUSTRY-MIGRATIONS.md for exact evidence and advisor comparison. No demo conversions or production release. Final implementation acceptance/merge remains pending; PR #45 is open. Existing app-head CI passed 65 unit/SQL and 32 browser tests. Live signed-in owner UI saving is still unverified.
 
-
 ## Deferred batch accepted and merged — October 18, 2026 Pacific
 
 Owner approved PR #44 at 1911ea74b0380b22f4e02eb4b87ee014ad963b34 and the linked tracking/industry proposals with “Approved.” PR #44 merged with history preserved as e77446657ee8abb276b0ff61842ceaff053255c9. Core checks 39166225703 passed lint, TypeScript, 59 unit/SQL tests, build and 26 desktop/mobile browser tests; preview was READY. Issues #36/#41/#42/#43 are accepted. No production deployment or live data/configuration change. Main deployment remains disabled; review branch retained.
 
 The concrete design/persistence boundaries in DEFERRED-FOLLOWUP-REVIEW.md for #38/#40 are now approved for implementation and migration preparation. This supersedes proposal-only wording. Original purchases remain immutable; owner-only versioned/idempotent industry confirmation and append-only history, compatible catalog quotes, privacy-safe tracking branding and public return link are the bounded scope. No real billing, entitlement/industry modules or industry data conversion. Exact migration execution and final acceptance of the new implementation remain separate.
 
-
 ## Deferred follow-ups opened — October 18, 2026 Pacific
 
 Owner directed “Please begin work on the deferred issues” after PR #33 acceptance. New focused branch `feature/deferred-workspace-review` starts from main fa7b6f0486c6703f70213d730b60cb0b553f3c17. Issues #36/#41/#42/#43 implement saved workspace product images, singular product counts, compact persistent settings navigation/return-to-top/aligned icons, and clear returning-user landing actions. Details and concrete #38/#40 proposals: `DEFERRED-FOLLOWUP-REVIEW.md`; interactive fictional review at `/prototypes/deferred-review.html`. Industry conversion and tracking branding need review of their described persistence boundaries; neither migration is prepared/applied. No live business data, Auth/Storage configuration or production deployment changed. Issues remain open for owner acceptance; no merge authorized.
-
 
 ## Storefront phase accepted and merged — October 18, 2026
 
@@ -73,7 +90,6 @@ Acceptance covers the storefront product layout, popup cart, five header presets
 
 Automatic production deployment from main remains disabled in vercel.json; this acceptance does not release production. Retain the feature branch while its review preview is in use. Live owner-workspace saving was not independently automated; do not infer that coverage from the shopper checks. Figma recreation remains deferred until allowance is available. Deferred issues #36, #38, #40, #41, #42, and #43 remain outside this phase; demo tracking issues are not closed by this acceptance.
 
-
 ## Header navigation activated — October 18, 2026
 
 Owner explicitly approved the reviewed development migration and a temporary 23-hour preview access link. Applied the unchanged SQL from 4de79145bbb226fe945c4db0fbcc5a437a7b0773 as `20261018174618_storefront_header_navigation`; sixteen migrations are recorded. This supersedes prepared-only/pending-approval statements below. Filename and test references match the service version; SQL content is unchanged. Reload the workspace to enable Standard/Custom and navigation saving. Existing non-centered layouts retain Custom mode.
@@ -81,7 +97,6 @@ Owner explicitly approved the reviewed development migration and a temporary 23-
 Live rolled-back synthetic checks passed defaults, owner/editor writes, invalid mode/URL rejection, retained custom values, active-link catalog publication, inactive-link redaction, private client omission and outsider/anonymous denial. All fixtures were rolled back; zero synthetic Auth users remain. Security-advisor categories/counts are unchanged (one private deny-all RLS notice, five public and thirteen authenticated definer notices, one existing password-protection notice). No Auth configuration, Storage, product or order data changed.
 
 The approved temporary link opened the protected 4de7914 preview. Live Retail Demo checks passed Home/standard navigation, saved About text, selected-location Contact information, collapsed header/menu and direct Add to cart. Live signed-in owner-workspace saving remains unverified; isolated browser/actual SQL evidence is distinct. Review: https://talix-87483sc45-bravokelo.vercel.app/shop/retail-demo . Figma recreation remains deferred. No merge or production release is authorized.
-
 
 ## Header navigation implementation — October 18, 2026
 
@@ -94,10 +109,6 @@ Validation passed: lint (one pre-existing unused-variable warning in the Figma p
 ## Retail Demo population — October 18, 2026
 
 Owner created Retail Demo and authorized unattended fictional setup (issue #34). Development setup committed: 24 products in six collections, Main Store default and Market Annex published, Studio unpublished; centered identity remains default. Eight orders were created through checkout_simulated and advanced/refunded through existing checked RPCs: received, in progress, ready, completed, cancelled, declined, partial refund and full refund. No real payments, mail, Auth users, schema/security or other businesses changed. Original bundled SVG illustrations/logo/header are in public/demo-retail; scripts/demo contains the guarded one-time setup (not a migration). External bundled demo images can be detached, not deleted through Storage cleanup. Assets deployed READY at c24ea82387436f54d987b3e2976e664b9b19531e. Owner reported missing images: stored bundled assets used a separate protected preview hostname. Render bundled demo URLs on the current origin in storefront/header/workspace/editor; stored HTTPS URLs and cleanup behavior stay unchanged. Desktop/mobile regression checks block the original hostname and verify real image decoding from the current origin. Protected live-browser acceptance remains unverified. No merge or production release authorized.
-
-
-
-
 
 ## Header choice activated — October 17 Pacific / October 18 UTC
 
@@ -129,13 +140,11 @@ Prepared: single business header, centered name/photo, business account/cart ico
 
 Local lint, TypeScript, 53 unit/SQL tests, production build and all 12 desktop/mobile browser scenarios pass. New browser coverage checks collection filtering, default/fallback location, saved header photo/theme rendering, no duplicate application header, 48px icon targets, narrow-phone column collapse, and owner appearance preview/save/cancel plus header-photo upload/save/delete. Screenshots were reviewed against the approved Figma layout. A final menu/search styling correction also passed both focused desktop/mobile browser rechecks. Tests use isolated Auth/Storage fixtures and actual migration SQL/RLS, not live Supabase or real customer acceptance. Apply only after reviewing the final tested migration and obtaining explicit development-execution approval. Figma design acceptance is implementation authorization, not live database execution or merge acceptance.
 
-
 ## Storefront owner review corrections — October 17, 2026
 
 Owner authorized compact image-led quick-add tiles, tile-click product dialogs and a collapsing sticky business header with the cart at top right. Presentation changes are prepared on the existing storefront branch. Local lint, TypeScript, 48 unit/SQL tests, production build and all 10 desktop/mobile browser scenarios pass. Screenshot review covers both widths; browser assertions cover two-column mobile tiles, first-row visibility, direct base-product addition, modal options/focus and the persistent collapsing cart header. Browser verification uses isolated fixtures, not live customer data. The configurable initial location is pending the explicit schema/catalog boundary decision described in PRODUCT-DESIGN; no default-location schema or live database change has been made.
 
 Publication of review commit 0bd391a and PR #33 was explicitly approved, including existing automatic feature previews. Owner then authorized copying the existing development preview settings to this branch and rebuilding; deployment dpl_71wgSMCpgdG68VzCUutkgSKnhXMa reached READY at that commit. Owner confirmed sign-in works. The automated deployed-page fetch was blocked by Vercel Authentication, so no automated deployed sign-in claim is made. No merge is authorized.
-
 
 ## Active storefront development — Issue #32, October 17, 2026
 
@@ -149,13 +158,11 @@ Publication boundary: #32 explicitly excludes automatic deployment, while the ac
 
 Resume: inspect this commit and the current remote branch, obtain that publication decision, then fast-forward the existing feature branch and open the prepared review PR against main. Read its actual CI results before claiming CI success; obtain separate owner visual/merge acceptance. Do not treat the storefront foundation as a complete primary-business-website service.
 
-
 ## Repository history cleanup — October 16, 2026 Pacific / October 17 UTC
 
 Owner explicitly authorized rewriting the repository history and force-pushing without further interaction. Nineteen affected commits were replaced with cleaned versions; all five branch histories were audited and no tags exist. Only historical documentation text changed; application files, migrations, dependencies and merge topology were preserved. The cleaned branch tip before this handoff is d8e860a922b95ca6b2ed7039184130188727a884. The accepted application tree is unchanged. Use the latest main branch for all future work; do not merge old design history back into it. Commit timestamps for reconstructed commits reflect the cleanup operation. Historical checkpoint IDs below refer to equivalent cleaned commits; linked CI runs originally validated the corresponding pre-rewrite source trees.
 
 GitHub retains a read-only head reference for merged PR #14, which still points to the original history. Branch cleanup does not purge that managed PR reference or cached commit views. Full server-side removal is outside the connected repository tools; see GitHub's history-removal documentation. No claim of total GitHub-side erasure is made. The three older branches were already clean and were retained. The design branch follows the cleaned baseline while its testing preview remains in use. Automatic main deployments remain disabled; no database changes or production release occurred.
-
 
 ## Accepted baseline — October 16, 2026 Pacific / October 17 UTC
 
@@ -167,7 +174,6 @@ Development has thirteen applied migrations, including approved business logos, 
 
 Continue testing the accepted READY preview https://talix-74bcwbdmh-bravokelo.vercel.app/ . Preserve feature/talix-design-refresh while that review URL remains in use; remove it once replaced, per the owner's cleanup preference. main remains the development baseline. Automatic main deployment is disabled by vercel.json; no production release, payment processing or email-delivery activation is part of this acceptance. Next work requires a new owner request; do not reopen completed review gates.
 
-
 ## Integrated development baseline — October 16, 2026 (Pacific / UTC)
 
 Repository: BravoKelo/Talix. Default/development baseline branch: main.
@@ -175,6 +181,7 @@ Repository: BravoKelo/Talix. Default/development baseline branch: main.
 The owner explicitly instructed merging the existing work and continuing manual testing afterward, superseding the requirement to finish additional live acceptance before this early-development integration. Do not reimpose that checkpoint. Future material product/architecture/schema/security/infrastructure decisions still follow AGENTS.md; this approval does not authorize payment processing or broader features.
 
 ## Confirmed integration
+
 - PR #2: foundation and business-neutral commerce core; retargeted to main and merged by merge commit 05e6db3040c4fb3b255ff38cf2f2fe87add03c8a.
 - PR #4: customer signup, offerings, subscriptions, Users and reconciliation; retargeted to main and merged by merge commit fce04b7ddc35f0505868c616dd0d3fb257571df8.
 - The final application merge tree is 0ebe54e04d408786bd929b8d73305aa3ad3f5c66, exactly identical to accepted onboarding head 432e7dd59abca5d3db8b847f061dead8c6d3f0f0.
@@ -182,6 +189,7 @@ The owner explicitly instructed merging the existing work and continuing manual 
 - A documentation-only follow-up records this baseline. Recover the latest main SHA from GitHub; this document cannot contain its own commit SHA.
 
 ## Implemented
+
 Next.js/Supabase/Vercel business-neutral ordering/fulfillment; multiple subscriptions per client and locations per subscription; general/location products, generic options, images, published catalogs, guest checkout, private order tracking, fulfillment histories and simulated payments/refunds.
 
 Landing signup collects structured business/contact/first-location details, offers sample business types/plans/extras, reviews once and uses the owner-approved no-mail confirmation page before workspace entry. Additional subscriptions preserve the shared client profile and keep separate immutable purchase details. Offerings are editable by allowlisted Talix staff.
@@ -189,6 +197,7 @@ Landing signup collects structured business/contact/first-location details, offe
 Users lists editable existing accounts, protects Owner, supports predefined/custom permission roles and independent subscription/location assignments. Managers cannot alter themselves/Owner or grant authority/location access they lack. ADR 0003 records the implemented mapping and approval history. Invitations are not implemented; employee Auth accounts must already exist.
 
 ## Services and deployment
+
 Existing Talix development Supabase project: lzepujggusieapablzhn, us-east-1, PostgreSQL 17. Ten recorded migrations through 20261008033814_preserve_client_profile; no replay/rollback or new migration during integration. Application tables have RLS. The profile function body was compared byte-for-byte to its reviewed migration; body/prosrc MD5 84fab1fca6bb9a2e4a51c945a1a2caef and complete-definition MD5 912ec850712b76b19d8a4d641a2dc990. Fixed search path and execution grants remain unchanged.
 
 Vercel project prj_Xmg24E6djhGtCFIJsmP9EblkLDym, team team_eTPaf9j2OvuQWUZGssM8wVjv, Node 24. Production tracks main, but the approved root vercel.json now sets git.deploymentEnabled.main=false on main. Feature previews remain enabled; manual releases are not disabled. Post-merge inspection found only the historical production deployment from 9b0e35ea; no new production deployment. No production database configuration or release was made. The owner's screenshots showed an empty Project production-variable tab; Shared variables were not inspected.
@@ -196,6 +205,7 @@ Vercel project prj_Xmg24E6djhGtCFIJsmP9EblkLDym, team team_eTPaf9j2OvuQWUZGssM8w
 Continue testing the protected onboarding preview: https://talix-git-feature-customer-onboarding-bravokelo.vercel.app/ . It uses the existing development service and TALIX_EMAIL_CONFIRMATION_PENDING=true. Production is not configured for this development journey. Main deployment/release configuration can be decided when actually needed.
 
 ## Validation and honest limits
+
 - Core head 5c481daa3f03027a06afb4cd481b304cff8b0707 passed push/PR checks 38972419707 and 38972426161.
 - Onboarding implementation/configuration head e75be28b2611a27c88ea404e5bf6003b82d37ae5 passed push/PR checks 38972427075 and 38972431963; matching feature previews are READY.
 - Accepted documentation head 432e7dd59abca5d3db8b847f061dead8c6d3f0f0 passed push/PR checks 38973288019 and 38973293326. Main's merged tree is identical.
@@ -205,10 +215,10 @@ Continue testing the protected onboarding preview: https://talix-git-feature-cus
 - Main-trigger CI runs, when present, must be read before reporting their result. Documentation-only follow-up status is recorded in Issue #10.
 
 ## Next work
+
 The owner resumes testing and reports issues. Record and correct the next authorized batch, using main as the baseline and focused feature branches. Do not restart theoretical POC/discovery or repeat completed reconciliation. No new feature scope is approved.
 
 Known limits: simulated billing/payments only; no card collection or money movement; real email verification/delivery deferred until launch; predefined role mappings remain the current implemented defaults; USD only; hours descriptive, no stock/tax/shipping/scheduled-order enforcement; latest 100 location orders; no invitations/shared ownership/full CRM/BOM/inventory/industry modules/integrations. Existing advisor notices and two historical synthetic Storage images are unchanged. No owner data was modified or deleted during integration.
-
 
 ## Active design review — Issues #11–13
 
@@ -216,16 +226,13 @@ Branch feature/talix-design-refresh starts from main 0616ae15. The owner supplie
 
 No merge is authorized by this design request. Review exact PR/head and preview before acceptance. After an accepted merge, remove this new feature branch once its preview is replaced, per the owner's tidy-branch preference. Do not delete older branches while an active testing URL depends on them.
 
-
 ### Public landing page added to the same design review
 
 The owner requested a redesigned Talix homepage after seeing the unchanged old landing page. Issue #11/PR #14 now include an original responsive marketing homepage using established capabilities and the Talix palette, with explicit sample-content illustration, future-feature labels and simulated-payment disclosure. No backend or schema changes. Review the preview root URL, not only /login. Existing browser scenarios now also check the homepage heading, payment FAQ, signup entry and horizontal fit on desktop/mobile. Exact-head CI and deployment evidence belong in PR #14; owner acceptance/merge remain outstanding.
 
-
 ### Mobile/touch design correction
 
 Owner approved replacing wrapped mobile navigation with compact disclosure menus and increasing touch targets. Same feature/talix-design-refresh branch/PR #14 now includes responsive public/workspace menus, deliberate single-column mobile controls and 48px touch targets. Tests exercise mobile menu opening before navigation. Review the latest matching preview/head in PR #14; no merge is implied. Cloud-browser preview access was previously declined and has not been retried; local browser screenshots and automated checks remain the visual/functional evidence.
-
 
 ## Latest authorized review batch — Issues #15–21
 
@@ -235,11 +242,9 @@ Business-logo configuration adds a prepared migration 20261017010613_business_lo
 
 Local logo SQL tests verify shared settings managers can save/upload without product permissions, outsiders/viewers cannot, unsafe logo addresses are rejected, and public catalog adds no client identity. Browser suites use isolated SQL/Auth fixtures, not actual service account creation. Exact published head/checks/deployment and final test outcomes are recorded in PR #14. Review before merge; issues remain open until owner acceptance. No additional branches were created; retain existing previews until replaced.
 
-
 ### Logo activation — October 17, 2026 UTC
 
 Supersedes the pending-execution boundary above: the owner explicitly approved applying the prepared logo-storage migration to Talix development. Applied successfully to project lzepujggusieapablzhn as 20261017032355_business_logos; repository filename aligned with the recorded service version, with unchanged SQL. Eleven migrations are now recorded. Verified nullable logo_url, public JPEG/PNG/WebP bucket with 5 MB limit, existing settings-based insert/select policies and public catalog logo field. Live transaction checks passed authorized owner upload metadata/save, unsafe URL rejection, foreign-folder rejection, and outsider upload/save denial. All synthetic Auth/workspace/storage metadata was rolled back. No existing business records or image files were changed. This is database/RLS verification, not a real browser binary-upload acceptance claim. Existing preview detects logo_url automatically and enables uploads after reloading the workspace. Security advisors still report established public/authenticated RPC notices, private admin deny-all RLS, and disabled leaked-password protection; no new functions or broader permissions were added. Final owner UI review and merge acceptance remain pending; no merge or production deployment authorized.
-
 
 ### Owner testing corrections #22–25 — October 16, 2026 Pacific
 
@@ -248,7 +253,6 @@ Owner authorized this batch on the existing feature/talix-design-refresh / PR #1
 The proposed migration 20261017035355_readable_order_numbers_and_cancellation.sql is NOT APPLIED to development. It backfills location-specific order numbers chronologically starting at 1001, enforces location/number uniqueness, allocates new numbers under a location row lock, and exposes only the number through existing order visibility/private-token tracking. UUIDs, tracking links, checkout idempotency and histories remain intact. It extends the existing checked advance_order RPC to cancel paid/partially-refunded received/in-progress/ready orders under existing orders.fulfill permission, records the event once, and leaves payment/refund amounts unchanged. Completed/cancelled orders cannot be reopened. No new public RPC or permission role is added.
 
 Until separately approved development execution, the preview uses a readable received-date reference for existing orders and shows cancellation as awaiting availability. This is a compatibility fallback, not a permanent unique order number; final numeric numbering/cancellation activation requires the prepared migration. No database changes in this batch are authorized by implementation approval alone under AGENTS.md. Exact validation and preview evidence belong in PR #14. Keep issues open for owner review.
-
 
 ### Latest owner corrections — Issues #23–24 and #26–29
 
@@ -260,7 +264,6 @@ Product images and business logos offer Delete image, staged until Save so Cance
 
 Prepared migrations remain UNAPPLIED: revised 20261017035355_readable_order_numbers_and_cancellation.sql, and 20261017042159_product_and_image_deletion.sql. The latter grants product deletion under existing products.manage scope, plus Storage API deletion for unreferenced business images under existing settings/products authority. A private, explicitly authorized reference-check helper inspects saved uses without tenant RLS hiding them; it is not a public RPC. No role, payment, deployment or service configuration change. Specific development execution approval and final merge acceptance remain separate. Local unit/SQL suite now has 46 passing tests; full browser and exact-head CI evidence belongs in PR #14. Nothing merged or applied in this correction batch.
 
-
 ### Approved development activation — October 16, 2026 Pacific / October 17 UTC
 
 Owner explicitly approved both prepared migrations. Applied unchanged SQL to Talix development lzepujggusieapablzhn as 20261017050812_readable_order_numbers_and_cancellation and 20261017050814_product_and_image_deletion. Repository filenames and the backfill-test reference are aligned with recorded service versions. Thirteen migrations are now recorded; the previous unapplied status is superseded. Existing two orders have permanent numbers, no missing values, and numbering starts at 100001 per location. UUIDs, private links and existing snapshots remain intact.
@@ -268,7 +271,6 @@ Owner explicitly approved both prepared migrations. Applied unchanged SQL to Tal
 Live transaction checks passed 100001/100002 allocation, checkout retry safety, idempotent cancellation with unchanged paid/refund state, product/image authorization and outsider denial, referenced-versus-unreferenced image checks, authorized product deletion and preserved order tracking snapshots. All temporary Auth/workspace/product/order records were rolled back. No stored image files were uploaded/deleted during live verification, and no existing product/order state was changed except the approved numeric backfill. Real-service file-byte deletion remains for owner testing; do not report SQL policy checks as end-to-end Storage API verification. Security advisor categories/counts remain unchanged; the new helper stays private and anonymous execution is denied.
 
 Implementation head 9cfd223f2427c16e1e540c76acc82cd6e1b382bf passed GitHub workflow 39003044749, including all 46 unit/SQL tests and six browser scenarios. Existing READY preview https://talix-ccie2zt3q-bravokelo.vercel.app/ now uses the activated database behavior after reload. This checkpoint changes filenames/test reference/documentation only. Main and production deployment hold remain unchanged. Final owner review/merge acceptance is still pending; keep PR #14 and review issues open.
-
 
 ### Final image picker correction — Issue #30
 

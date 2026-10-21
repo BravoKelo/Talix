@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { TaskDialog } from "./order-dialog";
-import { validWebsiteUrl } from "@/lib/header-navigation";
+import { standardHeaderLinks, validWebsiteUrl } from "@/lib/header-navigation";
 import type { Location, Subscription } from "@/lib/types";
 
 type NavigationItem = {
@@ -18,24 +18,27 @@ export function StorefrontNavigation({
   location?: Location;
   preview?: boolean;
 }) {
-  const items: NavigationItem[] =
+  const configuredLinks =
     subscription.header_mode === "custom"
       ? (subscription.header_links ?? [])
-          .filter(
-            (l) =>
-              l.label.trim() &&
-              (l.destination === "storefront" || validWebsiteUrl(l.url)),
-          )
-          .map((l) => ({
-            label: l.label,
-            href: l.destination === "website" ? l.url : "#shop-welcome",
-          }))
-      : [
-          { label: "Home", href: "#shop-welcome" },
-          { label: "Shop", href: "#shop-products" },
-          { label: "About", action: "about" },
-          { label: "Contact", action: "contact" },
-        ];
+      : standardHeaderLinks;
+  const items: NavigationItem[] = configuredLinks
+    .filter(
+      (link) =>
+        link.label.trim() &&
+        (link.destination !== "website" || validWebsiteUrl(link.url)),
+    )
+    .map((link) => {
+      if (link.destination === "website")
+        return { label: link.label, href: link.url };
+      if (link.destination === "shop")
+        return { label: link.label, href: "#shop-products" };
+      if (link.destination === "about")
+        return { label: link.label, action: "about" };
+      if (link.destination === "contact")
+        return { label: link.label, action: "contact" };
+      return { label: link.label, href: "#shop-welcome" };
+    });
   const container = useRef<HTMLDivElement>(null);
   const measure = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(0);

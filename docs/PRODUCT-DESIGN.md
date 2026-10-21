@@ -1,5 +1,17 @@
 # Talix Product Design
 
+## Website and storefront owner setup — approved October 19, 2026 Pacific
+
+After creating a subscription, an owner enters a resumable **Website & storefront** setup area. The three reversible choices are **Use my existing website**, **Use a Talix template**, and **Decide later**. This decision is not part of price review and does not disable the subscription's existing Talix ordering page.
+
+The existing-website path stores a private, validated HTTPS address and explains how to add an ordinary link to Talix ordering. Talix does not fetch, reproduce, mask, or frame the external website. Embedding is a separately approved future product direction outside this release.
+
+The template path offers four included, goal-based starting points: **Order First**, **Browse & Shop**, **Visit & Order**, and **Story & Shop**. They share the same catalog, checkout, accessibility, mobile, search, and security foundation. Owners can use controlled branding and presentation settings, see saved/unsaved responsive previews, open a contained customer preview marked **Preview — not live**, and launch explicitly. Launch requires a published location. An empty catalog requires acknowledgement and results in **Live — online ordering not ready** with unavailable ordering actions hidden.
+
+Website-path, template selection, and launch authority are owner-only. Existing staff authority for products, locations, appearance, and users is unchanged. The setup includes a plain-language **Help customers find your business** checklist using only **Ready**, **Needs attention**, **Checking**, and **Couldn’t check — try again**. Foundational SEO and AI-search readiness is included in every template and never promises ranking, indexing, citations, traffic, leads, or revenue.
+
+One verified owner-supplied domain identity is an approved future address option inside the template path without an immediate extra recurring website charge. It is not implemented until the dedicated architecture, security, provider-capacity, support, and operations review is approved. Owners retain registration and renewal responsibility; masking and registrar-credential collection are prohibited. Expanded self-service website controls, managed marketing, custom design, and embed capabilities remain separately scoped future offerings.
+
 ## Status
 
 **Design status:** Confirmed workflows and owner-approved October 16 visual direction; implementation remains for review.
@@ -86,7 +98,6 @@ The owner confirmed that prospective customers should not choose an internal ord
 
 Customer signup no longer exposes this internal requirement. Migration application and operational verification belong in CURRENT-STATE and PROJECT-HISTORY.
 
-
 ## Review corrections — October 8, 2026
 
 Issues #5–9 implement the owner-requested batch. Logged-out navigation offers Sign in and Sign up. Logout clears the Auth session and opens sign-in with a full navigation; workspace/admin entry verifies the current user and private responses are not cached. Duplicate-email feedback appears beside the signup action with a sign-in link and preserves typed values. Owners have a visible Add subscription action alongside subscription selection, using their existing account.
@@ -96,7 +107,6 @@ Users starts with configured users, protected Owner, subscription roles and sepa
 ## Reconciliation checkpoint — October 7, 2026 (Pacific; October 8 UTC)
 
 The owner closed Issues #5–9 after review. Preserve those corrected workflows; closure does not approve merging or the complete visual design. Issue #10 authorizes focused stabilization: successful custom-role creation keeps that role selected for later saves; a failed removal retains the selected user's editor and location choices, while successful removal returns to Add a user. Adding a subscription preserves the shared client profile and retains its own purchase details. This profile correction is applied and verified on development after separate execution approval.
-
 
 ## October 16 design batch — Issues #11–13
 
@@ -108,21 +118,17 @@ The storefront editor exposes existing subscription-wide business name/introduct
 
 All seven appearance screenshots were reviewed. Observed references include settings discovery, header/contact/mode choices, logo upload, editable/reorderable links, grouped color controls with preview and Save/Cancel; slideshow contents were not supplied. Only existing Talix settings work in this first design slice; other controls are placeholders rather than inferred implementation. Talix application colors do not restrict an owner's saved storefront brand color.
 
-
 ## Public homepage extension — October 16, 2026
 
 The owner authorized extending Issue #11/PR #14 to redesign the public landing page. The original Talix blue/white/gold page introduces ordering and fulfillment, an explicitly illustrative workspace visual, core capabilities, the customer-to-team workflow, a clearly planned capabilities section, FAQs and signup/signin links. Use original assets and copy; do not invent testimonials, metrics or certifications. Sample plans and simulated payments are disclosed before signup; industry tools and integrations are described as future capabilities. Existing onboarding and global authentication navigation are preserved.
-
 
 ### Readability revision — October 16, 2026
 
 Owner review requested larger navigation and descriptive text across every refreshed page. Navigation and descriptions now use 16px text, general copy uses a 17px base, and supporting labels have a 14px minimum, including mobile. Line spacing and wrapping are increased; forms, resource links, sidebar navigation, settings and appearance previews retain their workflows. Illustrative product content also uses larger labels rather than the previous 7–12px sizes. This correction remains within Issue #11/PR #14.
 
-
 ### Mobile navigation and touch revision — October 16, 2026
 
 The owner rejected wrapping mobile navigation/controls and approved compact navigation menus and touch-friendly controls. Public and workspace sections now use accessible mobile disclosure menus with single-column choices; desktop navigation remains visible. Mobile actions, subscription/location selectors, resource placeholders and signup steps have deliberate single-column layouts rather than wrapped rows. Controls keep readable type and single-line labels. Buttons, primary navigation, selects and disclosure summaries have at least 48px targets; checkbox/radio labels provide larger activation areas. Paragraph text still wraps naturally. This supersedes the earlier control-wrapping approach and remains within Issue #11/PR #14.
-
 
 ## Review corrections #15–21 — October 16, 2026
 
@@ -136,7 +142,6 @@ The owner authorized this testing batch and requested a final review before merg
 - Users has internal Users, Add/Edit user and Permissions tabs. Tabs have keyboard navigation and clear selected state; user/role drafts survive internal tab changes. Existing protected Owner, custom roles and delegation rules remain enforced.
 
 Business-logo upload/save is implemented against a prepared additive migration, not yet applied to development. The nullable logo URL and public business-logos bucket use existing settings.manage authority; public images are limited to JPEG/PNG/WebP up to 5 MB, uploaded under the subscription's folder without overwrites. No logo means a business initial, not another Talix logo. Public catalog output adds only the logo URL. Until database activation, logo input is disabled and existing branding can still save. Storage/image URLs and retained uploads follow the existing product-image approach; orphan cleanup is not part of this batch.
-
 
 ## Accepted design baseline — PR #14, October 16, 2026 Pacific
 
@@ -187,7 +192,6 @@ Appearance settings retain staged Save/Cancel and logo handling, adding centered
 
 The additive migration is applied to development after explicit owner execution approval; CURRENT-STATE records the version and live database verification. Reloading the workspace enables the new controls. Final visual/merge acceptance remains required. No subscription tiers, industry modules, custom domains, arbitrary CSS/scripts, provider integration or production release are included.
 
-
 ## Approved cart popup, header presets and tabbed design settings — October 17, 2026 Pacific
 
 Owner rejected the permanent cart/checkout block retained from the older storefront. Cart design acceptance (“That looks like what I was expecting”) supersedes every earlier inline-cart or cart-jump description above. Figma source: desktop 20:333, mobile 20:434, empty 20:524 in NsJQpQsR2YNjTwNHdWPWu7. Click/tap the header cart to open a right-side desktop modal (440px maximum) or full-width mobile modal, with dim backdrop, Close/Escape/outside dismissal, focus return and background scroll lock. Show product thumbnail, name/options, unit and line price, quantity 1–99, explicit removal, empty state and a pinned subtotal/checkout/continue-shopping footer. No cart, customer form or simulation controls appear in the browsing page. Go to checkout exposes the existing guest/simulated-payment form as a separate step; Back to cart/Cancel preserve the cart. Existing authoritative pricing, location clearing, idempotency and private tracking remain.
@@ -226,11 +230,9 @@ Owner explicitly approved the updated Header tab prototype at 0ff643c24175854982
 
 This is design acceptance for issue #35. Prototype scaffolding and browser-local storage remain review-only. Navigation application implementation/persistence is not yet prepared or applied. Database/security execution, final merge and production release remain separate approvals. Unrelated workspace/tablet/sign-in/tracking follow-ups are not silently added to this slice.
 
-
 ### Header implementation prepared — October 18, 2026
 
 The approved Header prototype is now implemented in the existing application editor and shared storefront header. Custom link rows preserve one expanded editor, explicit reorder/add/remove and 48px targets. Save validates all retained custom values, including while Standard is selected; an unfinished hidden custom link must be corrected or removed before saving. Standard/Custom switching otherwise preserves custom settings. Existing non-centered layouts are proposed to retain their selection on migration by entering Custom mode; no sample website links are inserted. The exact additive persistence proposal is `HEADER-NAVIGATION-MIGRATION.md`, prepared for separate owner database approval. Final application acceptance, migration execution, merge and production release remain separate.
-
 
 ## Storefront phase accepted and merged — October 18, 2026
 
@@ -240,20 +242,17 @@ Acceptance covers the storefront product layout, popup cart, five header presets
 
 Automatic production deployment from main remains disabled in vercel.json; this acceptance does not release production. Retain the feature branch while its review preview is in use. Live owner-workspace saving was not independently automated; do not infer that coverage from the shopper checks. Figma recreation remains deferred until allowance is available. Deferred issues #36, #38, #40, #41, #42, and #43 remain outside this phase; demo tracking issues are not closed by this acceptance.
 
-
 ## Deferred follow-up implementation review — October 18, 2026
 
 Owner authorized beginning the deferred issues after the storefront merge. The application review batch implements #36 saved images/fallbacks in workspace product cards, #41 singular count wording, #42 compact pinned workspace shortcuts with Business & account expansion, sticky settings tabs/return to top and aligned smaller icon tiles, and #43 Signed in → Sign out → View Your Workspace with a session-aware hero action beside Explore Talix. Keep Talix workspace styling separate from storefront branding, permission visibility and staged drafts. Final visuals remain for owner review.
 
 The fictional tracking/industry review in public/prototypes/deferred-review.html and docs/DEFERRED-FOLLOWUP-REVIEW.md is a proposal, not accepted design or live functionality. Preserve current tracking/privacy and immutable subscription purchase behavior until the proposed protected changes receive review. No schema activation, merge or production release is implied.
 
-
 ## Deferred batch accepted and merged — October 18, 2026 Pacific
 
 Owner approved PR #44 at 1911ea74b0380b22f4e02eb4b87ee014ad963b34 and the linked tracking/industry proposals with “Approved.” PR #44 merged with history preserved as e77446657ee8abb276b0ff61842ceaff053255c9. Core checks 39166225703 passed lint, TypeScript, 59 unit/SQL tests, build and 26 desktop/mobile browser tests; preview was READY. Issues #36/#41/#42/#43 are accepted. No production deployment or live data/configuration change. Main deployment remains disabled; review branch retained.
 
 The concrete design/persistence boundaries in DEFERRED-FOLLOWUP-REVIEW.md for #38/#40 are now approved for implementation and migration preparation. This supersedes proposal-only wording. Original purchases remain immutable; owner-only versioned/idempotent industry confirmation and append-only history, compatible catalog quotes, privacy-safe tracking branding and public return link are the bounded scope. No real billing, entitlement/industry modules or industry data conversion. Exact migration execution and final acceptance of the new implementation remain separate.
-
 
 ## Approved tracking and industry follow-up — October 18, 2026 Pacific
 

@@ -12,7 +12,9 @@ import { AppearanceEditor } from "./appearance-editor";
 import { OrderDialog } from "./order-dialog";
 import { Users } from "./users";
 import { type Permission } from "@/lib/permissions";
+import { confirmedMutation } from "@/lib/persistence";
 import { SubscriptionSummary } from "./subscription-summary";
+import { WebsiteSetup } from "./website-setup";
 import { LocationForm, ProductEditor } from "./product-editor";
 import { browserClient } from "@/lib/supabase/client";
 import {
@@ -84,11 +86,6 @@ const plannedFeatures = [
     description: "Connect the other tools your business uses.",
   },
   {
-    id: "website",
-    label: "Website builder",
-    description: "Tools to create and manage your business website.",
-  },
-  {
     id: "industry",
     label: "Industry tools",
     description: "Business-specific ordering and fulfillment workflows.",
@@ -110,9 +107,11 @@ type Event = {
 export function Workspace({
   userId,
   email,
+  initialWebsiteSetup = false,
 }: {
   userId: string;
   email: string;
+  initialWebsiteSetup?: boolean;
 }) {
   const [compactHeader, setCompactHeader] = useState(false);
   const [headerOpen, setHeaderOpen] = useState(false);
@@ -122,7 +121,9 @@ export function Workspace({
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, []);
-  const [settingsArea, setSettingsArea] = useState("");
+  const [settingsArea, setSettingsArea] = useState(
+    initialWebsiteSetup ? "website" : "",
+  );
   const [productEditor, setProductEditor] = useState<Product | "new" | null>(
     null,
   );
@@ -157,7 +158,7 @@ export function Workspace({
     [orders, setOrders] = useState<Order[]>([]),
     [events, setEvents] = useState<Event[]>([]),
     [selected, setSelected] = useState(""),
-    [tab, setTab] = useState("orders"),
+    [tab, setTab] = useState(initialWebsiteSetup ? "settings" : "orders"),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false),
     [, setRole] = useState("viewer");
@@ -353,7 +354,26 @@ export function Workspace({
     ...(shared("users.view") ? ["users"] : []),
   ];
   const settingTiles = [
-    ...(shared("settings.view")
+    ...(owner
+      ? [
+          {
+            id: "website",
+            title: "Website Appearance",
+            description:
+              sub?.website_path === "deferred"
+                ? "Setup deferred — resume whenever you are ready"
+                : sub?.website_path === "existing"
+                  ? "Existing website connected to Talix ordering"
+                  : sub?.website_live_template
+                    ? "Talix website live — review or update it"
+                    : "Choose, preview and launch your customer experience",
+            icon: "▣",
+            available: true,
+          },
+        ]
+      : []),
+    ...(shared("settings.view") &&
+    (!owner || sub?.website_path !== "talix_template")
       ? [
           {
             id: "appearance",
@@ -914,11 +934,16 @@ export function Workspace({
                               disabled={busy}
                               onClick={() =>
                                 void run(async () => {
-                                  const { error } = await browserClient()
+                                  const result = await browserClient()
                                     .from("products")
                                     .update({ available: !p.available })
-                                    .eq("id", p.id);
-                                  if (error) throw error;
+                                    .eq("id", p.id)
+                                    .select("id")
+                                    .single();
+                                  confirmedMutation(
+                                    result,
+                                    "The product was not updated. Your access may have changed.",
+                                  );
                                   setProducts((previous) =>
                                     previous.map((x) =>
                                       x.id === p.id
@@ -958,12 +983,15 @@ export function Workspace({
                   save={async (value) => {
                     const db = browserClient();
                     if (productEditor === "new") {
-                      const { data, error } = await db
+                      const result = await db
                         .from("products")
                         .insert(value)
                         .select("*")
                         .single();
-                      if (error) throw error;
+                      const data = confirmedMutation(
+                        result,
+                        "The new product was not returned.",
+                      );
                       setProducts((previous) =>
                         [...previous, data].sort((a, b) =>
                           a.name.localeCompare(b.name),
@@ -972,13 +1000,16 @@ export function Workspace({
                     } else {
                       const { subscription_id: ignored, ...updates } = value;
                       void ignored;
-                      const { data, error } = await db
+                      const result = await db
                         .from("products")
                         .update(updates)
                         .eq("id", productEditor.id)
                         .select("*")
                         .single();
-                      if (error) throw error;
+                      const data = confirmedMutation(
+                        result,
+                        "The product was not updated. Your access may have changed.",
+                      );
                       setProducts((previous) =>
                         previous.map((x) => (x.id === data.id ? data : x)),
                       );
@@ -988,13 +1019,16 @@ export function Workspace({
                     productEditor === "new"
                       ? undefined
                       : async () => {
-                          const { error } = await browserClient()
+                          const result = await browserClient()
                             .from("products")
                             .delete()
                             .eq("id", productEditor.id)
                             .select("id")
                             .single();
-                          if (error) throw error;
+                          confirmedMutation(
+                            result,
+                            "The product was not deleted. Your access may have changed.",
+                          );
                           setProducts((previous) =>
                             previous.filter((p) => p.id !== productEditor.id),
                           );
@@ -1072,9 +1106,12 @@ export function Workspace({
                   </button>
                 )}
                 {settingsArea &&
-                  !["appearance", "location", "subscription"].includes(
-                    settingsArea,
-                  ) && (
+                  ![
+                    "appearance",
+                    "location",
+                    "subscription",
+                    "website",
+                  ].includes(settingsArea) && (
                     <section className="panel">
                       <h2>
                         {settingTiles.find((t) => t.id === settingsArea)?.title}
@@ -1084,6 +1121,25 @@ export function Workspace({
                   )}
                 <div hidden={settingsArea !== "subscription"}>
                   {owner && <SubscriptionSummary key={sid} id={sid} />}
+                </div>
+                <div hidden={settingsArea !== "website"}>
+                  {owner && (
+                    <WebsiteSetup
+                      key={sub.id}
+                      subscription={sub}
+                      locations={locations}
+                      products={products}
+                      close={() => setSettingsArea("")}
+                      openAppearance={() => setSettingsArea("appearance")}
+                      onSaved={(website) =>
+                        setSubs((previous) =>
+                          previous.map((item) =>
+                            item.id === sid ? { ...item, ...website } : item,
+                          ),
+                        )
+                      }
+                    />
+                  )}
                 </div>
                 <div className="settings-tools">
                   <div
@@ -1118,11 +1174,19 @@ export function Workspace({
                           delete (payload as Partial<typeof v>).header_links;
                         if (!("header_layout" in sub))
                           delete (payload as Partial<typeof v>).header_layout;
-                        const { error } = await browserClient()
+                        if (!("website_hero_url" in sub))
+                          delete (payload as Partial<typeof v>)
+                            .website_hero_url;
+                        const result = await browserClient()
                           .from("subscriptions")
                           .update(payload)
-                          .eq("id", sid);
-                        if (error) throw error;
+                          .eq("id", sid)
+                          .select("id")
+                          .single();
+                        confirmedMutation(
+                          result,
+                          "Your appearance was not saved. Your access may have changed.",
+                        );
                         setSubs((previous) =>
                           previous.map((s) =>
                             s.id === sid
@@ -1155,11 +1219,16 @@ export function Workspace({
                           cancel={() => setSettingsArea("")}
                           save={(v) =>
                             run(async () => {
-                              const { error } = await browserClient()
+                              const result = await browserClient()
                                 .from("locations")
                                 .update(v)
-                                .eq("id", lid);
-                              if (error) throw error;
+                                .eq("id", lid)
+                                .select("id")
+                                .single();
+                              confirmedMutation(
+                                result,
+                                "The location was not saved. Your access may have changed.",
+                              );
                               setLocations(
                                 locations.map((l) =>
                                   l.id === lid ? { ...l, ...v } : l,
@@ -1178,7 +1247,7 @@ export function Workspace({
                           e.preventDefault();
                           const f = new FormData(e.currentTarget);
                           void run(async () => {
-                            const { data, error } = await browserClient()
+                            const result = await browserClient()
                               .from("locations")
                               .insert({
                                 subscription_id: sid,
@@ -1186,7 +1255,10 @@ export function Workspace({
                               })
                               .select()
                               .single();
-                            if (error) throw error;
+                            const data = confirmedMutation(
+                              result,
+                              "The new location was not returned.",
+                            );
                             setLocations([...locations, data]);
                             setLid(data.id);
                           });

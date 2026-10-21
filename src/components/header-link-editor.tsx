@@ -65,8 +65,11 @@ export function HeaderLinkEditor({
               <strong>{link.label || "New link"}</strong>
               <small>
                 {link.destination === "storefront"
-                  ? "This storefront"
-                  : link.url || "Website address needed"}
+                  ? "Storefront home"
+                  : link.destination === "website"
+                    ? link.url || "Website address needed"
+                    : link.destination[0].toUpperCase() +
+                      link.destination.slice(1)}
               </small>
             </button>
             <button
@@ -112,7 +115,10 @@ export function HeaderLinkEditor({
                   })
                 }
               >
-                <option value="storefront">This storefront</option>
+                <option value="home">Home</option>
+                <option value="shop">Shop</option>
+                <option value="about">About</option>
+                <option value="contact">Contact</option>
                 <option value="website">Website address</option>
               </select>
             </label>
@@ -151,7 +157,7 @@ export function HeaderLinkEditor({
         onClick={() => {
           change([
             ...links,
-            { label: "New link", destination: "storefront", url: "" },
+            { label: "New link", destination: "shop", url: "" },
           ]);
           setExpanded(links.length);
           focusRow(links.length);

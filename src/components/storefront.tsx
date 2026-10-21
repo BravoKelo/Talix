@@ -8,25 +8,49 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/client";
 import { TaskDialog } from "@/components/order-dialog";
+import {
+  WebsiteTemplateFooter,
+  WebsiteTemplateHero,
+} from "@/components/website-template-hero";
 import { money, type Catalog, type CartLine, type Product } from "@/lib/types";
+import { websiteProductsForLocation } from "@/lib/website";
 type Line = CartLine & { name: string; unit: number; optionNames: string[] };
+function defaultCatalogLocation(catalog: Catalog) {
+  const published = [...catalog.locations].sort(
+    (a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id),
+  );
+  return (
+    published.find(
+      (location) =>
+        location.id === catalog.subscription.default_location_id,
+    )?.id ??
+    published[0]?.id ??
+    ""
+  );
+}
 function ProductCard({
   product,
   open,
   onAdd,
+  eager = false,
 }: {
   product: Product;
   open: () => void;
   onAdd: () => void;
+  eager?: boolean;
 }) {
   return (
-    <article className="shop-product-card">
+    <article className="shop-product-card" id={`product-${product.id}`}>
       <button
         className="shop-tile-open secondary"
         onClick={open}
         aria-label={`View ${product.name}`}
       >
-        <ProductImage key={product.image_url} product={product} />
+        <ProductImage
+          key={product.image_url}
+          product={product}
+          eager={eager}
+        />
         <span className="shop-card-copy">
           <span className="shop-product-name">{product.name}</span>
           <span className="muted shop-product-summary">
@@ -107,11 +131,28 @@ function ProductDetails({
 export function Storefront({
   slug,
   signedIn = false,
+  initialCatalog = null,
 }: {
   slug: string;
   signedIn?: boolean;
+  initialCatalog?: Catalog | null;
 }) {
   const router = useRouter();
+  const [businessSignedIn, setBusinessSignedIn] = useState(signedIn);
+  useEffect(() => {
+    let alive = true;
+    const client = browserClient();
+    void client.auth.getUser().then(({ data }) => {
+      if (alive) setBusinessSignedIn(!!data.user);
+    });
+    const { data } = client.auth.onAuthStateChange((_event, session) => {
+      if (alive) setBusinessSignedIn(!!session?.user);
+    });
+    return () => {
+      alive = false;
+      data.subscription.unsubscribe();
+    };
+  }, []);
   const [compactHeader, setCompactHeader] = useState(false);
   useEffect(() => {
     const update = () => setCompactHeader(window.scrollY > 48);
@@ -127,13 +168,16 @@ export function Storefront({
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [cartNotice, setCartNotice] = useState("");
-  const [catalog, setCatalog] = useState<Catalog | null>(null);
-  const [location, setLocation] = useState("");
+  const [catalog, setCatalog] = useState<Catalog | null>(initialCatalog);
+  const [location, setLocation] = useState(() =>
+    initialCatalog ? defaultCatalogLocation(initialCatalog) : "",
+  );
   const [cart, setCart] = useState<Line[]>([]);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
   useEffect(() => {
+    if (initialCatalog) return;
     let alive = true;
     async function load() {
       try {
@@ -152,16 +196,7 @@ export function Storefront({
           setQuery("");
           setActiveProduct(null);
           setRequestId(null);
-          const published = [...next.locations].sort(
-            (a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id),
-          );
-          setLocation(
-            published.find(
-              (l) => l.id === next.subscription.default_location_id,
-            )?.id ??
-              published[0]?.id ??
-              "",
-          );
+          setLocation(defaultCatalogLocation(next));
         }
       } catch (e) {
         if (alive)
@@ -174,7 +209,7 @@ export function Storefront({
     return () => {
       alive = false;
     };
-  }, [slug]);
+  }, [initialCatalog, slug]);
   function add(p: Product, ids: string[]) {
     setMessage("");
     setCartNotice(`${p.name} added to your cart.`);
@@ -249,9 +284,7 @@ export function Storefront({
         <p role="status">{message}</p>
       </main>
     );
-  const products = catalog.products.filter(
-    (p) => p.location_id === null || p.location_id === location,
-  );
+  const products = websiteProductsForLocation(catalog.products, location);
   const categories = [
     ...new Set(
       products.map((p) => p.category?.trim()).filter((c): c is string => !!c),
@@ -266,9 +299,10 @@ export function Storefront({
   );
   const selectedLocation = catalog.locations.find((l) => l.id === location);
   const itemCount = cart.reduce((sum, line) => sum + line.quantity, 0);
+  const orderingReady = products.length > 0;
   return (
     <main
-      className={`store visual-store figma-store header-${headerLayout(catalog.subscription)}`}
+      className={`store visual-store figma-store header-${headerLayout(catalog.subscription)}${catalog.subscription.website_live_template ? ` website-template template-${catalog.subscription.website_live_template}` : ""}`}
       id="shop-welcome"
       style={storefrontStyle(catalog.subscription)}
     >
@@ -280,7 +314,8 @@ export function Storefront({
           subscription={catalog.subscription}
           location={selectedLocation}
           search={
-            headerLayout(catalog.subscription) === "search" ? (
+            headerLayout(catalog.subscription) === "search" &&
+            (!catalog.subscription.website_live_template || orderingReady) ? (
               <label className="shop-header-search">
                 <span className="sr-only">Search products</span>
                 <input
@@ -302,26 +337,35 @@ export function Storefront({
             >
               <Image width={24} height={24} src="/storefront/user.svg" alt="" />
             </button>
-            <button
-              className="shop-icon shop-cart-link secondary"
-              aria-haspopup="dialog"
-              onClick={() => {
-                setAccountOpen(false);
-                setCheckoutOpen(false);
-                setCartOpen(true);
-              }}
-              aria-label={`Your cart (${itemCount})`}
-            >
-              <Image width={24} height={24} src="/storefront/cart.svg" alt="" />
-              <span className="shop-cart-count" aria-hidden="true">
-                {itemCount}
-              </span>
-            </button>
+            {(!catalog.subscription.website_live_template || orderingReady) && (
+              <button
+                className="shop-icon shop-cart-link secondary"
+                aria-haspopup="dialog"
+                onClick={() => {
+                  setAccountOpen(false);
+                  setCheckoutOpen(false);
+                  setCartOpen(true);
+                }}
+                aria-label={`Your cart (${itemCount})`}
+              >
+                <Image
+                  width={24}
+                  height={24}
+                  src="/storefront/cart.svg"
+                  alt=""
+                />
+                <span className="shop-cart-count" aria-hidden="true">
+                  {itemCount}
+                </span>
+              </button>
+            )}
             {accountOpen && (
               <div className="shop-account-panel">
                 <p>Business account</p>
-                <Link href={signedIn ? "/workspace" : "/login"}>
-                  {signedIn ? "Open business workspace" : "Business sign in"}
+                <Link href={businessSignedIn ? "/workspace" : "/login"}>
+                  {businessSignedIn
+                    ? "Open business workspace"
+                    : "Business sign in"}
                 </Link>
                 <p className="muted">You can shop and check out as a guest.</p>
               </div>
@@ -329,6 +373,13 @@ export function Storefront({
           </div>
         </StorefrontHeader>
       </header>
+      {catalog.subscription.website_live_template && (
+        <WebsiteTemplateHero
+          subscription={catalog.subscription}
+          location={selectedLocation}
+          products={products}
+        />
+      )}
       <section className="shop-toolbar" aria-label="Shopping location">
         <label id="shop-location" className="shop-location-control">
           <span className="sr-only">Choose a location</span>
@@ -356,23 +407,27 @@ export function Storefront({
             ))}
           </select>
         </label>
-        <button
-          className="shop-menu-toggle"
-          aria-expanded={menuOpen}
-          aria-controls="shop-menu"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          Menu
-        </button>
-        <label className="shop-search">
-          <span className="sr-only">Search products</span>
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products"
-          />
-        </label>
+        {(!catalog.subscription.website_live_template || orderingReady) && (
+          <>
+            <button
+              className="shop-menu-toggle"
+              aria-expanded={menuOpen}
+              aria-controls="shop-menu"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              Menu
+            </button>
+            <label className="shop-search">
+              <span className="sr-only">Search products</span>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search products"
+              />
+            </label>
+          </>
+        )}
       </section>
       {!location ? (
         <div className="empty">
@@ -432,10 +487,11 @@ export function Storefront({
                   {visibleProducts.length === 1 ? "product" : "products"}
                 </p>
                 <div className="catalog">
-                  {visibleProducts.map((p) => (
+                  {visibleProducts.map((p, index) => (
                     <ProductCard
                       key={p.id}
                       product={p}
+                      eager={index === 0}
                       open={() => setActiveProduct(p)}
                       onAdd={() => add(p, [])}
                     />
@@ -465,6 +521,12 @@ export function Storefront({
             </div>
           </section>
         </div>
+      )}
+      {catalog.subscription.website_live_template && (
+        <WebsiteTemplateFooter
+          subscription={catalog.subscription}
+          location={selectedLocation}
+        />
       )}
       <p role="status" className="sr-only">
         {cartNotice}

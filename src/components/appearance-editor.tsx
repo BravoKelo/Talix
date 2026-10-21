@@ -10,16 +10,18 @@ import {
   headerLayout,
   designFor,
   storefrontStyle,
+  contrastRatio,
   type StorefrontDesign,
 } from "@/lib/storefront-design";
 import { HeaderLinkEditor } from "./header-link-editor";
-import { validHeaderLinks } from "@/lib/header-navigation";
+import { standardHeaderLinks, validHeaderLinks } from "@/lib/header-navigation";
 import type { HeaderLink, Location, Subscription } from "@/lib/types";
 
 type Branding = StorefrontDesign & {
   header_mode: "standard" | "custom";
   header_links: HeaderLink[];
   header_photo_url: string | null;
+  website_hero_url: string | null;
   default_location_id: string | null;
 } & Pick<Subscription, "name" | "description" | "accent" | "logo_url">;
 export function AppearanceEditor({
@@ -48,6 +50,7 @@ export function AppearanceEditor({
       ("header_layout" in subscription ? "custom" : "standard"),
     header_links: subscription.header_links ?? [],
     header_photo_url: subscription.header_photo_url ?? null,
+    website_hero_url: subscription.website_hero_url ?? null,
     default_location_id: subscription.default_location_id ?? null,
     name: subscription.name,
     description: subscription.description,
@@ -64,25 +67,38 @@ export function AppearanceEditor({
     "business-logos",
     subscription.id,
   );
+  const hero = useImageDraft(
+    subscription.website_hero_url ?? null,
+    "business-logos",
+    subscription.id,
+  );
   const [draft, setDraft] = useState<Branding>(original);
   const [saved, setSaved] = useState<Branding>(original);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const dirty =
     photo.dirty ||
+    hero.dirty ||
     image.dirty ||
     JSON.stringify(draft) !== JSON.stringify(saved);
+  const websiteAppearance = subscription.website_path === "talix_template";
   return (
     <section
       id="storefront-appearance"
       className="panel appearance-editor"
-      aria-label="Storefront appearance"
+      aria-label={
+        websiteAppearance ? "Website appearance" : "Storefront appearance"
+      }
     >
       <div className="section-heading">
         <p className="eyebrow">MAKE IT YOURS</p>
-        <h2>Storefront appearance</h2>
+        <h2>
+          {websiteAppearance ? "Website appearance" : "Storefront appearance"}
+        </h2>
         <p className="muted">
-          One look for every location in this subscription.
+          {websiteAppearance
+            ? "One source of truth for your Talix website and ordering experience."
+            : "One look for every location in this subscription."}
         </p>
       </div>
       <PageTabs
@@ -127,20 +143,30 @@ export function AppearanceEditor({
               );
               return;
             }
+            if (contrastRatio(draft.storefront_text, "#ffffff") < 4.5) {
+              setTab("style");
+              setMessage(
+                "Choose a darker product text color so customers can read it on the light background.",
+              );
+              return;
+            }
             setBusy(true);
             setMessage("");
             try {
               const url = await image.prepare();
               const photoUrl = await photo.prepare();
+              const heroUrl = await hero.prepare();
               const value = {
                 ...draft,
                 logo_url: url,
                 header_photo_url: photoUrl,
+                website_hero_url: heroUrl,
               };
               await save(value);
               const old = [
                 ...image.committed(url),
                 ...photo.committed(photoUrl),
+                ...hero.committed(heroUrl),
               ];
               setDraft(value);
               setSaved(value);
@@ -268,11 +294,28 @@ export function AppearanceEditor({
                   </p>
                 )}
                 {draft.header_mode === "standard" ? (
-                  <p className="muted">
-                    Home returns to the top, Shop opens your products, About
-                    shows your business introduction, and Contact shows the
-                    shopper’s selected location.
-                  </p>
+                  <div className="stack">
+                    <p className="muted">
+                      Home returns to the top, Shop opens your products, About
+                      shows your business introduction, and Contact shows the
+                      shopper’s selected location.
+                    </p>
+                    <button
+                      type="button"
+                      className="secondary"
+                      onClick={() =>
+                        setDraft({
+                          ...draft,
+                          header_mode: "custom",
+                          header_links: standardHeaderLinks.map((link) => ({
+                            ...link,
+                          })),
+                        })
+                      }
+                    >
+                      Customize these links
+                    </button>
+                  </div>
                 ) : null}
                 <div
                   hidden={
@@ -333,6 +376,19 @@ export function AppearanceEditor({
                       setDraft({ ...draft, header_links: links })
                     }
                   />
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() =>
+                      setDraft({
+                        ...draft,
+                        header_mode: "standard",
+                        header_links: [],
+                      })
+                    }
+                  >
+                    Restore Home, Shop, About and Contact
+                  </button>
                 </div>
                 <label>
                   Header identity
@@ -371,8 +427,8 @@ export function AppearanceEditor({
                   }}
                 />
                 <p className="muted">
-                  JPEG, PNG or WebP, up to 5 MB. Displayed in your header
-                  identity area; the photo is public.
+                  JPEG, PNG or WebP, up to 5 MB. Displayed in the centered
+                  header identity area; the photo is public.
                 </p>
                 {photo.preview && (
                   <button
@@ -381,6 +437,34 @@ export function AppearanceEditor({
                     onClick={() => photo.clear()}
                   >
                     Delete header photo
+                  </button>
+                )}
+                <ImagePicker
+                  label="Website hero image"
+                  filename={hero.filename}
+                  disabled={!("website_hero_url" in subscription)}
+                  choose={(file) => {
+                    try {
+                      hero.choose(file);
+                      setMessage(
+                        "Hero image selected. Save branding to upload it.",
+                      );
+                    } catch (e) {
+                      setMessage((e as Error).message);
+                    }
+                  }}
+                />
+                <p className="muted">
+                  JPEG, PNG or WebP, up to 5 MB. Used as the large featured
+                  image in your Talix website template; the image is public.
+                </p>
+                {hero.preview && (
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => hero.clear()}
+                  >
+                    Delete website hero image
                   </button>
                 )}
                 <label>

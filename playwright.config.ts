@@ -29,6 +29,16 @@ export default defineConfig({
       name: "mobile",
       use: { browserName: "chromium", viewport: { width: 390, height: 844 } },
     },
+    {
+      name: "firefox-critical",
+      testMatch: /(?:onboarding|storefront)\.spec\.ts/,
+      use: { browserName: "firefox" },
+    },
+    {
+      name: "webkit-critical",
+      testMatch: /(?:onboarding|storefront)\.spec\.ts/,
+      use: { browserName: "webkit" },
+    },
   ],
 });
 

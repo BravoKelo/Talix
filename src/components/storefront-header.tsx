@@ -12,12 +12,14 @@ export function StorefrontHeader({
   location,
 }: {
   subscription: Partial<Subscription>;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   search?: React.ReactNode;
   preview?: boolean;
   location?: Location;
 }) {
   const design = designFor(subscription);
+  const centeredPhoto =
+    design.header_identity === "photo" ? subscription.header_photo_url : null;
   return (
     <div
       className={`shop-nav header-nav-${headerLayout(subscription)}`}
@@ -44,14 +46,14 @@ export function StorefrontHeader({
         )}
       </a>
       <div className="shop-centered-identity">
-        {design.header_identity === "photo" && subscription.header_photo_url ? (
+        {centeredPhoto ? (
           <>
             <Image
               width={300}
               height={56}
               unoptimized
-              src={displayImageUrl(subscription.header_photo_url)}
-              alt={subscription.name || "Business"}
+              src={displayImageUrl(centeredPhoto)}
+              alt={`${subscription.name || "Business"} header identity`}
             />
             {preview ? (
               <span className="sr-only">{subscription.name}</span>
