@@ -430,6 +430,39 @@ for (const changedPrice of [false, true])
             (element) => element.scrollWidth <= element.clientWidth,
           ),
         ).toBe(true);
+        expect(
+          await page
+            .locator(".website-onboarding")
+            .evaluate((element) => element.scrollWidth <= element.clientWidth),
+        ).toBe(true);
+        for (const selector of [
+          ".website-step-content",
+          ".website-step-body",
+          ".website-review-preview",
+          ".website-step-actions button",
+        ]) {
+          expect(
+            await page.locator(selector).evaluateAll((elements) =>
+              elements.every((element) => {
+                const box = element.getBoundingClientRect();
+                return box.left >= 0 && box.right <= window.innerWidth;
+              }),
+            ),
+          ).toBe(true);
+        }
+        expect(
+          await previewRegion
+            .locator(".website-template-action")
+            .evaluateAll((elements) =>
+              elements.every((element) => {
+                const box = element.getBoundingClientRect();
+                const frame = element
+                  .closest(".website-inline-preview")!
+                  .getBoundingClientRect();
+                return box.left >= frame.left && box.right <= frame.right;
+              }),
+            ),
+        ).toBe(true);
         await page.getByRole("button", { name: "Save draft" }).click();
         await expect(page.getByRole("status")).toContainText("Draft saved");
         await expect(

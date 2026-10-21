@@ -4460,6 +4460,7 @@ body:has(.business-tracking) > footer {
   margin: 0;
 }
 .website-step-sidebar {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 36px;
@@ -4550,6 +4551,8 @@ body:has(.business-tracking) > footer {
 }
 .website-step-body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   align-content: start;
   gap: 26px;
   padding: 38px clamp(24px, 5vw, 64px) 48px;
@@ -5391,6 +5394,12 @@ body:has(.business-tracking) > footer {
   overflow-wrap: anywhere;
   scrollbar-gutter: stable;
 }
+.website-inline-preview .website-template-action {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
 .website-go-live-grid .website-checklist {
   padding: 20px;
 }
@@ -5460,7 +5469,7 @@ body:has(.business-tracking) > footer {
 }
 @media (max-width: 760px) {
   .website-onboarding {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .website-step-sidebar {
     gap: 18px;
@@ -5486,7 +5495,7 @@ body:has(.business-tracking) > footer {
   .website-go-live-grid,
   .website-template-hero,
   .website-template-about {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .template-choice {
     grid-template-columns: 110px 1fr;
@@ -5534,6 +5543,11 @@ body:has(.business-tracking) > footer {
   .website-template-footer {
     align-items: stretch;
     flex-direction: column;
+  }
+}
+@media (max-width: 480px) {
+  .website-step-actions > div {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 .subscription-summary summary {
