@@ -16,6 +16,8 @@ for (const changedPrice of [false, true])
             "20261018043256_storefront_header_layout.sql",
             "20261018174618_storefront_header_navigation.sql",
             "20261019183000_website_owner_onboarding.sql",
+            "20261020224059_separate_website_hero_image.sql",
+            "20261021011154_editable_standard_navigation.sql",
           ]
         : [],
     );
@@ -814,19 +816,29 @@ for (const changedPrice of [false, true])
       await expect(
         page.getByText("No settings match your search. Try another word."),
       ).toBeVisible();
-      await page.getByLabel("Search settings", { exact: true }).fill("website");
+      await page
+        .getByLabel("Search settings", { exact: true })
+        .fill(changedPrice ? "logo" : "website");
       async function openWebsiteAppearance() {
-        await page.getByRole("button", { name: /Website Appearance/ }).click();
-        await page
-          .getByRole("button", { name: "Template & appearance" })
-          .click();
-        await page
-          .getByRole("button", { name: "Open appearance editor" })
-          .click();
+        if (changedPrice) {
+          await page
+            .getByRole("button", {
+              name: /Storefront appearance Business logo/,
+            })
+            .click();
+        } else {
+          await page.getByRole("button", { name: /Website Appearance/ }).click();
+          await page
+            .getByRole("button", { name: "Template & appearance" })
+            .click();
+          await page
+            .getByRole("button", { name: "Open appearance editor" })
+            .click();
+        }
       }
       await openWebsiteAppearance();
       const appearance = page.getByRole("region", {
-        name: "Website appearance",
+        name: changedPrice ? "Storefront appearance" : "Website appearance",
       });
       if (test.info().project.name === "mobile")
         await appearance
