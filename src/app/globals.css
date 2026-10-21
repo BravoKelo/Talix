@@ -5467,6 +5467,36 @@ body:has(.business-tracking) > footer {
     flex-direction: column;
   }
 }
+@media (max-width: 1100px) and (min-width: 761px) {
+  .website-onboarding {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .website-step-sidebar {
+    gap: 18px;
+    padding: 22px 18px;
+  }
+  .website-step-sidebar nav {
+    overflow-x: auto;
+  }
+  .website-step-sidebar ol {
+    display: flex;
+    min-width: max-content;
+  }
+  .website-step-sidebar nav button {
+    width: 170px;
+  }
+  .website-step-sidebar > .secondary {
+    display: none;
+  }
+  .website-step-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .website-step-actions > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 760px) {
   .website-onboarding {
     grid-template-columns: minmax(0, 1fr);
