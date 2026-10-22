@@ -1,8 +1,8 @@
 # Talix Architecture
 
-## Prepared owner mode transition — issue #83
+## Development owner mode transition — issue #83
 
-The owner approved preparation of one additional owner-only atomic operation for explicit storefront-only publication. `20261022032702_storefront_only_publication.sql` is NOT applied; existing development behavior remains until separate execution approval. [WEBSITE-MODES-REVIEW.md](WEBSITE-MODES-REVIEW.md) owns the prepared operation's lock/review/retry/grant contract. No table/column, public catalog projection or existing save/launch contract changes. Issue #84's homepage/Shop presentation reuses the existing canonical route, catalog and commerce state, with metadata reflecting homepage content; it creates no commerce or routing architecture.
+The owner approved one additional owner-only atomic operation for explicit storefront-only publication, then separately authorized development execution. `20261022032702_storefront_only_publication.sql` is applied unchanged to development as `20261022035957_storefront_only_publication`. [WEBSITE-MODES-REVIEW.md](WEBSITE-MODES-REVIEW.md) owns the operation's lock/review/retry/grant contract and actual verification. No table/column, public catalog projection or existing save/launch contract changes. Issue #84's homepage/Shop presentation reuses the existing canonical route, catalog and commerce state, with metadata reflecting homepage content; it creates no commerce or routing architecture. Production execution and PR merge remain separately gated.
 
 ## Website-setup extension activated in development
 
