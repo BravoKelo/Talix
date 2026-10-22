@@ -176,6 +176,13 @@ for (const template of [
     await expect(
       page.getByRole("region", { name: "Products", exact: true }),
     ).toBeVisible();
+    // A fragment-only navigation intentionally retains the current location.
+    await expect(page.getByLabel("Choose a location")).toHaveValue("South");
+    // A new document opened directly at Shop starts from the saved default.
+    await page.reload();
+    await expect(
+      page.getByRole("region", { name: "Products", exact: true }),
+    ).toBeVisible();
     await expect(page.getByLabel("Choose a location")).toHaveValue("North");
   });
 }
@@ -730,7 +737,7 @@ test("custom navigation handles long links and overflow for every preset", async
       page
         .getByRole("navigation", { name: "Menu links" })
         .getByRole("link", { name: "Order online" }),
-    ).toHaveAttribute("href", "#shop-welcome");
+    ).toHaveAttribute("href", "#shop-products");
     await expect(
       page
         .getByRole("navigation", { name: "Menu links" })

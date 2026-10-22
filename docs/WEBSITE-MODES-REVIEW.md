@@ -34,6 +34,8 @@ Local isolated SQL tests cover deferred save preservation, required pending path
 
 The owner elected to perform browser review personally. Agent manual browser testing is not claimed. Required exact-head automated CI is reported separately, including the existing CI development-server startup failure if it recurs. Physical-device and real assistive-technology evidence retain the approved support-policy deferral.
 
+Initial application CI run 39718526370 passed 54/74 browser scenarios. Its 20 failures came from two incorrect assertions: a fragment-only navigation was expected to reset the selected location, and a pre-change custom storefront link still expected the Home fragment. The corrected scenarios explicitly verify retained location for a fragment change, saved default on a fresh reload, and the approved Shop fragment. All 20 affected local automated scenarios pass across desktop/mobile Chromium, Firefox and WebKit (1.6 minutes). This focused result does not replace final exact-head full-suite CI or owner manual acceptance.
+
 Owner review:
 
 1. Select each template and inspect Home in Go Live and Website Appearance preview. Only Order First shows the whole catalog; Browse shows at most three eligible featured items; Visit leads with real location information; Story uses the saved description.
