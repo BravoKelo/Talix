@@ -565,6 +565,7 @@ test("five header presets preserve shopping, responsive layout and collapsing ac
     });
     await page.evaluate(() => window.scrollTo(0, 600));
     await expect(page.locator(".shop-header")).toHaveClass(/is-compact/);
+    await expect(search).toHaveCount(1);
     await expect(
       page.getByRole("button", { name: "Your cart (0)", exact: true }),
     ).toBeInViewport();

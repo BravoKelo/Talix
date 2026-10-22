@@ -3588,7 +3588,7 @@ body:has(.shop-cart-dialog[open]) {
 .header-search .shop-toolbar > .shop-search {
   display: none;
 }
-.header-search .shop-header.is-compact + .shop-toolbar > .shop-search {
+.header-search .shop-header.is-compact ~ .shop-content .shop-toolbar > .shop-search {
   display: block;
 }
 :is(.header-left, .header-two_row, .header-minimal) .shop-nav {

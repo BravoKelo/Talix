@@ -419,7 +419,7 @@ export function Storefront({
           </a>
         </div>
       )}
-      <div hidden={!showShop}>
+      <div className="shop-content" hidden={!showShop}>
         <section className="shop-toolbar" aria-label="Shopping location">
           <label id="shop-location" className="shop-location-control">
             <span className="sr-only">Choose a location</span>
