@@ -434,11 +434,24 @@ for (const changedPrice of [false, true])
           { width: 768, height: 1000 },
         ]) {
           await page.setViewportSize(viewport);
-          expect(
-            await previewRegion.evaluate(
-              (element) => element.scrollWidth <= element.clientWidth,
-            ),
-          ).toBe(true);
+          await page.evaluate(
+            () =>
+              new Promise<void>((resolve) => {
+                requestAnimationFrame(() =>
+                  requestAnimationFrame(() => resolve()),
+                );
+              }),
+          );
+          // Header overflow links are recomputed by ResizeObserver after resize.
+          await expect
+            .poll(
+              () =>
+                previewRegion.evaluate(
+                  (element) => element.scrollWidth - element.clientWidth,
+                ),
+              { message: `Preview overflow at ${viewport.width}px` },
+            )
+            .toBeLessThanOrEqual(0);
           expect(
             await page
               .locator(".website-onboarding")
@@ -1655,10 +1668,16 @@ for (const changedPrice of [false, true])
         const subscriptionPicker = page.getByLabel("Subscription", {
           exact: true,
         });
-        if (!(await subscriptionPicker.isVisible()))
-          await page
-            .getByRole("button", { name: "Business & account" })
-            .click();
+        await expect(
+          page.getByRole("heading", { name: "Build your website" }),
+        ).toBeVisible();
+        if (!(await subscriptionPicker.isVisible())) {
+          const headerToggle = page.getByRole("button", {
+            name: "Business & account",
+          });
+          await headerToggle.focus();
+          await headerToggle.press("Space");
+        }
         await expect(subscriptionPicker).toBeVisible();
         await subscriptionPicker.selectOption({ label: "Second business" });
         await expect(

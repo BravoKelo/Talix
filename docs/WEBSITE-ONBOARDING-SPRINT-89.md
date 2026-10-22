@@ -22,6 +22,8 @@ Proposed minimal decision for owner approval: retain the single canonical URL an
 
 ## Validation and manual acceptance
 
+The final responsive correction uses available-space wrapping for setup and review panels after WebKit retained desktop grid tracks during a tablet resize. The 768px check remains strict and passes locally alongside mobile Chromium. The additional-subscription regression waits for setup to render and opens the compact header by keyboard before selecting a subscription. No check is skipped or converted into a retry of a failed business operation.
+
 Review PR: [#90](https://github.com/BravoKelo/Talix/pull/90). Initial application head `3af2339` passed [Core checks 39592766196](https://github.com/BravoKelo/Talix/actions/runs/39592766196): all 89 unit/SQL tests and 58 browser scenarios, lint/type/build. Real protected-preview verification passed the saved/published journeys against Talix development; subsequent screenshot review exposed clipped narrow-phone content hidden by the outer container. The follow-up corrects inner grid sizing, phone action stacking and preview action wrapping, with explicit panel/control bounds checks. Final head and corrected preview evidence are recorded in #89 and PR #90; the initial preview is superseded for visual review. The disposable account and subscription used in the first live run were removed, with zero matching rows verified.
 
 Exact-head CI, final preview URL and deployment evidence belong in PR and issue #89 handoff; local tests are not live-service evidence. Physical-device and real assistive-technology checks retain the approved deferral in `SUPPORTED-ENVIRONMENTS.md`.
