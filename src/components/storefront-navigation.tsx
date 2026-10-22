@@ -123,7 +123,10 @@ export function StorefrontNavigation({
             className="shop-navigation-link shop-navigation-toggle"
             aria-haspopup="dialog"
             aria-expanded={dialog === "menu"}
-            onClick={() => setDialog("menu")}
+            onClick={(event) => {
+              event.currentTarget.focus();
+              setDialog("menu");
+            }}
           >
             {visible ? "More" : "☰"}
             <span className="sr-only">

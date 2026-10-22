@@ -21,8 +21,7 @@ function defaultCatalogLocation(catalog: Catalog) {
   );
   return (
     published.find(
-      (location) =>
-        location.id === catalog.subscription.default_location_id,
+      (location) => location.id === catalog.subscription.default_location_id,
     )?.id ??
     published[0]?.id ??
     ""
@@ -43,14 +42,14 @@ function ProductCard({
     <article className="shop-product-card" id={`product-${product.id}`}>
       <button
         className="shop-tile-open secondary"
-        onClick={open}
+        onClick={(event) => {
+          // WebKit does not focus a button on pointer activation by default.
+          event.currentTarget.focus();
+          open();
+        }}
         aria-label={`View ${product.name}`}
       >
-        <ProductImage
-          key={product.image_url}
-          product={product}
-          eager={eager}
-        />
+        <ProductImage key={product.image_url} product={product} eager={eager} />
         <span className="shop-card-copy">
           <span className="shop-product-name">{product.name}</span>
           <span className="muted shop-product-summary">
@@ -341,7 +340,8 @@ export function Storefront({
               <button
                 className="shop-icon shop-cart-link secondary"
                 aria-haspopup="dialog"
-                onClick={() => {
+                onClick={(event) => {
+                  event.currentTarget.focus();
                   setAccountOpen(false);
                   setCheckoutOpen(false);
                   setCartOpen(true);

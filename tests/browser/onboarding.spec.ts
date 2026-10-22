@@ -337,12 +337,56 @@ for (const changedPrice of [false, true])
         await expect(page.getByRole("status")).toContainText(
           "No website was published",
         );
+        await expect(page.getByRole("status")).toBeFocused();
+        await expect(
+          page
+            .getByRole("navigation", { name: "Workspace shortcuts" })
+            .getByRole("link", { name: "Open storefront ↗", exact: true }),
+        ).toHaveAttribute("href", /\/shop\//);
         await page.getByRole("radio", { name: /Use a Talix template/ }).check();
         await page.getByRole("button", { name: "Save and continue" }).click();
         await expect(
           page.getByRole("heading", { name: "Business identity" }),
         ).toBeFocused();
         await expect(page.getByText("CUSTOMER PREVIEW")).toHaveCount(0);
+        await page.screenshot({
+          path: `test-results/website-identity-${test.info().project.name}.png`,
+          fullPage: true,
+        });
+        await expect(
+          page.getByRole("button", {
+            name: "Edit Website Branding",
+            exact: true,
+          }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole("button", {
+            name: "Edit Website Branding",
+            exact: true,
+          }),
+        ).toHaveCSS("background-color", "rgb(232, 185, 79)");
+        await expect(
+          page.getByText("Optional — using business initial", { exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByText("Optional — using business name", { exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByText("Optional — no hero image added", { exact: true }),
+        ).toBeVisible();
+        await expect(page.locator(".website-brand-color > span")).toHaveCSS(
+          "background-color",
+          "rgb(37, 99, 235)",
+        );
+        await page
+          .getByRole("button", { name: "Web address", exact: false })
+          .click();
+        await expect(
+          page.getByText("FUTURE OPTION", { exact: true }),
+        ).toHaveCount(0);
+        await expect(
+          page.getByText(/Custom domains are not available yet/),
+        ).toBeVisible();
         expect(
           (
             await gateway.db.query<{ default_location_id: string | null }>(
@@ -355,29 +399,223 @@ for (const changedPrice of [false, true])
           .click();
         await page.getByRole("radio", { name: /Order First/ }).check();
         await page.getByRole("button", { name: "Go live" }).click();
-        const previewButton = page.getByRole("button", {
-          name: "Open customer preview",
+        await expect(
+          page.getByRole("button", { name: "Open customer preview" }),
+        ).toHaveCount(0);
+        const preview = page.getByRole("region", {
+          name: "Your website preview",
         });
-        await previewButton.click();
+        await expect(preview.getByText("Preview — not live")).toBeVisible();
+        await expect(preview.getByText("Featured products")).toBeVisible();
         await expect(
-          page
-            .getByLabel("Order First customer preview")
-            .getByText("Preview — not live"),
+          preview.getByRole("navigation", { name: "Navigation preview" }),
         ).toBeVisible();
-        await expect(
-          page
-            .getByLabel("Order First customer preview")
-            .getByText("Featured products"),
-        ).toBeVisible();
-        await expect(
-          page
-            .getByLabel("Order First customer preview")
-            .getByRole("navigation", { name: "Navigation preview" }),
-        ).toBeVisible();
-        await page.keyboard.press("Escape");
-        await expect(previewButton).toBeFocused();
+        for (const device of ["Mobile", "Tablet", "Desktop"]) {
+          await preview
+            .getByRole("button", { name: device, exact: true })
+            .click();
+          await expect(
+            preview.getByRole("button", { name: device, exact: true }),
+          ).toHaveAttribute("aria-pressed", "true");
+        }
+        await page.screenshot({
+          path: `test-results/website-review-${test.info().project.name}.png`,
+          fullPage: true,
+        });
+        const previewRegion = page.getByRole("region", {
+          name: "Scrollable website preview",
+        });
+        const originalViewport = page.viewportSize() ?? {
+          width: 1280,
+          height: 720,
+        };
+        for (const viewport of [
+          originalViewport,
+          { width: 768, height: 1000 },
+        ]) {
+          await page.setViewportSize(viewport);
+          await page.evaluate(
+            () =>
+              new Promise<void>((resolve) => {
+                requestAnimationFrame(() =>
+                  requestAnimationFrame(() => resolve()),
+                );
+              }),
+          );
+          // Header overflow links are recomputed by ResizeObserver after resize.
+          await expect
+            .poll(
+              () =>
+                previewRegion.evaluate(
+                  (element) => element.scrollWidth - element.clientWidth,
+                ),
+              { message: `Preview overflow at ${viewport.width}px` },
+            )
+            .toBeLessThanOrEqual(0);
+          expect(
+            await page
+              .locator(".website-onboarding")
+              .evaluate(
+                (element) => element.scrollWidth <= element.clientWidth,
+              ),
+          ).toBe(true);
+          for (const selector of [
+            ".website-step-content",
+            ".website-step-body",
+            ".website-review-preview",
+            ".website-step-actions button",
+          ]) {
+            expect(
+              await page.locator(selector).evaluateAll((elements) =>
+                elements.every((element) => {
+                  const box = element.getBoundingClientRect();
+                  return box.left >= 0 && box.right <= window.innerWidth;
+                }),
+              ),
+            ).toBe(true);
+          }
+          expect(
+            await previewRegion
+              .locator(".website-template-action")
+              .evaluateAll((elements) =>
+                elements.every((element) => {
+                  const box = element.getBoundingClientRect();
+                  const frame = element
+                    .closest(".website-inline-preview")!
+                    .getBoundingClientRect();
+                  return box.left >= frame.left && box.right <= frame.right;
+                }),
+              ),
+          ).toBe(true);
+        }
+        await page.setViewportSize(originalViewport);
         await page.getByRole("button", { name: "Save draft" }).click();
         await expect(page.getByRole("status")).toContainText("Draft saved");
+        await expect(
+          page
+            .getByRole("navigation", { name: "Workspace shortcuts" })
+            .getByRole("link", { name: "Open storefront ↗", exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByRole("button", { name: "Make website live" }),
+        ).toBeDisabled();
+        await page
+          .getByRole("checkbox", { name: /Launch without online ordering/ })
+          .check();
+        await page
+          .context()
+          .route("**/rest/v1/rpc/launch_website_template", (route) =>
+            route.fulfill({
+              status: 200,
+              contentType: "application/json",
+              body: JSON.stringify({ website_live_template: "order_first" }),
+            }),
+          );
+        await page.getByRole("button", { name: "Make website live" }).click();
+        await expect(page.getByRole("status")).toContainText(
+          "Publication could not be confirmed",
+        );
+        await expect(
+          page.getByRole("status").getByRole("link", { name: "Open website" }),
+        ).toHaveCount(0);
+        await page.context().unroute("**/rest/v1/rpc/launch_website_template");
+        await page.getByRole("button", { name: "Make website live" }).click();
+        await expect(page.getByRole("status")).toContainText(
+          "Website published successfully, Independent shop has been published at",
+        );
+        await expect(page.getByRole("status")).toBeFocused();
+        const publication = (
+          await gateway.db.query<{ website_template_launched_at: string }>(
+            "select website_template_launched_at from public.subscriptions",
+          )
+        ).rows[0];
+        const publishedTime = await page.evaluate(
+          (value) => new Date(value).toLocaleString(),
+          publication.website_template_launched_at,
+        );
+        await expect(page.getByRole("status")).toContainText(publishedTime);
+        await expect(
+          page
+            .getByRole("status")
+            .getByRole("link", { name: "Open website", exact: true }),
+        ).toHaveAttribute("href", /\/shop\//);
+        await expect(
+          page
+            .getByRole("status")
+            .getByRole("link", { name: "Open website", exact: true }),
+        ).toHaveCSS("background-color", "rgb(232, 185, 79)");
+        await expect(
+          page
+            .getByRole("link", { name: "Open website ↗", exact: true })
+            .first(),
+        ).toBeVisible();
+        await page
+          .getByRole("button", { name: "Website setup", exact: false })
+          .click();
+        await page.getByRole("radio", { name: /Decide later/ }).check();
+        await page.getByRole("button", { name: "Save for later" }).click();
+        await expect(page.getByRole("status")).toContainText(
+          "Your existing live Talix website was not changed",
+        );
+        await expect(page.getByRole("status")).toBeFocused();
+        await expect(
+          page.getByRole("link", { name: "Open website ↗", exact: true }),
+        ).toBeVisible();
+        await page.screenshot({
+          path: `test-results/website-deferred-${test.info().project.name}.png`,
+          fullPage: true,
+        });
+        await page
+          .context()
+          .route("**/rest/v1/rpc/save_website_setup", (route) =>
+            route.fulfill({
+              status: 403,
+              contentType: "application/json",
+              body: JSON.stringify({ message: "Owner access required." }),
+            }),
+          );
+        await page.getByRole("button", { name: "Save for later" }).click();
+        await expect(page.getByRole("status")).toContainText(
+          "Owner access required",
+        );
+        await expect(page.getByRole("status")).not.toHaveClass(/success/);
+        await page.context().unroute("**/rest/v1/rpc/save_website_setup");
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= window.innerWidth,
+          ),
+        ).toBe(true);
+        await page.getByRole("radio", { name: /Use a Talix template/ }).check();
+        await page.getByRole("button", { name: "Save draft" }).click();
+        await expect(page.getByRole("status")).toContainText("Draft saved");
+        await page.route(
+          "https://images.example.invalid/identity.png",
+          (route) =>
+            route.fulfill({
+              contentType: "image/svg+xml",
+              body: '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="navy"/></svg>',
+            }),
+        );
+        await gateway.db.query(
+          "update public.subscriptions set logo_url='https://images.example.invalid/identity.png',header_photo_url='https://images.example.invalid/identity.png',website_hero_url='https://images.example.invalid/identity.png',header_identity='photo'",
+        );
+        await page.reload();
+        await page.getByRole("button", { name: "Business identity" }).click();
+        await expect(page.getByText("✓ Added", { exact: true })).toHaveCount(2);
+        await expect(
+          page.getByText("✓ Added — displayed in header", { exact: true }),
+        ).toBeVisible();
+        await page
+          .getByRole("button", { name: "Edit Website Branding", exact: true })
+          .click();
+        await expect(
+          page.getByRole("button", { name: "Save branding", exact: true }),
+        ).toBeVisible();
+        // Restore the empty-asset fixture used by the existing appearance tests below.
+        await gateway.db.query(
+          "update public.subscriptions set logo_url=null,header_photo_url=null,website_hero_url=null,header_identity='name'",
+        );
+        await page.reload();
       }
       await expect(
         page
@@ -827,7 +1065,9 @@ for (const changedPrice of [false, true])
             })
             .click();
         } else {
-          await page.getByRole("button", { name: /Website Appearance/ }).click();
+          await page
+            .getByRole("button", { name: /Website Appearance/ })
+            .click();
           await page
             .getByRole("button", { name: "Template & appearance" })
             .click();
@@ -1428,10 +1668,16 @@ for (const changedPrice of [false, true])
         const subscriptionPicker = page.getByLabel("Subscription", {
           exact: true,
         });
-        if (!(await subscriptionPicker.isVisible()))
-          await page
-            .getByRole("button", { name: "Business & account" })
-            .click();
+        await expect(
+          page.getByRole("heading", { name: "Build your website" }),
+        ).toBeVisible();
+        if (!(await subscriptionPicker.isVisible())) {
+          const headerToggle = page.getByRole("button", {
+            name: "Business & account",
+          });
+          await headerToggle.focus();
+          await headerToggle.press("Space");
+        }
         await expect(subscriptionPicker).toBeVisible();
         await subscriptionPicker.selectOption({ label: "Second business" });
         await expect(

@@ -1,5 +1,15 @@
 # Talix Product Design
 
+## Overnight owner-review corrections — October 20, 2026 Pacific
+
+Sprint #89 authorizes bounded implementation of #86/#87/#85/#82/#88 for owner review. Business identity shows the saved brand color beside its hex value and distinguishes saved assets from optional business-initial/name fallbacks. **Edit Website Branding** uses the existing Talix gold action. Web address retains a short custom-domain availability boundary without a competing Future option card.
+
+Public workspace/setup actions use **Open website** only when `website_live_template` exists; otherwise they use **Open storefront**. Both open the currently published `/shop/<slug>` experience. Pending choices never determine the public label. Successful choice saves receive persistent, prominent, keyboard-focused status feedback; failed saves do not receive success styling.
+
+Go live places the existing content checks and compact live details before an inline **Your website** draft preview, using the shared header/template components, appearance preview styling and Mobile/Tablet/Desktop controls. There is no separate customer-preview popup. Successful publication announces the saved business name and the database-returned publication timestamp, with a gold **Open website** action. Repeating publication of the same template retains the original database timestamp; the UI does not invent a fresh update time.
+
+Final visual acceptance remains pending. #83's storefront-only publication operation and #84's materially revised homepage/Shop behavior remain blocked pending their bounded protected decisions; see `WEBSITE-ONBOARDING-SPRINT-89.md`. Saving Decide later continues to preserve an already published website until that separately approved operation exists.
+
 ## Website and storefront owner setup — approved October 19, 2026 Pacific
 
 After creating a subscription, an owner enters a resumable **Website & storefront** setup area. The three reversible choices are **Use my existing website**, **Use a Talix template**, and **Decide later**. This decision is not part of price review and does not disable the subscription's existing Talix ordering page.

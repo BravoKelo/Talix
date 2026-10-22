@@ -1,5 +1,13 @@
 # Talix current state
 
+## Overnight onboarding corrections — October 20, 2026 Pacific
+
+Review is now [PR #90](https://github.com/BravoKelo/Talix/pull/90), continued October 21 after a usage-limit interruption. Initial head `3af2339` passed Core checks run 39592766196: 89 unit/SQL and all 58 configured browser scenarios, lint/type/build. Its actual development preview passed signup, owner saves, explicit empty-catalog publication and public-destination checks with no captured browser runtime errors. Visual screenshot review then found narrow-phone panel clipping; the corrective follow-up constrains the inner grids, stacks phone actions and adds panel/control-boundary assertions. The corrected onboarding journey passes all four local engine/viewport projects. Final exact commit, CI, preview validation and fixture-cleanup evidence belong in issue #89 and PR #90. Do not use the earlier preview as final review evidence.
+
+Sprint #89 follows main `a7d4fc7` (PR #80 merged). The existing onboarding feature branch now prepares #86/#87/#85/#82/#88 for review with its existing Talix-development Vercel preview settings. Public action labels follow live state; choice-save feedback is prominent; identity assets/color are clear; Web address loses the redundant card; Go Live uses an inline responsive draft preview and database-timestamp publication confirmation. No schema, security, infrastructure, migration, main or production changes. Exact commit, CI and live preview evidence are recorded in #89 and the new PR after validation; implementation alone is not review-ready acceptance.
+
+`WEBSITE-ONBOARDING-SPRINT-89.md` records precise #83/#84 protected decisions and manual review steps. Both remain unimplemented; saving deferred still preserves a live website. Older statements below that PR #74/#80 work is unmerged are historical; current main includes both. No new merge is authorized.
+
 ## Owner-review corrections for website setup — October 20, 2026 Pacific
 
 The owner conditionally approved the website samples subject to resolving the already-recorded issues #75–#79. The existing-website path now uses a three-step connection journey with no template controls; Decide Later is a one-step save-and-return path; both outcomes provide explicit, non-publishing confirmation while preserving any previously launched Talix site. Business identity no longer contains a partial false-affordance preview. Go Live contains the complete private preview, including the storefront header, navigation, hero, products, business story and location details, followed by distinct publication confirmation and a working website action.
