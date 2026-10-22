@@ -4967,6 +4967,10 @@ body:has(.business-tracking) > footer {
   gap: 12px;
   margin-top: 30px;
 }
+.website-home-navigation {
+  margin: 0;
+  padding: 16px clamp(24px, 7vw, 104px);
+}
 .website-template-action {
   display: inline-flex;
   align-items: center;

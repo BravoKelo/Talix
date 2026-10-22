@@ -1,5 +1,11 @@
 # Talix current state
 
+## Approved website mode and homepage follow-up — #83 / #84
+
+PR #90 is merged as `5c0b9618760007b338ccbf64f7e7ba6d66b82353` at the owner's explicit direction; its reviewed head is `aeec14daf48bdd0fa5851b454a14f049163af999`. Lint/type/build and 89 unit/SQL tests passed; final browser CI timed out before scenarios ran, and owner took over browser testing. The scoped merge decision and verified final development preview are recorded in #89/PR #90. Main automatic deployment remains disabled.
+
+The owner then approved implementing #83 and #84. The retained onboarding feature branch now prepares the explicit Go Live storefront-only transition and differentiated template homepages. [WEBSITE-MODES-REVIEW.md](WEBSITE-MODES-REVIEW.md) records the exact bounded migration, security/compatibility contract and manual review. Migration `20261022032702_storefront_only_publication.sql` is prepared and isolated-test verified, **not applied**; separate development execution approval is required. Without activation, publication reports awaiting activation and preserves the live site. #84 needs no database change. No new merge or production operation is authorized. Earlier pending/blocked proposal wording below is historical and superseded by the recorded approvals.
+
 ## Overnight onboarding corrections — October 20, 2026 Pacific
 
 Review is now [PR #90](https://github.com/BravoKelo/Talix/pull/90), continued October 21 after a usage-limit interruption. Initial head `3af2339` passed Core checks run 39592766196: 89 unit/SQL and all 58 configured browser scenarios, lint/type/build. Its actual development preview passed signup, owner saves, explicit empty-catalog publication and public-destination checks with no captured browser runtime errors. Visual screenshot review then found narrow-phone panel clipping; the corrective follow-up constrains the inner grids, stacks phone actions and adds panel/control-boundary assertions. The corrected onboarding journey passes all four local engine/viewport projects. Final exact commit, CI, preview validation and fixture-cleanup evidence belong in issue #89 and PR #90. Do not use the earlier preview as final review evidence.

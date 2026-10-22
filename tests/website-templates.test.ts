@@ -34,8 +34,8 @@ const products: Product[] = [
 const expected: Record<WebsiteTemplate, string> = {
   order_first: "Shop available products",
   browse_shop: "Find something made for your day.",
-  visit_order: "Order for this location",
-  story_shop: "Made personal. Chosen with care.",
+  visit_order: "PLAN YOUR VISIT",
+  story_shop: "The story of Useful Goods",
 };
 
 describe("approved website templates", () => {
@@ -62,10 +62,51 @@ describe("approved website templates", () => {
         }),
       );
       expect(html).toContain(copy);
-      expect(html).toContain("Featured products");
-      expect(html).toContain("Clear information");
-      expect(html).toContain("A business customers can know and trust.");
+      expect(html).toContain("About Useful Goods");
       expect(html).toContain("100 Market Street");
+      expect(html.includes('id="template-products-title"')).toBe(
+        template === "order_first" || template === "browse_shop",
+      );
+      expect(html).not.toContain("popular choices");
+      expect(html).not.toContain("Customer favorites");
+      expect(html).not.toContain("blockquote");
     });
   }
+
+  it("limits featured products and shows the complete preview catalog only in Shop", () => {
+    const subscription: Subscription = {
+      id: "business",
+      client_id: "client",
+      name: "Useful Goods",
+      slug: "goods",
+      accent: "#172a4d",
+      description: "Saved business story.",
+      website_template: "browse_shop",
+    };
+    const many = Array.from({ length: 5 }, (_, i) => ({
+      ...products[0],
+      id: `item-${i}`,
+      name: `Item ${i}`,
+    }));
+    const home = renderToStaticMarkup(
+      createElement(WebsiteTemplateHero, {
+        subscription,
+        location,
+        products: many,
+        preview: true,
+      }),
+    );
+    expect(home).toContain("Item 2");
+    expect(home).not.toContain("Item 3");
+    const shop = renderToStaticMarkup(
+      createElement(WebsiteTemplateHero, {
+        subscription,
+        location,
+        products: many,
+        preview: true,
+        previewView: "shop",
+      }),
+    );
+    expect(shop).toContain("Item 4");
+  });
 });

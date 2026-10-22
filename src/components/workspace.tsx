@@ -1151,6 +1151,7 @@ export function Workspace({
                       key={sub.id}
                       subscription={sub}
                       locations={locations}
+                      products={products}
                       allowed={shared("settings.manage")}
                       cancel={() => setSettingsArea("")}
                       cleanup={(url) =>

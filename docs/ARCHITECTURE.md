@@ -1,5 +1,9 @@
 # Talix Architecture
 
+## Prepared owner mode transition — issue #83
+
+The owner approved preparation of one additional owner-only atomic operation for explicit storefront-only publication. `20261022032702_storefront_only_publication.sql` is NOT applied; existing development behavior remains until separate execution approval. [WEBSITE-MODES-REVIEW.md](WEBSITE-MODES-REVIEW.md) owns the prepared operation's lock/review/retry/grant contract. No table/column, public catalog projection or existing save/launch contract changes. Issue #84's homepage/Shop presentation reuses the existing canonical route, catalog and commerce state, with metadata reflecting homepage content; it creates no commerce or routing architecture.
+
 ## Website-setup extension activated in development
 
 The approved website-owner onboarding batch adds a subscription-owned state contract in `20261019183000_website_owner_onboarding.sql`, applied to development as service version `20261019201906_website_owner_onboarding`. Private path, draft template, existing-site address, and timestamps remain protected by subscription reads; only the active template identifier is added to the explicit public-catalog projection. Dedicated security-definer save and launch operations verify `private.is_owner`, validate constrained input, acknowledge the affected subscription, and make launch atomic. Launch locks the subscription, requires a published location, and requires explicit acknowledgement when no eligible product exists. Existing delegated `settings.manage` authority cannot mutate these fields.

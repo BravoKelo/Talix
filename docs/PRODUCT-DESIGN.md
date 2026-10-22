@@ -1,5 +1,11 @@
 # Talix Product Design
 
+## Approved follow-up — explicit storefront-only publication and homepage goals
+
+Owner approved #83/#84 after review, with implementation following merged PR #90. For an already-launched Talix website, Decide Later → Save to continue saves the pending choice and opens Go Live; it does not hide the website. Go Live explicitly reviews storefront-only mode and requires Publish storefront-only mode. Only an authoritative committed result shows “Your existing website has been hidden, Talix is now in storefront only mode” and Open storefront. Preserve business/catalog/branding, address and saved draft. Never-launched subscribers retain the one-step Save for later path. This supersedes the prior permanent-preservation outcome for an explicitly published deferred transition; saving alone still preserves the site. Activation of the prepared database operation remains separately gated.
+
+Only Order First embeds the full shared storefront on Home. Visit & Order prioritizes the selected published location's address, hours and contact; Browse & Shop presents up to three real eligible Featured products and saved business information; Story & Shop presents the saved business story and contact information. The other three use Shop to enter the existing shared storefront. Preserve the canonical address, Home/Shop anchors, cart/location state, browser history and direct Shop links; retain an accessible Shop action even if custom navigation omits one. Previews reproduce these content rules with ordering disabled. Use honest missing-content fallbacks, actual categories and no invented popularity, testimonials or business commitments. Homepage structured data includes only the homepage's visible eligible products. No new public routes or ranking data are introduced.
+
 ## Overnight owner-review corrections — October 20, 2026 Pacific
 
 Sprint #89 authorizes bounded implementation of #86/#87/#85/#82/#88 for owner review. Business identity shows the saved brand color beside its hex value and distinguishes saved assets from optional business-initial/name fallbacks. **Edit Website Branding** uses the existing Talix gold action. Web address retains a short custom-domain availability boundary without a competing Future option card.

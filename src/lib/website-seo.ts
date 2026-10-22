@@ -1,5 +1,5 @@
 import type { Catalog } from "./types";
-import { websiteProductsForLocation } from "./website";
+import { websiteHomepageProducts, websiteProductsForLocation } from "./website";
 
 const fallbackOrigin = "https://talix.app";
 
@@ -34,9 +34,9 @@ export function websiteStructuredData(catalog: Catalog, canonical: string) {
     catalog.locations.find(
       (item) => item.id === catalog.subscription.default_location_id,
     ) ?? catalog.locations[0];
-  const products = websiteProductsForLocation(
-    catalog.products,
-    location?.id,
+  const products = websiteHomepageProducts(
+    websiteProductsForLocation(catalog.products, location?.id),
+    catalog.subscription.website_live_template,
   ).map((product) => ({
     "@type": "Product",
     "@id": canonical + "#product-" + product.id,

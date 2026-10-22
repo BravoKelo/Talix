@@ -180,4 +180,130 @@ describe.sequential("owner website setup authority", () => {
     );
     expect(result.ordering_ready).toBe(true);
   });
+
+  it("publishes storefront-only mode only after owner review and preserves business data", async () => {
+    await as(owner);
+    const live = await rpc<Record<string, unknown>>("launch_website_template", [
+      sid,
+      false,
+    ]);
+    const args = [
+      sid,
+      live.website_live_template,
+      live.website_template_launched_at,
+    ];
+    await expect(rpc("publish_storefront_only", args)).rejects.toThrow(
+      "Save Decide later",
+    );
+    const pending = await rpc<Record<string, unknown>>("save_website_setup", [
+      sid,
+      "deferred",
+      "order_first",
+      null,
+      false,
+    ]);
+    expect(pending.website_live_template).toBe("order_first");
+    for (const id of [editor, outsider]) {
+      await as(id);
+      await expect(rpc("publish_storefront_only", args)).rejects.toThrow(
+        "Owner access required",
+      );
+    }
+    await as(null, "anon");
+    await expect(rpc("publish_storefront_only", args)).rejects.toThrow(
+      "permission denied",
+    );
+    await as(owner);
+    await expect(
+      rpc("publish_storefront_only", [sid, null, null]),
+    ).rejects.toThrow("Reload setup");
+    await expect(
+      rpc("publish_storefront_only", [
+        sid,
+        "story_shop",
+        live.website_template_launched_at,
+      ]),
+    ).rejects.toThrow("live website changed");
+    await expect(
+      rpc("publish_storefront_only", [
+        sid,
+        live.website_live_template,
+        new Date(
+          Date.parse(live.website_template_launched_at as string) - 1000,
+        ).toISOString(),
+      ]),
+    ).rejects.toThrow("live website changed");
+    await expect(
+      db.query(
+        "update public.subscriptions set website_live_template=null where id=$1",
+        [sid],
+      ),
+    ).rejects.toThrow("permission denied");
+    const saved = await rpc<Record<string, unknown>>(
+      "publish_storefront_only",
+      args,
+    );
+    expect(saved).toMatchObject({
+      website_path: "deferred",
+      website_live_template: null,
+      website_template_launched_at: null,
+      website_template: "order_first",
+      storefront_only: true,
+    });
+    expect(await rpc("publish_storefront_only", args)).toEqual(saved);
+    await as(null, "anon");
+    const catalog = await rpc<{
+      subscription: Record<string, unknown>;
+      products: unknown[];
+      locations: unknown[];
+    }>("public_catalog", ["website-study"]);
+    expect(catalog.subscription).toMatchObject({
+      name: "Website study",
+      slug: "website-study",
+      website_live_template: null,
+    });
+    expect(catalog.products).toHaveLength(1);
+    expect(catalog.locations).toHaveLength(1);
+    expect(catalog.subscription).not.toHaveProperty("website_template");
+  });
+
+  it("rejects a stale storefront-only confirmation after another publication", async () => {
+    await as(owner);
+    const previous = await rpc<Record<string, unknown>>(
+      "launch_website_template",
+      [sid, false],
+    );
+    await rpc("save_website_setup", [
+      sid,
+      "talix_template",
+      "story_shop",
+      null,
+      false,
+    ]);
+    const newer = await rpc<Record<string, unknown>>(
+      "launch_website_template",
+      [sid, false],
+    );
+    await rpc("save_website_setup", [
+      sid,
+      "deferred",
+      "story_shop",
+      null,
+      false,
+    ]);
+    await expect(
+      rpc("publish_storefront_only", [
+        sid,
+        previous.website_live_template,
+        previous.website_template_launched_at,
+      ]),
+    ).rejects.toThrow("live website changed");
+    const state = (
+      await db.query<{ website_live_template: string }>(
+        "select website_live_template from public.subscriptions where id=$1",
+        [sid],
+      )
+    ).rows[0];
+    expect(state.website_live_template).toBe(newer.website_live_template);
+  });
 });

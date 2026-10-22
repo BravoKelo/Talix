@@ -44,14 +44,20 @@ const templateSteps: SetupStep[] = [
   { id: "address", label: "Web address" },
   { id: "review", label: "Go live" },
 ];
-function stepsFor(path: WebsitePath): SetupStep[] {
+function stepsFor(path: WebsitePath, deferredReview: boolean): SetupStep[] {
   if (path === "existing")
     return [
       { id: "setup", label: "Website setup" },
       { id: "address", label: "Existing website" },
       { id: "review", label: "Review connection" },
     ];
-  if (path === "deferred") return [{ id: "setup", label: "Website setup" }];
+  if (path === "deferred")
+    return deferredReview
+      ? [
+          { id: "setup", label: "Website setup" },
+          { id: "review", label: "Go live" },
+        ]
+      : [{ id: "setup", label: "Website setup" }];
   return templateSteps;
 }
 
@@ -74,7 +80,14 @@ export function WebsiteSetup({
   const [path, setPath] = useState<WebsitePath>(
     subscription.website_path ?? "deferred",
   );
-  const setupSteps = useMemo(() => stepsFor(path), [path]);
+  // Retain the review screen after publication so its confirmation stays visible.
+  const [deferredReview, setDeferredReview] = useState(
+    !!subscription.website_live_template,
+  );
+  const setupSteps = useMemo(
+    () => stepsFor(path, deferredReview),
+    [path, deferredReview],
+  );
   const activeStep = setupSteps[step] ?? setupSteps[0];
   const [template, setTemplate] = useState<WebsiteTemplate | null>(
     subscription.website_template ?? null,
@@ -102,18 +115,21 @@ export function WebsiteSetup({
     "desktop",
   );
   const [confirmLaunch, setConfirmLaunch] = useState(false);
+  const [previewView, setPreviewView] = useState<"home" | "shop">("home");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [messageKind, setMessageKind] = useState<"success" | "error">("error");
   const feedback = useRef<HTMLDivElement>(null);
   const [completion, setCompletion] = useState<
-    "deferred" | "existing" | "template" | null
+    "deferred" | "existing" | "template" | "storefront" | null
   >(
     subscription.website_setup_completed_at
       ? subscription.website_path === "existing"
         ? "existing"
         : subscription.website_path === "deferred"
-          ? "deferred"
+          ? subscription.website_live_template
+            ? null
+            : "deferred"
           : subscription.website_live_template
             ? "template"
             : null
@@ -143,7 +159,8 @@ export function WebsiteSetup({
     if (
       messageKind === "success" &&
       (message.startsWith("Saved for later") ||
-        message.startsWith("Website published successfully"))
+        message.startsWith("Website published successfully") ||
+        message.startsWith("Your existing website has been hidden"))
     ) {
       feedback.current?.focus();
       feedback.current?.scrollIntoView({ block: "nearest" });
@@ -212,7 +229,7 @@ export function WebsiteSetup({
       onSaved({ ...saved, default_location_id: persistedLocationId || null });
       setMessageKind("success");
       if (markComplete && path === "deferred") {
-        setCompletion("deferred");
+        setCompletion(saved.website_live_template ? null : "deferred");
         setMessage(
           saved.website_live_template
             ? "Saved for later. Your existing live Talix website was not changed."
@@ -315,6 +332,64 @@ export function WebsiteSetup({
     }
   }
 
+  async function publishStorefront() {
+    setMessageKind("error");
+    if (!liveTemplate || !launchedAt) return;
+    const previousTemplate = liveTemplate;
+    const previousLaunchedAt = launchedAt;
+    if (!(await save(false))) return;
+    setBusy(true);
+    setCompletion(null);
+    setMessage("");
+    setMessageKind("error");
+    try {
+      const { data, error } = await browserClient().rpc(
+        "publish_storefront_only",
+        {
+          p_subscription: subscription.id,
+          p_previous_template: previousTemplate,
+          p_previous_launched_at: previousLaunchedAt,
+        },
+      );
+      if (error) {
+        if (error.code === "PGRST202" || error.code === "42883")
+          throw new Error(
+            "Storefront-only publication is awaiting activation. Your live website has not been hidden.",
+          );
+        throw error;
+      }
+      const saved = data as
+        | (WebsiteState & { storefront_only?: boolean })
+        | null;
+      if (
+        !saved ||
+        saved.storefront_only !== true ||
+        saved.website_path !== "deferred" ||
+        saved.website_live_template !== null ||
+        saved.website_template_launched_at !== null
+      ) {
+        throw new Error(
+          "Publication could not be confirmed. Reload setup to check the public mode before trying again.",
+        );
+      }
+      setLiveTemplate(null);
+      setLaunchedAt(null);
+      onSaved({ ...saved, default_location_id: savedLocationId || null });
+      setCompletion("storefront");
+      setMessageKind("success");
+      setMessage(
+        "Your existing website has been hidden, Talix is now in storefront only mode",
+      );
+    } catch (error) {
+      setMessage(
+        (error as { message?: string })?.message ||
+          "Publication could not be confirmed. Reload setup to check the public mode, or retry this confirmation safely.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section
       className="website-onboarding"
@@ -370,20 +445,24 @@ export function WebsiteSetup({
             aria-label="Website setup status"
           >
             <strong>
-              {completion === "template"
-                ? "Website published successfully"
-                : completion === "existing"
-                  ? "Existing website connection saved"
-                  : "Website setup saved for later"}
+              {completion === "storefront"
+                ? "Storefront-only mode published"
+                : completion === "template"
+                  ? "Website published successfully"
+                  : completion === "existing"
+                    ? "Existing website connection saved"
+                    : "Website setup saved for later"}
             </strong>
             <p>
-              {completion === "template"
-                ? `${subscription.name} is published at its Talix website address.`
-                : completion === "existing"
-                  ? "Your existing website connection is saved. The public Talix experience remains unchanged."
-                  : liveTemplate
-                    ? "Setup is deferred. Your previously published Talix website remains unchanged."
-                    : "No marketing website was published. Your Talix ordering page remains available."}
+              {completion === "storefront"
+                ? "Your existing website has been hidden, Talix is now in storefront only mode"
+                : completion === "template"
+                  ? `${subscription.name} is published at its Talix website address.`
+                  : completion === "existing"
+                    ? "Your existing website connection is saved. The public Talix experience remains unchanged."
+                    : liveTemplate
+                      ? "Setup is deferred. Your previously published Talix website remains unchanged."
+                      : "No marketing website was published. Your Talix ordering page remains available."}
             </p>
             {completion !== "deferred" && (
               <div className="website-template-actions">
@@ -431,6 +510,8 @@ export function WebsiteSetup({
                       checked={path === item.id}
                       onChange={() => {
                         setPath(item.id);
+                        if (item.id === "deferred" && liveTemplate)
+                          setDeferredReview(true);
                         setStep(0);
                         setMessage("");
                         setCompletion(null);
@@ -450,7 +531,9 @@ export function WebsiteSetup({
               <strong>Your choice is flexible</strong>
               <p>
                 {path === "deferred"
-                  ? "Save this choice and return to Website Appearance whenever you are ready."
+                  ? deferredReview && liveTemplate
+                    ? "Save to continue, then use Go live to publish storefront-only mode. Your existing website stays live until you confirm."
+                    : "Save this choice and return to Website Appearance whenever you are ready."
                   : "Start with the best fit today. Nothing publishes until you complete the final review."}
               </p>
             </div>
@@ -856,6 +939,7 @@ export function WebsiteSetup({
                             subscription={previewSubscription}
                             location={selectedLocation}
                             preview
+                            onPreviewNavigate={setPreviewView}
                           />
                         </div>
                         <WebsiteTemplateHero
@@ -863,6 +947,8 @@ export function WebsiteSetup({
                           location={selectedLocation}
                           products={eligibleProducts}
                           preview
+                          previewView={previewView}
+                          onPreviewNavigate={setPreviewView}
                         />
                       </div>
                     ) : (
@@ -895,16 +981,42 @@ export function WebsiteSetup({
               </>
             ) : (
               <div className="website-callout">
-                <strong>
+                <h3>
                   {path === "existing"
                     ? "Your website connection is ready to save"
-                    : "Your choice is saved for later"}
-                </strong>
+                    : deferredReview
+                      ? "Switch to storefront-only mode"
+                      : "Your choice is saved for later"}
+                </h3>
                 <p>
                   {path === "existing"
                     ? `Customers can continue using ${existingUrl || "your existing website"}, with a normal link to Talix ordering.`
-                    : "Nothing will be published, and you can return at any time."}
+                    : deferredReview
+                      ? "Your existing Talix website will be hidden only when you publish this change. Your storefront address, products, branding and saved website draft are retained."
+                      : "Nothing will be published, and you can return at any time."}
                 </p>
+                {path === "deferred" && deferredReview && (
+                  <div>
+                    <p>
+                      {liveTemplate
+                        ? "Your existing website is still live."
+                        : "Your storefront is the current public experience."}
+                    </p>
+                    {liveTemplate && (
+                      <p>
+                        Current website:{" "}
+                        {
+                          websiteTemplates.find(
+                            (item) => item.id === liveTemplate,
+                          )?.title
+                        }
+                        .
+                        {launchedAt &&
+                          ` Published ${new Date(launchedAt).toLocaleString()}.`}
+                      </p>
+                    )}
+                  </div>
+                )}
                 {path === "existing" && (
                   <dl>
                     <div>
@@ -949,7 +1061,7 @@ export function WebsiteSetup({
                 disabled={busy}
                 onClick={() => void continueFromStep()}
               >
-                Save and continue
+                {path === "deferred" ? "Save to continue" : "Save and continue"}
               </button>
             ) : path === "talix_template" ? (
               <button
@@ -967,6 +1079,14 @@ export function WebsiteSetup({
                   : liveTemplate
                     ? "Update live website"
                     : "Make website live"}
+              </button>
+            ) : path === "deferred" && deferredReview ? (
+              <button
+                type="button"
+                disabled={busy || !liveTemplate || !launchedAt}
+                onClick={() => void publishStorefront()}
+              >
+                {busy ? "Working…" : "Publish storefront-only mode"}
               </button>
             ) : path === "existing" ? (
               <button

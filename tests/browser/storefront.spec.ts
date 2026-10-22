@@ -85,17 +85,100 @@ test("launched template without products presents the business without empty com
   ).toBeVisible();
   await expect(page.getByText("Online ordering is not ready")).toBeVisible();
   await expect(
-    page.getByRole("region", { name: "Business commitments" }),
-  ).toBeVisible();
-  await expect(
     page.getByRole("heading", {
-      name: "A business customers can know and trust.",
+      name: "About Example store",
     }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: /Your cart/ })).toHaveCount(0);
   await expect(page.getByPlaceholder("Search products")).toHaveCount(0);
   await expect(page.locator(".shop-menu-toggle")).toHaveCount(0);
 });
+
+for (const template of [
+  "order_first",
+  "browse_shop",
+  "visit_order",
+  "story_shop",
+] as const) {
+  test(`${template}: Home and Shop retain cart, location and history`, async ({
+    page,
+  }) => {
+    await mockCatalog(page, {
+      ...catalog,
+      subscription: {
+        ...catalog.subscription,
+        website_live_template: template,
+        header_mode: "custom",
+        header_links: [],
+      },
+      products: [
+        ...catalog.products,
+        ...Array.from({ length: 4 }, (_, i) =>
+          product(`extra-${i}`, `Extra ${i}`),
+        ),
+      ],
+    });
+    await page.goto("/shop/example");
+    await expect(page.locator(".website-template-hero")).toBeVisible();
+    if (template === "order_first")
+      await expect(
+        page.getByRole("region", { name: "Products", exact: true }),
+      ).toBeVisible();
+    else
+      await expect(
+        page.getByRole("region", { name: "Products", exact: true }),
+      ).toBeHidden();
+    if (template === "browse_shop") {
+      await expect(
+        page.locator(".website-template-product-grid article"),
+      ).toHaveCount(3);
+      await expect(
+        page.getByText("Featured products", { exact: true }),
+      ).toBeVisible();
+    } else
+      await expect(
+        page.locator(".website-template-product-grid article"),
+      ).toHaveCount(0);
+    // Shop is reachable even when custom header links omit it.
+    await page
+      .locator(".website-template-page")
+      .getByRole("link", { name: "Shop", exact: true })
+      .click();
+    await expect(
+      page.getByRole("region", { name: "Products", exact: true }),
+    ).toBeVisible();
+    await expect(page.locator("#shop-products")).toBeFocused();
+    await page.getByLabel("Choose a location").selectOption("South");
+    await page
+      .getByRole("button", {
+        name: "Add Everyday notebook to cart",
+        exact: true,
+      })
+      .click();
+    await page
+      .getByRole("link", { name: "Back to homepage", exact: true })
+      .click();
+    await expect(page.locator(".website-template-hero")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Your cart (1)", exact: true }),
+    ).toBeVisible();
+    await page.goBack();
+    await expect(
+      page.getByRole("region", { name: "Products", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Choose a location")).toHaveValue("South");
+    await expect(
+      page.getByRole("button", { name: "Your cart (1)", exact: true }),
+    ).toBeVisible();
+    await page.goForward();
+    await expect(page.locator(".website-template-hero")).toBeVisible();
+    await page.goto("/shop/example#shop-products");
+    await expect(
+      page.getByRole("region", { name: "Products", exact: true }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Choose a location")).toHaveValue("North");
+  });
+}
 
 test("visual shopping: keyboard details, scoped search, cart variants and location reset", async ({
   page,

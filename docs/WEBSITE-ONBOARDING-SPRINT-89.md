@@ -1,5 +1,7 @@
 # Website onboarding sprint #89
 
+Follow-up: PR #90 merged as `5c0b9618760007b338ccbf64f7e7ba6d66b82353` by explicit owner direction with its documented CI browser-startup limitation. The owner subsequently approved the #83/#84 proposals below. Their implementation/activation review is now owned by [WEBSITE-MODES-REVIEW.md](WEBSITE-MODES-REVIEW.md); historical blocked/proposal wording here is superseded. No #83 migration execution is implied by implementation approval.
+
 ## Scope and baseline
 
 Owner requested unattended implementation and preview verification of bounded corrections on October 20, 2026 Pacific. Baseline main: `a7d4fc7` (merged PR #80). Existing `feature/website-owner-onboarding` was fast-forwarded to that baseline and reused for the focused UI corrections and its existing branch-scoped development preview. No merge, production deployment, migration or service configuration change is authorized or performed.

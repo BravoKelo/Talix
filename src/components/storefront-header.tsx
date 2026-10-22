@@ -10,12 +10,14 @@ export function StorefrontHeader({
   search,
   preview = false,
   location,
+  onPreviewNavigate,
 }: {
   subscription: Partial<Subscription>;
   children?: React.ReactNode;
   search?: React.ReactNode;
   preview?: boolean;
   location?: Location;
+  onPreviewNavigate?: (view: "home" | "shop") => void;
 }) {
   const design = designFor(subscription);
   const centeredPhoto =
@@ -71,6 +73,7 @@ export function StorefrontHeader({
         subscription={subscription}
         location={location}
         preview={preview}
+        onPreviewNavigate={onPreviewNavigate}
       />
       {search}
       {children}
