@@ -189,11 +189,29 @@ export function Storefront({
       element.after(expanded);
       try {
         const nav = expanded.querySelector<HTMLElement>(".shop-nav");
-        if (nav)
+        const actualNav = element.querySelector<HTMLElement>(".shop-nav");
+        if (nav && actualNav) {
+          // Install the measured starting height immediately. Animating the
+          // measurement itself leaves WebKit midway to that height when an
+          // early scroll starts, so its margin and height curves disagree.
+          const transitions = [element, actualNav].map((node) => ({
+            node,
+            value: node.style.getPropertyValue("transition"),
+            priority: node.style.getPropertyPriority("transition"),
+          }));
+          transitions.forEach(({ node }) =>
+            node.style.setProperty("transition", "none"),
+          );
           element.style.setProperty(
             "--shop-expanded-nav-height",
             `${nav.getBoundingClientRect().height}px`,
           );
+          actualNav.getBoundingClientRect();
+          transitions.forEach(({ node, value, priority }) => {
+            if (value) node.style.setProperty("transition", value, priority);
+            else node.style.removeProperty("transition");
+          });
+        }
       } finally {
         expanded.remove();
       }

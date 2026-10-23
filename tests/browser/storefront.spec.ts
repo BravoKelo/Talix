@@ -610,7 +610,8 @@ for (const width of [1280, 768, 390]) {
         state.running = false;
         return state.samples;
       });
-      expect(samples.at(-1)!.y, layout).toBe(55);
+      // Firefox can retain subpixel scroll positions after font/grid rounding.
+      expect(Math.abs(samples.at(-1)!.y - 55), layout).toBeLessThan(0.1);
       expect(
         Math.max(...samples.map((s) => s.top)) -
           Math.min(...samples.map((s) => s.top)),
@@ -686,7 +687,9 @@ test("long-name header keeps its footprint after responsive resizing", async ({
     await page.mouse.wheel(0, 55);
     await expect(header).toHaveClass(/is-compact/);
     await page.waitForTimeout(300);
-    expect(await page.evaluate(() => scrollY)).toBe(55);
+    expect(Math.abs((await page.evaluate(() => scrollY)) - 55)).toBeLessThan(
+      0.1,
+    );
     expect(
       Math.abs(
         (await page
