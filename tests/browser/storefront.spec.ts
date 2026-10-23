@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import type { Catalog, Product } from "../../src/lib/types";
+import { standardHeaderLinks } from "../../src/lib/header-navigation";
 
 const product = (
   id: string,
@@ -550,7 +551,9 @@ for (const width of [1280, 768, 390]) {
         ...catalog,
         subscription: {
           ...catalog.subscription,
+          name: "Thoughtfully Chosen Goods and Everyday Essentials for Neighbors Across Our Local Community",
           header_mode: "custom",
+          header_links: standardHeaderLinks,
           header_layout: layout,
           website_live_template: "order_first",
         },
@@ -654,6 +657,51 @@ for (const width of [1280, 768, 390]) {
     }
   });
 }
+
+test("long-name header keeps its footprint after responsive resizing", async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await mockCatalog(page, {
+    ...catalog,
+    subscription: {
+      ...catalog.subscription,
+      name: "Thoughtfully Chosen Goods and Everyday Essentials for Neighbors Across Our Local Community",
+    },
+    products: Array.from({ length: 24 }, (_, i) =>
+      product(`item-${i}`, `Item ${i}`),
+    ),
+  });
+  await page.goto("/shop/example");
+  await expect(page.locator(".shop-product-card").first()).toBeVisible();
+  for (const width of [1280, 390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const header = page.locator(".shop-header");
+    await expect(header).not.toHaveClass(/is-compact/);
+    await page.waitForTimeout(300);
+    const top = await page
+      .locator(".shop-content")
+      .evaluate((el) => el.getBoundingClientRect().top + scrollY);
+    await page.mouse.wheel(0, 55);
+    await expect(header).toHaveClass(/is-compact/);
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => scrollY)).toBe(55);
+    expect(
+      Math.abs(
+        (await page
+          .locator(".shop-content")
+          .evaluate((el) => el.getBoundingClientRect().top + scrollY)) - top,
+      ),
+    ).toBeLessThanOrEqual(2);
+    await expect(header).toHaveCount(1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+});
 
 test("header respects reduced motion and retains keyboard navigation focus", async ({
   page,

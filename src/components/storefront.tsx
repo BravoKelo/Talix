@@ -4,7 +4,7 @@ import { ProductImage } from "./product-image";
 import Link from "next/link";
 import { StorefrontHeader } from "./storefront-header";
 import { headerLayout, storefrontStyle } from "@/lib/storefront-design";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/client";
 import { TaskDialog } from "@/components/order-dialog";
@@ -157,6 +157,52 @@ export function Storefront({
   const header = useRef<HTMLElement>(null);
   const [websiteView, setWebsiteView] = useState<"home" | "shop">("home");
   const [navigationHash, setNavigationHash] = useState<string | null>(null);
+  useLayoutEffect(() => {
+    const element = header.current;
+    if (!element || !catalog) return;
+    let measuredWidth = -1;
+    const measure = () => {
+      const width = element.getBoundingClientRect().width;
+      if (width === measuredWidth) return;
+      measuredWidth = width;
+      // Measure natural expanded layout outside document flow, even when the
+      // real header is compact. Reset the old measurement so narrower/wider
+      // layouts can shrink as well as grow. Never measure on scroll frames.
+      const expanded = element.cloneNode(true) as HTMLElement;
+      expanded.classList.remove("is-compact");
+      expanded.style.removeProperty("--shop-expanded-nav-height");
+      Object.assign(expanded.style, {
+        position: "absolute",
+        visibility: "hidden",
+        pointerEvents: "none",
+        width: `${width}px`,
+        top: "0",
+        left: "0",
+        margin: "0",
+      });
+      expanded.inert = true;
+      expanded.setAttribute("aria-hidden", "true");
+      expanded
+        .querySelectorAll("[id]")
+        .forEach((node) => node.removeAttribute("id"));
+      expanded.querySelectorAll("dialog").forEach((node) => node.remove());
+      element.after(expanded);
+      try {
+        const nav = expanded.querySelector<HTMLElement>(".shop-nav");
+        if (nav)
+          element.style.setProperty(
+            "--shop-expanded-nav-height",
+            `${nav.getBoundingClientRect().height}px`,
+          );
+      } finally {
+        expanded.remove();
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [catalog, websiteView]);
   useEffect(() => {
     function syncView(event?: HashChangeEvent) {
       const hash = window.location.hash;
