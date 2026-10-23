@@ -8,7 +8,7 @@ import {
   type Product,
   type Subscription,
 } from "@/lib/types";
-import { websiteTemplates } from "@/lib/website";
+import { websiteHomepageProducts, websiteTemplates } from "@/lib/website";
 import { ProductImage } from "./product-image";
 
 function TemplateAction({
@@ -66,7 +66,13 @@ function HeroImage({
   );
 }
 
-function PreviewProducts({ products }: { products: Product[] }) {
+function PreviewProducts({
+  products,
+  full = false,
+}: {
+  products: Product[];
+  full?: boolean;
+}) {
   return (
     <section
       className="website-template-products"
@@ -74,12 +80,18 @@ function PreviewProducts({ products }: { products: Product[] }) {
     >
       <div className="website-template-section-heading">
         <p className="eyebrow">SHOP THE COLLECTION</p>
-        <h3 id="template-products-title">Featured products</h3>
-        <p>Explore popular choices available from this business.</p>
+        <h3 id="template-products-title">
+          {full ? "Products" : "Featured products"}
+        </h3>
+        <p>
+          {full
+            ? "Available from the selected location."
+            : "Explore a selection from this business. Open Shop to see all available products."}
+        </p>
       </div>
       {products.length ? (
         <div className="website-template-product-grid">
-          {products.slice(0, 3).map((product) => (
+          {products.map((product) => (
             <article key={product.id}>
               <ProductImage product={product} />
               <div>
@@ -100,19 +112,6 @@ function PreviewProducts({ products }: { products: Product[] }) {
   );
 }
 
-function TrustStrip() {
-  return (
-    <section
-      className="website-template-trust"
-      aria-label="Business commitments"
-    >
-      <strong>Clear information</strong>
-      <strong>Local service</strong>
-      <strong>Simple online ordering</strong>
-    </section>
-  );
-}
-
 function introductionFrom(description: string) {
   const firstSentence = description.match(/^.*?[.!?](?:\s|$)/)?.[0]?.trim();
   return firstSentence || description;
@@ -129,28 +128,27 @@ export function WebsiteTemplateFooter({
 }) {
   return (
     <>
-      <TrustStrip />
       <section className="website-template-about">
         <div>
           <p className="eyebrow">ABOUT {subscription.name.toUpperCase()}</p>
-          <h2>A business customers can know and trust.</h2>
+          <h2>About {subscription.name}</h2>
           <p>
             {subscription.description ||
-              "Share what makes your business useful, distinct, and ready to help."}
+              "Business information is not yet available."}
           </p>
         </div>
         <dl>
           <div>
             <dt>Visit</dt>
-            <dd>{location?.address || "Add a published location address"}</dd>
+            <dd>{location?.address || "Address not provided"}</dd>
           </div>
           <div>
             <dt>Hours</dt>
-            <dd>{location?.hours || "Add your current hours"}</dd>
+            <dd>{location?.hours || "Hours not provided"}</dd>
           </div>
           <div>
             <dt>Call</dt>
-            <dd>{location?.phone || "Add a customer phone number"}</dd>
+            <dd>{location?.phone || "Phone not provided"}</dd>
           </div>
         </dl>
       </section>
@@ -182,11 +180,15 @@ export function WebsiteTemplateHero({
   location,
   products,
   preview = false,
+  previewView = "home",
+  onPreviewNavigate,
 }: {
   subscription: Subscription;
   location?: Location;
   products: Product[];
   preview?: boolean;
+  previewView?: "home" | "shop";
+  onPreviewNavigate?: (view: "home" | "shop") => void;
 }) {
   const template =
     subscription.website_template ?? subscription.website_live_template;
@@ -194,8 +196,7 @@ export function WebsiteTemplateHero({
   const templateName =
     websiteTemplates.find((item) => item.id === template)?.title ?? "Website";
   const description =
-    subscription.description ||
-    "Discover useful products and personal service from a local business.";
+    subscription.description || "Business information is not yet available.";
   const introduction = introductionFrom(description);
   const locationLine = [location?.name, location?.address]
     .filter(Boolean)
@@ -208,110 +209,161 @@ export function WebsiteTemplateHero({
     >
       {preview && <p className="preview-banner">Preview — not live</p>}
 
-      {template === "order_first" && (
-        <section className="website-template-hero website-order-hero">
-          <div className="website-template-copy">
-            <p className="eyebrow">{locationLine || templateName}</p>
-            <h2>{subscription.name}</h2>
-            <p>{introduction}</p>
-            <div className="website-template-actions">
-              <TemplateAction preview={preview}>
-                Shop available products
-              </TemplateAction>
-              <TemplateAction preview={preview} secondary>
-                Location &amp; hours
-              </TemplateAction>
-            </div>
-          </div>
-          <div className="website-template-media">
-            <HeroImage subscription={subscription} products={products} />
-            {products[0] && (
-              <div className="website-template-feature-card">
-                <span>POPULAR NOW</span>
-                <strong>{products[0].name}</strong>
-                <small>{money(products[0].price_cents)}</small>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {template === "browse_shop" && (
-        <section className="website-template-hero website-browse-hero">
-          <div className="website-template-media">
-            <HeroImage subscription={subscription} products={products} />
-          </div>
-          <div className="website-template-copy">
-            <p className="eyebrow">EXPLORE {subscription.name.toUpperCase()}</p>
-            <h2>Find something made for your day.</h2>
-            <p>{introduction}</p>
-            <TemplateAction preview={preview}>
-              Browse the collection
-            </TemplateAction>
-          </div>
-          <div
-            className="website-browse-categories"
-            aria-label="Popular categories"
+      {preview && onPreviewNavigate && (
+        <div
+          className="website-template-actions"
+          role="group"
+          aria-label="Preview page"
+        >
+          <button
+            type="button"
+            className="secondary"
+            aria-pressed={previewView === "home"}
+            onClick={() => onPreviewNavigate("home")}
           >
-            <span>New arrivals</span>
-            <span>Customer favorites</span>
-            <span>Everyday essentials</span>
-          </div>
-        </section>
+            Home
+          </button>
+          <button
+            type="button"
+            className="secondary"
+            aria-pressed={previewView === "shop"}
+            onClick={() => onPreviewNavigate("shop")}
+          >
+            Shop
+          </button>
+        </div>
       )}
 
-      {template === "visit_order" && (
-        <section className="website-template-hero website-visit-hero">
-          <div className="website-template-location-card">
-            <p className="eyebrow">VISIT OR ORDER ONLINE</p>
-            <h2>{subscription.name}</h2>
-            <dl>
-              <div>
-                <dt>Find us</dt>
-                <dd>{location?.address || "Location details coming soon"}</dd>
+      {(!preview || previewView === "home") && (
+        <div>
+          {template === "order_first" && (
+            <section className="website-template-hero website-order-hero">
+              <div className="website-template-copy">
+                <p className="eyebrow">{locationLine || templateName}</p>
+                <h2>{subscription.name}</h2>
+                <p>{introduction}</p>
+                <div className="website-template-actions">
+                  <TemplateAction preview={preview}>
+                    Shop available products
+                  </TemplateAction>
+                  <TemplateAction preview={preview} secondary>
+                    Location &amp; hours
+                  </TemplateAction>
+                </div>
               </div>
-              <div>
-                <dt>Today&apos;s hours</dt>
-                <dd>{location?.hours || "Hours coming soon"}</dd>
+              <div className="website-template-media">
+                <HeroImage subscription={subscription} products={products} />
+                {products[0] && (
+                  <div className="website-template-feature-card">
+                    <span>FEATURED PRODUCT</span>
+                    <strong>{products[0].name}</strong>
+                    <small>{money(products[0].price_cents)}</small>
+                  </div>
+                )}
               </div>
-              <div>
-                <dt>Questions?</dt>
-                <dd>{location?.phone || "Contact details coming soon"}</dd>
+            </section>
+          )}
+
+          {template === "browse_shop" && (
+            <section className="website-template-hero website-browse-hero">
+              <div className="website-template-media">
+                <HeroImage subscription={subscription} products={products} />
               </div>
-            </dl>
-            <TemplateAction preview={preview}>
-              Order for this location
-            </TemplateAction>
-          </div>
-          <div className="website-template-media">
-            <HeroImage subscription={subscription} products={products} />
-          </div>
-        </section>
+              <div className="website-template-copy">
+                <p className="eyebrow">
+                  EXPLORE {subscription.name.toUpperCase()}
+                </p>
+                <h2>Find something made for your day.</h2>
+                <p>{introduction}</p>
+                <TemplateAction preview={preview}>
+                  Browse the collection
+                </TemplateAction>
+              </div>
+              <div
+                className="website-browse-categories"
+                aria-label="Product categories"
+              >
+                {[
+                  ...new Set(
+                    products
+                      .map((product) => product.category?.trim())
+                      .filter(Boolean),
+                  ),
+                ]
+                  .slice(0, 3)
+                  .map((category) => (
+                    <span key={category}>{category}</span>
+                  ))}
+              </div>
+            </section>
+          )}
+
+          {template === "visit_order" && (
+            <section className="website-template-hero website-visit-hero">
+              <div className="website-template-location-card">
+                <p className="eyebrow">PLAN YOUR VISIT</p>
+                <h2>{subscription.name}</h2>
+                <dl>
+                  <div>
+                    <dt>Find us</dt>
+                    <dd>
+                      {location?.address || "Location details coming soon"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Hours</dt>
+                    <dd>{location?.hours || "Hours coming soon"}</dd>
+                  </div>
+                  <div>
+                    <dt>Questions?</dt>
+                    <dd>{location?.phone || "Contact details coming soon"}</dd>
+                  </div>
+                </dl>
+                <TemplateAction preview={preview}>Shop online</TemplateAction>
+              </div>
+              <div className="website-template-media">
+                <HeroImage subscription={subscription} products={products} />
+              </div>
+            </section>
+          )}
+
+          {template === "story_shop" && (
+            <section className="website-template-hero website-story-hero">
+              <div className="website-template-copy">
+                <p className="eyebrow">
+                  OUR STORY · {location?.name || "LOCAL BUSINESS"}
+                </p>
+                <h2>The story of {subscription.name}</h2>
+                <p>{description}</p>
+                <TemplateAction preview={preview}>
+                  Discover our products
+                </TemplateAction>
+              </div>
+              <div className="website-template-media">
+                <HeroImage subscription={subscription} products={products} />
+              </div>
+            </section>
+          )}
+
+          {template === "browse_shop" && (
+            <PreviewProducts
+              products={websiteHomepageProducts(products, template)}
+            />
+          )}
+          {!preview && (
+            <div className="website-template-actions website-home-navigation">
+              <a
+                className="button website-template-action"
+                href="#shop-products"
+              >
+                Shop
+              </a>
+            </div>
+          )}
+        </div>
       )}
 
-      {template === "story_shop" && (
-        <section className="website-template-hero website-story-hero">
-          <div className="website-template-copy">
-            <p className="eyebrow">
-              OUR STORY · {location?.name || "LOCAL BUSINESS"}
-            </p>
-            <h2>Made personal. Chosen with care.</h2>
-            <p>{introduction}</p>
-            <blockquote>
-              “The details matter—from what we offer to how we welcome every
-              customer.”
-            </blockquote>
-            <TemplateAction preview={preview}>
-              Discover our products
-            </TemplateAction>
-          </div>
-          <div className="website-template-media">
-            <HeroImage subscription={subscription} products={products} />
-          </div>
-        </section>
-      )}
-
-      {!products.length && (
+      {!products.length && !preview && template !== "browse_shop" && (
         <div className="website-template-ordering-status">
           <strong>Online ordering is not ready</strong>
           <span>
@@ -322,7 +374,9 @@ export function WebsiteTemplateHero({
 
       {preview && (
         <>
-          <PreviewProducts products={products} />
+          {(template === "order_first" || previewView === "shop") && (
+            <PreviewProducts products={products} full />
+          )}
           <WebsiteTemplateFooter
             subscription={subscription}
             location={location}

@@ -2,6 +2,8 @@
 import Image from "next/image";
 import { PageTabs } from "./page-tabs";
 import { StorefrontHeader } from "./storefront-header";
+import { WebsiteTemplateHero } from "./website-template-hero";
+import { websiteProductsForLocation } from "@/lib/website";
 import { ImagePicker } from "./image-picker";
 import { useImageDraft } from "@/lib/image-draft";
 import { useState } from "react";
@@ -15,7 +17,7 @@ import {
 } from "@/lib/storefront-design";
 import { HeaderLinkEditor } from "./header-link-editor";
 import { standardHeaderLinks, validHeaderLinks } from "@/lib/header-navigation";
-import type { HeaderLink, Location, Subscription } from "@/lib/types";
+import type { HeaderLink, Location, Product, Subscription } from "@/lib/types";
 
 type Branding = StorefrontDesign & {
   header_mode: "standard" | "custom";
@@ -28,6 +30,7 @@ export function AppearanceEditor({
   subscription,
   allowed,
   locations,
+  products,
   save,
   cancel,
   cleanup,
@@ -35,6 +38,7 @@ export function AppearanceEditor({
   subscription: Subscription;
   allowed: boolean;
   locations: Location[];
+  products: Product[];
   cancel: () => void;
   cleanup: (url: string) => Promise<void>;
   save: (value: Branding) => Promise<void>;
@@ -42,6 +46,7 @@ export function AppearanceEditor({
   const [tab, setTab] = useState("branding");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [device, setDevice] = useState("desktop");
+  const [previewView, setPreviewView] = useState<"home" | "shop">("home");
   const expanded = "default_location_id" in subscription;
   const original = {
     ...designFor(subscription),
@@ -82,6 +87,20 @@ export function AppearanceEditor({
     image.dirty ||
     JSON.stringify(draft) !== JSON.stringify(saved);
   const websiteAppearance = subscription.website_path === "talix_template";
+  const previewLocation =
+    locations.find((l) => l.id === draft.default_location_id && l.published) ??
+    locations
+      .filter((l) => l.published)
+      .toSorted(
+        (a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id),
+      )[0];
+  const previewSubscription = {
+    ...subscription,
+    ...draft,
+    logo_url: image.preview,
+    header_photo_url: photo.preview,
+    website_hero_url: hero.preview,
+  };
   return (
     <section
       id="storefront-appearance"
@@ -646,12 +665,13 @@ export function AppearanceEditor({
             </button>
           </div>
           <div
-            className={`appearance-live-preview header-${headerLayout(draft)} preview-device-${device}`}
+            className={`appearance-live-preview${websiteAppearance && subscription.website_template ? " website-inline-preview" : ""} header-${headerLayout(draft)} preview-device-${device}`}
             style={storefrontStyle(draft)}
           >
             <div className="preview-header shop-header">
               <StorefrontHeader
                 preview
+                onPreviewNavigate={setPreviewView}
                 location={
                   locations.find(
                     (l) => l.id === draft.default_location_id && l.published,
@@ -701,32 +721,48 @@ export function AppearanceEditor({
                 </div>
               </StorefrontHeader>
             </div>
-            <div className="preview-catalog">
-              <details>
-                <summary>Business information</summary>
-                <p>{draft.description}</p>
-              </details>
-              <p>
-                Shopping at{" "}
-                {locations.find((l) => l.id === draft.default_location_id)
-                  ?.name ||
-                  locations.find((l) => l.published)?.name ||
-                  "your first published location"}
-              </p>
-              <div className="preview-product-grid">
-                {[1, 2, 3].map((i) => (
-                  <div key={i}>
-                    <div className="preview-photo" />
-                    <strong>Product</strong>
-                    <p>Brief description</p>
-                    <span className="preview-add">Add to cart</span>
-                  </div>
-                ))}
+            {websiteAppearance && subscription.website_template ? (
+              <WebsiteTemplateHero
+                subscription={previewSubscription}
+                location={previewLocation}
+                products={websiteProductsForLocation(
+                  products,
+                  previewLocation?.id,
+                )}
+                preview
+                previewView={previewView}
+                onPreviewNavigate={setPreviewView}
+              />
+            ) : (
+              <div className="preview-catalog">
+                <details>
+                  <summary>Business information</summary>
+                  <p>{draft.description}</p>
+                </details>
+                <p>
+                  Shopping at{" "}
+                  {locations.find((l) => l.id === draft.default_location_id)
+                    ?.name ||
+                    locations.find((l) => l.published)?.name ||
+                    "your first published location"}
+                </p>
+                <div className="preview-product-grid">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i}>
+                      <div className="preview-photo" />
+                      <strong>Product</strong>
+                      <p>Brief description</p>
+                      <span className="preview-add">Add to cart</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <p className="preview-note">
-            Layout preview · Products and ordering remain on your storefront.
+            {websiteAppearance
+              ? "Private website preview · Ordering is disabled."
+              : "Layout preview · Products and ordering remain on your storefront."}
           </p>
         </aside>
       </div>

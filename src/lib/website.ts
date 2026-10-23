@@ -91,6 +91,17 @@ export function websiteProductsForLocation(
   );
 }
 
+// Share homepage selection with metadata and private previews. Popularity is
+// not measured; Browse & Shop features the first three eligible catalog items.
+export function websiteHomepageProducts(
+  products: Product[],
+  template: WebsiteTemplate | null | undefined,
+) {
+  if (template === "order_first") return products;
+  if (template === "browse_shop") return products.slice(0, 3);
+  return [];
+}
+
 export function websiteReadiness(
   subscription: Subscription,
   locations: Location[],

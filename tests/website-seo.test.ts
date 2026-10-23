@@ -109,4 +109,35 @@ describe("website search foundation", () => {
       "Main location item",
     ]);
   });
+
+  it("includes only the selected template's visible homepage products", () => {
+    const many = {
+      ...catalog,
+      products: Array.from({ length: 5 }, (_, i) => ({
+        ...catalog.products[0],
+        id: `p-${i}`,
+        name: `Item ${i}`,
+      })),
+    };
+    for (const [template, count] of [
+      ["order_first", 5],
+      ["browse_shop", 3],
+      ["visit_order", 0],
+      ["story_shop", 0],
+    ] as const) {
+      const data = websiteStructuredData(
+        {
+          ...many,
+          subscription: {
+            ...many.subscription,
+            website_live_template: template,
+          },
+        },
+        "https://talix.app/shop/goods",
+      );
+      expect(
+        data["@graph"].filter((item) => item["@type"] === "Product"),
+      ).toHaveLength(count);
+    }
+  });
 });

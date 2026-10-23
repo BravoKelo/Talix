@@ -13,10 +13,12 @@ export function StorefrontNavigation({
   subscription,
   location,
   preview = false,
+  onPreviewNavigate,
 }: {
   subscription: Partial<Subscription>;
   location?: Location;
   preview?: boolean;
+  onPreviewNavigate?: (view: "home" | "shop") => void;
 }) {
   const configuredLinks =
     subscription.header_mode === "custom"
@@ -31,7 +33,7 @@ export function StorefrontNavigation({
     .map((link) => {
       if (link.destination === "website")
         return { label: link.label, href: link.url };
-      if (link.destination === "shop")
+      if (link.destination === "shop" || link.destination === "storefront")
         return { label: link.label, href: "#shop-products" };
       if (link.destination === "about")
         return { label: link.label, action: "about" };
@@ -89,7 +91,16 @@ export function StorefrontNavigation({
           {...common}
           href={preview ? "#" : item.href}
           onClick={(e) => {
-            if (preview) e.preventDefault();
+            if (preview) {
+              e.preventDefault();
+              if (
+                item.href === "#shop-products" ||
+                item.href === "#shop-welcome"
+              )
+                onPreviewNavigate?.(
+                  item.href === "#shop-products" ? "shop" : "home",
+                );
+            }
             setDialog(null);
           }}
         >

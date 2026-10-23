@@ -18,6 +18,7 @@ for (const changedPrice of [false, true])
             "20261019183000_website_owner_onboarding.sql",
             "20261020224059_separate_website_hero_image.sql",
             "20261021011154_editable_standard_navigation.sql",
+            "20261022032702_storefront_only_publication.sql",
           ]
         : [],
     );
@@ -406,7 +407,9 @@ for (const changedPrice of [false, true])
           name: "Your website preview",
         });
         await expect(preview.getByText("Preview — not live")).toBeVisible();
-        await expect(preview.getByText("Featured products")).toBeVisible();
+        await expect(
+          preview.getByRole("heading", { name: "Products", exact: true }),
+        ).toBeVisible();
         await expect(
           preview.getByRole("navigation", { name: "Navigation preview" }),
         ).toBeVisible();
@@ -553,11 +556,17 @@ for (const changedPrice of [false, true])
           .getByRole("button", { name: "Website setup", exact: false })
           .click();
         await page.getByRole("radio", { name: /Decide later/ }).check();
-        await page.getByRole("button", { name: "Save for later" }).click();
-        await expect(page.getByRole("status")).toContainText(
-          "Your existing live Talix website was not changed",
-        );
-        await expect(page.getByRole("status")).toBeFocused();
+        await page.getByRole("button", { name: "Save to continue" }).click();
+        await expect(
+          page.getByRole("heading", { name: "Switch to storefront-only mode" }),
+        ).toBeVisible();
+        expect(
+          (
+            await gateway.db.query<{ website_live_template: string }>(
+              "select website_live_template from public.subscriptions",
+            )
+          ).rows[0].website_live_template,
+        ).toBe("order_first");
         await expect(
           page.getByRole("link", { name: "Open website ↗", exact: true }),
         ).toBeVisible();
@@ -567,24 +576,64 @@ for (const changedPrice of [false, true])
         });
         await page
           .context()
-          .route("**/rest/v1/rpc/save_website_setup", (route) =>
+          .route("**/rest/v1/rpc/publish_storefront_only", (route) =>
             route.fulfill({
               status: 403,
               contentType: "application/json",
               body: JSON.stringify({ message: "Owner access required." }),
             }),
           );
-        await page.getByRole("button", { name: "Save for later" }).click();
+        await page
+          .getByRole("button", { name: "Publish storefront-only mode" })
+          .click();
         await expect(page.getByRole("status")).toContainText(
           "Owner access required",
         );
         await expect(page.getByRole("status")).not.toHaveClass(/success/);
-        await page.context().unroute("**/rest/v1/rpc/save_website_setup");
+        await page.context().unroute("**/rest/v1/rpc/publish_storefront_only");
+        // Simulate a lost response after the database has committed; retry must
+        // acknowledge the existing result without hiding a newer publication.
+        await page
+          .context()
+          .route("**/rest/v1/rpc/publish_storefront_only", async (route) => {
+            await fetch(route.request().url(), {
+              method: "POST",
+              headers: route.request().headers(),
+              body: route.request().postData(),
+            });
+            await route.fulfill({
+              status: 503,
+              json: { message: "Publication response lost. Retry safely." },
+            });
+          });
+        await page
+          .getByRole("button", { name: "Publish storefront-only mode" })
+          .click();
+        await expect(page.getByRole("status")).toContainText(
+          "Publication response lost",
+        );
+        await expect(page.getByRole("status")).not.toHaveClass(/success/);
+        await page.context().unroute("**/rest/v1/rpc/publish_storefront_only");
+        await page
+          .getByRole("button", { name: "Publish storefront-only mode" })
+          .click();
+        await expect(page.getByRole("status")).toContainText(
+          "Your existing website has been hidden, Talix is now in storefront only mode",
+        );
+        await expect(page.getByRole("status")).toBeFocused();
+        await expect(
+          page
+            .getByRole("navigation", { name: "Workspace shortcuts" })
+            .getByRole("link", { name: "Open storefront ↗", exact: true }),
+        ).toBeVisible();
         expect(
           await page.evaluate(
             () => document.documentElement.scrollWidth <= window.innerWidth,
           ),
         ).toBe(true);
+        await page
+          .getByRole("button", { name: "Website setup", exact: false })
+          .click();
         await page.getByRole("radio", { name: /Use a Talix template/ }).check();
         await page.getByRole("button", { name: "Save draft" }).click();
         await expect(page.getByRole("status")).toContainText("Draft saved");

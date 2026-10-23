@@ -3588,7 +3588,7 @@ body:has(.shop-cart-dialog[open]) {
 .header-search .shop-toolbar > .shop-search {
   display: none;
 }
-.header-search .shop-header.is-compact + .shop-toolbar > .shop-search {
+.header-search .shop-header.is-compact ~ .shop-content .shop-toolbar > .shop-search {
   display: block;
 }
 :is(.header-left, .header-two_row, .header-minimal) .shop-nav {
@@ -4966,6 +4966,10 @@ body:has(.business-tracking) > footer {
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 30px;
+}
+.website-home-navigation {
+  margin: 0;
+  padding: 16px clamp(24px, 7vw, 104px);
 }
 .website-template-action {
   display: inline-flex;

@@ -153,6 +153,24 @@ export function Storefront({
     };
   }, []);
   const [compactHeader, setCompactHeader] = useState(false);
+  const [websiteView, setWebsiteView] = useState<"home" | "shop">("home");
+  const [navigationHash, setNavigationHash] = useState<string | null>(null);
+  useEffect(() => {
+    function syncView(event?: HashChangeEvent) {
+      const hash = window.location.hash;
+      setNavigationHash(hash || (event ? "#shop-welcome" : null));
+      setWebsiteView(
+        hash === "#shop-products" ||
+          hash === "#shop-location" ||
+          hash.startsWith("#product-")
+          ? "shop"
+          : "home",
+      );
+    }
+    syncView();
+    window.addEventListener("hashchange", syncView);
+    return () => window.removeEventListener("hashchange", syncView);
+  }, []);
   useEffect(() => {
     const update = () => setCompactHeader(window.scrollY > 48);
     update();
@@ -168,6 +186,16 @@ export function Storefront({
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [cartNotice, setCartNotice] = useState("");
   const [catalog, setCatalog] = useState<Catalog | null>(initialCatalog);
+  useEffect(() => {
+    // Restore the anchor after revealing its view, including direct links and
+    // browser Back/Forward. Focus follows the intentionally changed context.
+    if (!catalog || !navigationHash) return;
+    const target = document.getElementById(navigationHash.slice(1));
+    if (!target) return;
+    target.tabIndex = -1;
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ block: "start" });
+  }, [navigationHash, catalog]);
   const [location, setLocation] = useState(() =>
     initialCatalog ? defaultCatalogLocation(initialCatalog) : "",
   );
@@ -299,6 +327,9 @@ export function Storefront({
   const selectedLocation = catalog.locations.find((l) => l.id === location);
   const itemCount = cart.reduce((sum, line) => sum + line.quantity, 0);
   const orderingReady = products.length > 0;
+  const liveTemplate = catalog.subscription.website_live_template;
+  const showShop =
+    !liveTemplate || liveTemplate === "order_first" || websiteView === "shop";
   return (
     <main
       className={`store visual-store figma-store header-${headerLayout(catalog.subscription)}${catalog.subscription.website_live_template ? ` website-template template-${catalog.subscription.website_live_template}` : ""}`}
@@ -314,6 +345,7 @@ export function Storefront({
           location={selectedLocation}
           search={
             headerLayout(catalog.subscription) === "search" &&
+            showShop &&
             (!catalog.subscription.website_live_template || orderingReady) ? (
               <label className="shop-header-search">
                 <span className="sr-only">Search products</span>
@@ -373,155 +405,164 @@ export function Storefront({
           </div>
         </StorefrontHeader>
       </header>
-      {catalog.subscription.website_live_template && (
+      {liveTemplate && websiteView === "home" && (
         <WebsiteTemplateHero
           subscription={catalog.subscription}
           location={selectedLocation}
           products={products}
         />
       )}
-      <section className="shop-toolbar" aria-label="Shopping location">
-        <label id="shop-location" className="shop-location-control">
-          <span className="sr-only">Choose a location</span>
-          <select
-            aria-label="Choose a location"
-            value={location}
-            onChange={(e) => {
-              setLocation(e.target.value);
-              setCart([]);
-              setCategory("");
-              setQuery("");
-              setActiveProduct(null);
-              setCartNotice("");
-              setRequestId(null);
-              setMessage("");
-            }}
-          >
-            {!catalog.locations.length && (
-              <option value="">No published locations</option>
-            )}
-            {catalog.locations.map((l) => (
-              <option key={l.id} value={l.id}>
-                Shopping at {l.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        {(!catalog.subscription.website_live_template || orderingReady) && (
-          <>
-            <button
-              className="shop-menu-toggle"
-              aria-expanded={menuOpen}
-              aria-controls="shop-menu"
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              Menu
-            </button>
-            <label className="shop-search">
-              <span className="sr-only">Search products</span>
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search products"
-              />
-            </label>
-          </>
-        )}
-      </section>
-      {!location ? (
-        <div className="empty">
-          {catalog.locations.length
-            ? "Choose a location to view its products."
-            : "No locations are currently available for online ordering."}
-        </div>
-      ) : (
-        <div className="store-layout">
-          <section
-            id="shop-products"
-            className="shop-discovery"
-            aria-label="Products"
-          >
-            <div className="shop-browse-layout">
-              <aside
-                id="shop-menu"
-                className={`shop-browse-menu${menuOpen ? " is-open" : ""}`}
-              >
-                <p>
-                  <strong>Browse products</strong>
-                </p>
-                <nav aria-label="Product collections">
-                  <button
-                    className="secondary"
-                    aria-pressed={!category}
-                    onClick={() => setCategory("")}
-                  >
-                    All products
-                  </button>
-                  {categories.map((c) => (
-                    <button
-                      className="secondary"
-                      key={c}
-                      aria-pressed={category === c}
-                      onClick={() => setCategory(c)}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </nav>
-                <details className="shop-business-info">
-                  <summary>Location information</summary>
-                  <p>{selectedLocation?.address}</p>
-                  <p>{selectedLocation?.phone}</p>
-                  <p>{selectedLocation?.hours}</p>
-                  <p>Changing location clears your cart.</p>
-                  {catalog.subscription.description && (
-                    <p>{catalog.subscription.description}</p>
-                  )}
-                </details>
-              </aside>
-              <div className="shop-results">
-                <h2 className="sr-only">{category || "Products"}</h2>
-                <p className="sr-only" role="status">
-                  {visibleProducts.length}{" "}
-                  {visibleProducts.length === 1 ? "product" : "products"}
-                </p>
-                <div className="catalog">
-                  {visibleProducts.map((p, index) => (
-                    <ProductCard
-                      key={p.id}
-                      product={p}
-                      eager={index === 0}
-                      open={() => setActiveProduct(p)}
-                      onAdd={() => add(p, [])}
-                    />
-                  ))}
-                </div>
-                {!products.length ? (
-                  <div className="empty">
-                    No products are available at this location.
-                  </div>
-                ) : (
-                  !visibleProducts.length && (
-                    <div className="empty">
-                      <p>No products match your search.</p>
-                      <button
-                        className="secondary"
-                        onClick={() => {
-                          setQuery("");
-                          setCategory("");
-                        }}
-                      >
-                        Clear search
-                      </button>
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-          </section>
+      {liveTemplate && websiteView === "shop" && (
+        <div className="website-template-actions website-home-navigation">
+          <a className="button secondary" href="#shop-welcome">
+            Back to homepage
+          </a>
         </div>
       )}
+      <div className="shop-content" hidden={!showShop}>
+        <section className="shop-toolbar" aria-label="Shopping location">
+          <label id="shop-location" className="shop-location-control">
+            <span className="sr-only">Choose a location</span>
+            <select
+              aria-label="Choose a location"
+              value={location}
+              onChange={(e) => {
+                setLocation(e.target.value);
+                setCart([]);
+                setCategory("");
+                setQuery("");
+                setActiveProduct(null);
+                setCartNotice("");
+                setRequestId(null);
+                setMessage("");
+              }}
+            >
+              {!catalog.locations.length && (
+                <option value="">No published locations</option>
+              )}
+              {catalog.locations.map((l) => (
+                <option key={l.id} value={l.id}>
+                  Shopping at {l.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          {(!catalog.subscription.website_live_template || orderingReady) && (
+            <>
+              <button
+                className="shop-menu-toggle"
+                aria-expanded={menuOpen}
+                aria-controls="shop-menu"
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                Menu
+              </button>
+              <label className="shop-search">
+                <span className="sr-only">Search products</span>
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search products"
+                />
+              </label>
+            </>
+          )}
+        </section>
+        {!location ? (
+          <div className="empty">
+            {catalog.locations.length
+              ? "Choose a location to view its products."
+              : "No locations are currently available for online ordering."}
+          </div>
+        ) : (
+          <div className="store-layout">
+            <section
+              id="shop-products"
+              className="shop-discovery"
+              aria-label="Products"
+            >
+              <div className="shop-browse-layout">
+                <aside
+                  id="shop-menu"
+                  className={`shop-browse-menu${menuOpen ? " is-open" : ""}`}
+                >
+                  <p>
+                    <strong>Browse products</strong>
+                  </p>
+                  <nav aria-label="Product collections">
+                    <button
+                      className="secondary"
+                      aria-pressed={!category}
+                      onClick={() => setCategory("")}
+                    >
+                      All products
+                    </button>
+                    {categories.map((c) => (
+                      <button
+                        className="secondary"
+                        key={c}
+                        aria-pressed={category === c}
+                        onClick={() => setCategory(c)}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </nav>
+                  <details className="shop-business-info">
+                    <summary>Location information</summary>
+                    <p>{selectedLocation?.address}</p>
+                    <p>{selectedLocation?.phone}</p>
+                    <p>{selectedLocation?.hours}</p>
+                    <p>Changing location clears your cart.</p>
+                    {catalog.subscription.description && (
+                      <p>{catalog.subscription.description}</p>
+                    )}
+                  </details>
+                </aside>
+                <div className="shop-results">
+                  <h2 className="sr-only">{category || "Products"}</h2>
+                  <p className="sr-only" role="status">
+                    {visibleProducts.length}{" "}
+                    {visibleProducts.length === 1 ? "product" : "products"}
+                  </p>
+                  <div className="catalog">
+                    {visibleProducts.map((p, index) => (
+                      <ProductCard
+                        key={p.id}
+                        product={p}
+                        eager={index === 0}
+                        open={() => setActiveProduct(p)}
+                        onAdd={() => add(p, [])}
+                      />
+                    ))}
+                  </div>
+                  {!products.length ? (
+                    <div className="empty">
+                      No products are available at this location.
+                    </div>
+                  ) : (
+                    !visibleProducts.length && (
+                      <div className="empty">
+                        <p>No products match your search.</p>
+                        <button
+                          className="secondary"
+                          onClick={() => {
+                            setQuery("");
+                            setCategory("");
+                          }}
+                        >
+                          Clear search
+                        </button>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
+      </div>
       {catalog.subscription.website_live_template && (
         <WebsiteTemplateFooter
           subscription={catalog.subscription}
