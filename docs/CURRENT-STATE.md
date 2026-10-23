@@ -1,5 +1,11 @@
 # Talix current state
 
+## Sprint #90 header integration — October 22, 2026 Pacific
+
+Sprint [#92](https://github.com/BravoKelo/Talix/issues/92) authorizes #81 first, then bounded #49/#51 work subject to their protected compatibility/recovery decisions. Recovery confirmed clean main `1b581d86833ed0d1dc625f4b35f9d15661f1e205` includes merged #90/#91; Sprint #89 work is not repeated. The focused header branch corrects a reproduced scroll-anchoring collapse/expansion loop without changing catalog or checkout contracts. [HEADER-SCROLL-REVIEW.md](HEADER-SCROLL-REVIEW.md) records cause, correction, test scope and manual review. #92/PR own exact final commits, CI and preview evidence. Implementation does not establish deployed verification or owner acceptance; no merge, production release, migration or infrastructure/security change is authorized.
+
+The owner subsequently approved merging PR #93. Its pre-merge review identified a long-name/populated-navigation case that still shifted scroll by 9px; the same bounded #81 correction now measures rendered expanded height and extends long-name/resize regressions. The earlier static-height test and preview evidence do not establish validation of this follow-up. PR #93 and #92 own the final corrected head, fresh CI/deployed evidence and actual merge identity; integration waits for those checks. This supersedes the no-merge-authorization wording above for PR #93 only. Main automatic deployment remains disabled; no production operation, schema/security change or branch deletion is authorized. #49/#51 remain pending their recorded product decisions.
+
 ## Approved website mode and homepage follow-up — #83 / #84
 
 PR #90 is merged as `5c0b9618760007b338ccbf64f7e7ba6d66b82353` at the owner's explicit direction; its reviewed head is `aeec14daf48bdd0fa5851b454a14f049163af999`. Lint/type/build and 89 unit/SQL tests passed; final browser CI timed out before scenarios ran, and owner took over browser testing. The scoped merge decision and verified final development preview are recorded in #89/PR #90. Main automatic deployment remains disabled.

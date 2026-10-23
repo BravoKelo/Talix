@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import type { Catalog, Product } from "../../src/lib/types";
+import { standardHeaderLinks } from "../../src/lib/header-navigation";
 
 const product = (
   id: string,
@@ -539,6 +540,217 @@ test("cart popup quantities, close/focus, empty state and checkout payload", asy
   await expect(opener).toBeFocused();
 });
 
+for (const width of [1280, 768, 390]) {
+  test(`header scroll stability at ${width}px: no anchoring, oscillation or lost actions`, async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await page.setViewportSize({ width, height: 844 });
+    for (const layout of ["centered", "left", "two_row", "search", "minimal"]) {
+      await mockCatalog(page, {
+        ...catalog,
+        subscription: {
+          ...catalog.subscription,
+          name: "Thoughtfully Chosen Goods and Everyday Essentials for Neighbors Across Our Local Community",
+          header_mode: "custom",
+          header_links: standardHeaderLinks,
+          header_layout: layout,
+          website_live_template: "order_first",
+        },
+        products: Array.from({ length: 24 }, (_, i) =>
+          product(`item-${i}`, `Item ${i}`),
+        ),
+      });
+      await page.goto("/shop/example");
+      const header = page.locator(".shop-header");
+      await expect(page.locator(".shop-product-card").first()).toBeVisible();
+      // Sample real frame geometry, including the entire animation; a final
+      // class assertion alone misses an anchoring loop between frames.
+      await page.evaluate(() => {
+        const state = {
+          samples: [] as {
+            y: number;
+            top: number;
+            height: number;
+            compact: boolean;
+          }[],
+          running: true,
+        };
+        Object.assign(window, { headerScrollEvidence: state });
+        const sample = () => {
+          const header = document.querySelector(".shop-header")!;
+          const content = document.querySelector(".website-template-page")!;
+          state.samples.push({
+            y: scrollY,
+            top: content.getBoundingClientRect().top + scrollY,
+            height: header.getBoundingClientRect().height,
+            compact: header.classList.contains("is-compact"),
+          });
+          if (state.running) requestAnimationFrame(sample);
+        };
+        requestAnimationFrame(sample);
+      });
+      await page.mouse.wheel(0, 55);
+      await expect(header).toHaveClass(/is-compact/);
+      await page.waitForTimeout(450);
+      const samples = await page.evaluate(() => {
+        const state = (
+          window as unknown as {
+            headerScrollEvidence: {
+              running: boolean;
+              samples: {
+                y: number;
+                top: number;
+                height: number;
+                compact: boolean;
+              }[];
+            };
+          }
+        ).headerScrollEvidence;
+        state.running = false;
+        return state.samples;
+      });
+      // Firefox can retain subpixel scroll positions after font/grid rounding.
+      expect(Math.abs(samples.at(-1)!.y - 55), layout).toBeLessThan(0.1);
+      expect(
+        Math.max(...samples.map((s) => s.top)) -
+          Math.min(...samples.map((s) => s.top)),
+        layout,
+      ).toBeLessThanOrEqual(2);
+      const states = samples
+        .map((s) => s.compact)
+        .filter((s, i, all) => i === 0 || s !== all[i - 1]);
+      expect(states.filter(Boolean), layout).toHaveLength(1);
+      if (layout !== "minimal" || width <= 700)
+        expect(
+          samples.some(
+            (s) => s.height > 58 && s.height < samples[0].height - 1,
+          ),
+          layout,
+        ).toBe(true);
+      for (const y of [47, 51, 46, 49, 25]) {
+        await page.evaluate((y) => window.scrollTo(0, y), y);
+        await expect(header).toHaveClass(/is-compact/);
+      }
+      await page.evaluate(() => window.scrollTo(0, 16));
+      await expect(header).not.toHaveClass(/is-compact/);
+      await page.waitForTimeout(250);
+      await page.mouse.wheel(0, 600);
+      await expect(header).toHaveClass(/is-compact/);
+      const cart = page.getByRole("button", {
+        name: "Your cart (0)",
+        exact: true,
+      });
+      await expect(cart).toBeInViewport();
+      await cart.click();
+      await expect(page.locator(".shop-cart-dialog")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(cart).toBeFocused();
+      await page.evaluate(() => (document.activeElement as HTMLElement).blur());
+      await page.mouse.wheel(0, -1000);
+      await expect(header).not.toHaveClass(/is-compact/);
+      await page.waitForTimeout(250);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    }
+  });
+}
+
+test("long-name header keeps its footprint after responsive resizing", async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await mockCatalog(page, {
+    ...catalog,
+    subscription: {
+      ...catalog.subscription,
+      name: "Thoughtfully Chosen Goods and Everyday Essentials for Neighbors Across Our Local Community",
+    },
+    products: Array.from({ length: 24 }, (_, i) =>
+      product(`item-${i}`, `Item ${i}`),
+    ),
+  });
+  await page.goto("/shop/example");
+  await expect(page.locator(".shop-product-card").first()).toBeVisible();
+  for (const width of [1280, 390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const header = page.locator(".shop-header");
+    await expect(header).not.toHaveClass(/is-compact/);
+    await page.waitForTimeout(300);
+    const top = await page
+      .locator(".shop-content")
+      .evaluate((el) => el.getBoundingClientRect().top + scrollY);
+    await page.mouse.wheel(0, 55);
+    await expect(header).toHaveClass(/is-compact/);
+    await page.waitForTimeout(300);
+    expect(Math.abs((await page.evaluate(() => scrollY)) - 55)).toBeLessThan(
+      0.1,
+    );
+    expect(
+      Math.abs(
+        (await page
+          .locator(".shop-content")
+          .evaluate((el) => el.getBoundingClientRect().top + scrollY)) - top,
+      ),
+    ).toBeLessThanOrEqual(2);
+    await expect(header).toHaveCount(1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+});
+
+test("header respects reduced motion and retains keyboard navigation focus", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await mockCatalog(page, {
+    ...catalog,
+    products: Array.from({ length: 24 }, (_, i) =>
+      product(`item-${i}`, `Item ${i}`),
+    ),
+  });
+  await page.goto("/shop/example");
+  const header = page.locator(".shop-header");
+  const home = page
+    .getByRole("navigation", { name: "Business navigation" })
+    .getByRole("link", { name: "Home", exact: true });
+  await home.focus();
+  await page.mouse.wheel(0, 100);
+  await page.waitForTimeout(250);
+  await expect(home).toBeFocused();
+  await expect(header).not.toHaveClass(/is-compact/);
+  // WebKit's default tab policy can skip links; verify keyboard activation
+  // and focus return without imposing a platform-specific tab preference.
+  const about = page
+    .getByRole("navigation", { name: "Business navigation" })
+    .getByRole("button", { name: "About", exact: true });
+  await about.focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByRole("dialog", { name: "About", exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(about).toBeFocused();
+  await page.getByPlaceholder("Search products").focus();
+  await expect(header).toHaveClass(/is-compact/);
+  expect(
+    await header.evaluate((el) => getComputedStyle(el).transitionDuration),
+  ).toBe("0s");
+  expect(
+    await page
+      .locator(".shop-nav")
+      .evaluate((el) => getComputedStyle(el).transitionDuration),
+  ).toBe("0s");
+});
+
 test("five header presets preserve shopping, responsive layout and collapsing actions", async ({
   page,
 }) => {
@@ -570,6 +782,9 @@ test("five header presets preserve shopping, responsive layout and collapsing ac
     await page.screenshot({
       path: `test-results/header-${layout}-${test.info().project.name}.png`,
     });
+    // Scrolling may collapse after the shopper leaves an expanded search
+    // control; while it has focus, that control must remain available.
+    await search.evaluate((el) => (el as HTMLElement).blur());
     await page.evaluate(() => window.scrollTo(0, 600));
     await expect(page.locator(".shop-header")).toHaveClass(/is-compact/);
     await expect(search).toHaveCount(1);
@@ -680,6 +895,14 @@ test("standard navigation uses saved content, follows the selected location and 
     .click();
   await page.evaluate(() => window.scrollTo(0, 600));
   await expect(page.locator(".shop-header")).toHaveClass(/is-compact/);
+  // Firefox's automation scroll-into-view can scroll a sticky control back to
+  // the document origin during its height transition. Wait for the final
+  // geometry before this navigation journey's automatic click.
+  await expect
+    .poll(() =>
+      page.locator(".shop-nav").evaluate((el) => el.getBoundingClientRect().height),
+    )
+    .toBeLessThanOrEqual(56.1);
   const menu = page.getByRole("button", {
     name: "Open navigation menu",
     exact: false,

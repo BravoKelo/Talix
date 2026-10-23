@@ -4,7 +4,7 @@ import { ProductImage } from "./product-image";
 import Link from "next/link";
 import { StorefrontHeader } from "./storefront-header";
 import { headerLayout, storefrontStyle } from "@/lib/storefront-design";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/client";
 import { TaskDialog } from "@/components/order-dialog";
@@ -153,8 +153,74 @@ export function Storefront({
     };
   }, []);
   const [compactHeader, setCompactHeader] = useState(false);
+  const [catalog, setCatalog] = useState<Catalog | null>(initialCatalog);
+  const header = useRef<HTMLElement>(null);
   const [websiteView, setWebsiteView] = useState<"home" | "shop">("home");
   const [navigationHash, setNavigationHash] = useState<string | null>(null);
+  useLayoutEffect(() => {
+    const element = header.current;
+    if (!element || !catalog) return;
+    let measuredWidth = -1;
+    const measure = () => {
+      const width = element.getBoundingClientRect().width;
+      if (width === measuredWidth) return;
+      measuredWidth = width;
+      // Measure natural expanded layout outside document flow, even when the
+      // real header is compact. Reset the old measurement so narrower/wider
+      // layouts can shrink as well as grow. Never measure on scroll frames.
+      const expanded = element.cloneNode(true) as HTMLElement;
+      expanded.classList.remove("is-compact");
+      expanded.style.removeProperty("--shop-expanded-nav-height");
+      Object.assign(expanded.style, {
+        position: "absolute",
+        visibility: "hidden",
+        pointerEvents: "none",
+        width: `${width}px`,
+        top: "0",
+        left: "0",
+        margin: "0",
+      });
+      expanded.inert = true;
+      expanded.setAttribute("aria-hidden", "true");
+      expanded
+        .querySelectorAll("[id]")
+        .forEach((node) => node.removeAttribute("id"));
+      expanded.querySelectorAll("dialog").forEach((node) => node.remove());
+      element.after(expanded);
+      try {
+        const nav = expanded.querySelector<HTMLElement>(".shop-nav");
+        const actualNav = element.querySelector<HTMLElement>(".shop-nav");
+        if (nav && actualNav) {
+          // Install the measured starting height immediately. Animating the
+          // measurement itself leaves WebKit midway to that height when an
+          // early scroll starts, so its margin and height curves disagree.
+          const transitions = [element, actualNav].map((node) => ({
+            node,
+            value: node.style.getPropertyValue("transition"),
+            priority: node.style.getPropertyPriority("transition"),
+          }));
+          transitions.forEach(({ node }) =>
+            node.style.setProperty("transition", "none"),
+          );
+          element.style.setProperty(
+            "--shop-expanded-nav-height",
+            `${nav.getBoundingClientRect().height}px`,
+          );
+          actualNav.getBoundingClientRect();
+          transitions.forEach(({ node, value, priority }) => {
+            if (value) node.style.setProperty("transition", value, priority);
+            else node.style.removeProperty("transition");
+          });
+        }
+      } finally {
+        expanded.remove();
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [catalog, websiteView]);
   useEffect(() => {
     function syncView(event?: HashChangeEvent) {
       const hash = window.location.hash;
@@ -172,11 +238,34 @@ export function Storefront({
     return () => window.removeEventListener("hashchange", syncView);
   }, []);
   useEffect(() => {
-    const update = () => setCompactHeader(window.scrollY > 48);
+    if (!catalog) return;
+    const update = () => {
+      // Do not hide/reparent a navigation or search control being used by
+      // keyboard. Re-evaluate after focus leaves the header.
+      if (
+        header.current?.querySelector(
+          ".shop-navigation:focus-within, .shop-header-search:focus-within",
+        )
+      )
+        return;
+      setCompactHeader((compact) =>
+        compact ? window.scrollY > 24 : window.scrollY > 48,
+      );
+    };
+    let frame = 0;
+    const afterFocus = () => {
+      frame = requestAnimationFrame(update);
+    };
     update();
     window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
+    const element = header.current;
+    element?.addEventListener("focusout", afterFocus);
+    return () => {
+      window.removeEventListener("scroll", update);
+      element?.removeEventListener("focusout", afterFocus);
+      cancelAnimationFrame(frame);
+    };
+  }, [catalog]);
   const [category, setCategory] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -185,7 +274,6 @@ export function Storefront({
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [cartNotice, setCartNotice] = useState("");
-  const [catalog, setCatalog] = useState<Catalog | null>(initialCatalog);
   useEffect(() => {
     // Restore the anchor after revealing its view, including direct links and
     // browser Back/Forward. Focus follows the intentionally changed context.
@@ -339,7 +427,10 @@ export function Storefront({
       <a className="shop-skip" href="#shop-location">
         Skip to location selection
       </a>
-      <header className={`shop-header${compactHeader ? " is-compact" : ""}`}>
+      <header
+        ref={header}
+        className={`shop-header${compactHeader ? " is-compact" : ""}`}
+      >
         <StorefrontHeader
           subscription={catalog.subscription}
           location={selectedLocation}

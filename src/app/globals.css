@@ -4209,6 +4209,45 @@ body:has(.shop-information-dialog[open]) {
   padding-block: 0;
 }
 
+/* Keep collapse out of document reflow: scroll anchoring must not turn one
+   downward scroll into repeated collapse/expand events. The reserved space
+   scrolls away with the page while the smaller header remains pinned. */
+.figma-store {
+  --shop-expanded-nav-height: 114px;
+}
+.figma-store.header-left {
+  --shop-expanded-nav-height: 88px;
+}
+.figma-store.header-minimal {
+  --shop-expanded-nav-height: 56px;
+}
+.figma-store .shop-header {
+  transition: margin-bottom 0.2s ease;
+}
+.figma-store .shop-header:has(.shop-navigation) .shop-nav {
+  min-height: var(--shop-expanded-nav-height);
+  transition: min-height 0.2s ease, padding-block 0.2s ease;
+}
+.figma-store .shop-header.is-compact:has(.shop-navigation) .shop-nav {
+  min-height: 56px;
+}
+.figma-store .shop-header.is-compact {
+  margin-bottom: calc(var(--shop-expanded-nav-height) - 56px);
+}
+@media (max-width: 700px) {
+  .figma-store,
+  .figma-store.header-left,
+  .figma-store.header-minimal {
+    --shop-expanded-nav-height: 72px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .figma-store .shop-header,
+  .figma-store .shop-header:has(.shop-navigation) .shop-nav {
+    transition: none;
+  }
+}
+
 /* Deferred workspace corrections: existing saved images and compact navigation. */
 .workspace .product-tile > .shop-product-image {
   width: 100%;
