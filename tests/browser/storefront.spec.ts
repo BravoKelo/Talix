@@ -895,6 +895,14 @@ test("standard navigation uses saved content, follows the selected location and 
     .click();
   await page.evaluate(() => window.scrollTo(0, 600));
   await expect(page.locator(".shop-header")).toHaveClass(/is-compact/);
+  // Firefox's automation scroll-into-view can scroll a sticky control back to
+  // the document origin during its height transition. Wait for the final
+  // geometry before this navigation journey's automatic click.
+  await expect
+    .poll(() =>
+      page.locator(".shop-nav").evaluate((el) => el.getBoundingClientRect().height),
+    )
+    .toBeLessThanOrEqual(56.1);
   const menu = page.getByRole("button", {
     name: "Open navigation menu",
     exact: false,
