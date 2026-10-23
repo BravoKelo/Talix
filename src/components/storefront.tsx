@@ -4,7 +4,7 @@ import { ProductImage } from "./product-image";
 import Link from "next/link";
 import { StorefrontHeader } from "./storefront-header";
 import { headerLayout, storefrontStyle } from "@/lib/storefront-design";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { browserClient } from "@/lib/supabase/client";
 import { TaskDialog } from "@/components/order-dialog";
@@ -153,6 +153,8 @@ export function Storefront({
     };
   }, []);
   const [compactHeader, setCompactHeader] = useState(false);
+  const [catalog, setCatalog] = useState<Catalog | null>(initialCatalog);
+  const header = useRef<HTMLElement>(null);
   const [websiteView, setWebsiteView] = useState<"home" | "shop">("home");
   const [navigationHash, setNavigationHash] = useState<string | null>(null);
   useEffect(() => {
@@ -172,11 +174,34 @@ export function Storefront({
     return () => window.removeEventListener("hashchange", syncView);
   }, []);
   useEffect(() => {
-    const update = () => setCompactHeader(window.scrollY > 48);
+    if (!catalog) return;
+    const update = () => {
+      // Do not hide/reparent a navigation or search control being used by
+      // keyboard. Re-evaluate after focus leaves the header.
+      if (
+        header.current?.querySelector(
+          ".shop-navigation:focus-within, .shop-header-search:focus-within",
+        )
+      )
+        return;
+      setCompactHeader((compact) =>
+        compact ? window.scrollY > 24 : window.scrollY > 48,
+      );
+    };
+    let frame = 0;
+    const afterFocus = () => {
+      frame = requestAnimationFrame(update);
+    };
     update();
     window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
+    const element = header.current;
+    element?.addEventListener("focusout", afterFocus);
+    return () => {
+      window.removeEventListener("scroll", update);
+      element?.removeEventListener("focusout", afterFocus);
+      cancelAnimationFrame(frame);
+    };
+  }, [catalog]);
   const [category, setCategory] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -185,7 +210,6 @@ export function Storefront({
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [cartNotice, setCartNotice] = useState("");
-  const [catalog, setCatalog] = useState<Catalog | null>(initialCatalog);
   useEffect(() => {
     // Restore the anchor after revealing its view, including direct links and
     // browser Back/Forward. Focus follows the intentionally changed context.
@@ -339,7 +363,10 @@ export function Storefront({
       <a className="shop-skip" href="#shop-location">
         Skip to location selection
       </a>
-      <header className={`shop-header${compactHeader ? " is-compact" : ""}`}>
+      <header
+        ref={header}
+        className={`shop-header${compactHeader ? " is-compact" : ""}`}
+      >
         <StorefrontHeader
           subscription={catalog.subscription}
           location={selectedLocation}
