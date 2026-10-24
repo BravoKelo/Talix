@@ -940,6 +940,14 @@ for (const changedPrice of [false, true])
         page.getByRole("button", { name: /Open order .* for Ledger Customer/ }),
       ).toBeFocused();
       await expect(page.getByText("Saved.", { exact: true })).toHaveCount(0);
+      if (!changedPrice) {
+        // Legacy inaccessible values remain stored until the owner explicitly corrects them.
+        await gateway.db.query(
+          "update public.subscriptions set storefront_text='#ffffff' where id=$1",
+          [fixture.sid],
+        );
+        await page.reload();
+      }
       await expect(page.locator("body > footer")).toBeHidden();
       await gateway.db.query(
         "insert into public.products(subscription_id,name,description,price_cents) values($1,'Longer product name to compare uniform tiles','A much longer description with enough words to take several lines without changing the size of the tile or moving its actions.',2000)",
@@ -1208,6 +1216,93 @@ for (const changedPrice of [false, true])
         await appearance
           .getByRole("button", { name: "Open storefront preview", exact: true })
           .click();
+      await appearance.getByRole("tab", { name: "Style", exact: true }).click();
+      const productText = appearance.getByLabel("Product text", {
+        exact: true,
+      });
+      const savedText = async () =>
+        (
+          await gateway.db.query<{ storefront_text: string }>(
+            "select storefront_text from public.subscriptions where id=$1",
+            [fixture.sid],
+          )
+        ).rows[0].storefront_text;
+      const originalText = await savedText();
+      if (!changedPrice) {
+        await expect(productText).toHaveValue("#ffffff");
+        await expect(
+          appearance.getByText(
+            /Your saved Product text color needs correction/,
+          ),
+        ).toBeVisible();
+        expect(await savedText()).toBe("#ffffff");
+      }
+      await productText.fill("#ffffff");
+      await expect(productText).toHaveAttribute("aria-invalid", "true");
+      await expect(productText).toHaveAccessibleDescription(
+        /1\.00:1.*at least 4\.5:1/,
+      );
+      if (!changedPrice) {
+        await expect(
+          appearanceContent
+            .locator(".website-template-product-grid h4")
+            .first(),
+        ).toHaveCSS("color", "rgb(255, 255, 255)");
+        await expect(
+          appearanceContent
+            .locator(".website-template-product-grid strong")
+            .first(),
+        ).toHaveCSS("color", "rgb(255, 255, 255)");
+      }
+      await appearance
+        .getByRole("tab", { name: "Branding", exact: true })
+        .click();
+      await appearance
+        .getByRole("button", { name: "Save branding", exact: true })
+        .click();
+      await expect(productText).toBeFocused();
+      await expect(
+        appearance.getByRole("tab", { name: "Style", exact: true }),
+      ).toHaveAttribute("aria-selected", "true");
+      expect(await savedText()).toBe(originalText);
+      const correction = appearance.getByRole("button", {
+        name: "Use readable default",
+        exact: true,
+      });
+      await correction.focus();
+      await page.keyboard.press("Enter");
+      await expect(productText).toBeFocused();
+      await expect(productText).toHaveAttribute("aria-invalid", "false");
+      expect(await savedText()).toBe(originalText);
+      await productText.fill("#777777");
+      await expect(productText).toHaveAttribute("aria-invalid", "true");
+      await productText.fill("#315566");
+      await expect(productText).toHaveAttribute("aria-invalid", "false");
+      await appearance
+        .getByRole("button", { name: "Save branding", exact: true })
+        .click();
+      await expect(appearance.getByRole("status")).toContainText(
+        "has been saved",
+      );
+      expect(await savedText()).toBe("#315566");
+      if (!changedPrice) {
+        await expect(
+          appearanceContent
+            .locator(".website-template-product-grid h4")
+            .first(),
+        ).toHaveCSS("color", "rgb(49, 85, 102)");
+        await expect(
+          appearanceContent
+            .locator(".website-template-product-grid strong")
+            .first(),
+        ).toHaveCSS("color", "rgb(49, 85, 102)");
+        await expect(
+          appearanceContent.locator(".website-template-product-grid p").first(),
+        ).toHaveCSS("color", "rgb(102, 112, 133)");
+      }
+      await appearance
+        .getByRole("tab", { name: "Branding", exact: true })
+        .click();
       const logoFilename = appearance
         .locator(".image-picker")
         .filter({
