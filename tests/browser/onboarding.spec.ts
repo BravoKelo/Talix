@@ -510,6 +510,18 @@ for (const changedPrice of [false, true])
         await expect
           .poll(() => frame.locator("body").evaluate(() => innerWidth))
           .toBe(390);
+        // Restoring the host viewport also updates the fitted frame height.
+        // Wait for ResizeObserver before deciding whether scrolling is needed.
+        await expect
+          .poll(() =>
+            preview.locator("iframe").evaluate((element) => {
+              const available = element.parentElement!.clientWidth;
+              return Math.abs(
+                element.getBoundingClientRect().width - Math.min(390, available),
+              );
+            }),
+          )
+          .toBeLessThan(1);
         await preview
           .locator(".website-preview-viewport")
           .scrollIntoViewIfNeeded();
@@ -517,9 +529,14 @@ for (const changedPrice of [false, true])
           .getByRole("region", { name: "Scrollable website preview" })
           .focus();
         await preview.locator(".website-preview-viewport").hover();
+        const scrollGeometry = await frame.locator("body").evaluate(() => ({
+          viewport: innerHeight,
+          content: document.documentElement.scrollHeight,
+        }));
+        const needsScroll = scrollGeometry.content > scrollGeometry.viewport;
         // Engines cap or smooth a large wheel delta differently. Exercise
         // ordinary repeated scrolling until the bottom content is reached.
-        for (let attempt = 0; attempt < 8; attempt++) {
+        for (let attempt = 0; needsScroll && attempt < 8; attempt++) {
           await page.mouse.wheel(0, 600);
           await page.waitForTimeout(150);
           if (
@@ -532,9 +549,12 @@ for (const changedPrice of [false, true])
           )
             break;
         }
-        await expect
-          .poll(() => frame.locator("body").evaluate(() => scrollY))
-          .toBeGreaterThan(0);
+        if (needsScroll)
+          await expect
+            .poll(() => frame.locator("body").evaluate(() => scrollY), {
+              message: `Native preview scrolling: ${JSON.stringify(scrollGeometry)}`,
+            })
+            .toBeGreaterThan(0);
         await preview
           .locator(".website-preview-viewport")
           .scrollIntoViewIfNeeded();
