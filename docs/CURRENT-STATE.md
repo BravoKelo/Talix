@@ -1,5 +1,17 @@
 # Talix current state
 
+## Sprint #91 preview correction prepared — October 23, 2026 Pacific
+
+Sprint [#97](https://github.com/BravoKelo/Talix/issues/97) authorizes #96, #62,
+#64 and #66 in that order. Recovery confirmed main `4bb93bb` includes Sprint
+#90's PR #95; #49 and #94 remain outside this sprint. The focused #96 branch
+reproduces Desktop rendering at 329px in a 1280px workspace and introduces a
+shared, proportionally scaled true viewport for Go Live and Website Appearance.
+[WEBSITE-PREVIEW-REVIEW.md](WEBSITE-PREVIEW-REVIEW.md) records its design,
+regression scope and the development-preview approval blocker. Implementation
+is not completed validation or owner acceptance; #97/PR own exact-head evidence.
+No merge, production or database change is authorized.
+
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 
 Header PR #93 is merged as `edf233467e87ba165e51dc7e6b7ce21b857db491`; #81 is closed. The owner **did not approve #49's proposed extras editor/cart changes**; extras are intended as configurable inventory item selections through future Inventory & BOM. #49 remains open and deferred, not resolved.

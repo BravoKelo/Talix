@@ -17,9 +17,7 @@ import {
   websiteReadiness,
   websiteTemplates,
 } from "@/lib/website";
-import { headerLayout, storefrontStyle } from "@/lib/storefront-design";
-import { StorefrontHeader } from "./storefront-header";
-import { WebsiteTemplateHero } from "./website-template-hero";
+import { WebsitePreview } from "./website-preview";
 
 type WebsiteState = Pick<
   Subscription,
@@ -115,7 +113,6 @@ export function WebsiteSetup({
     "desktop",
   );
   const [confirmLaunch, setConfirmLaunch] = useState(false);
-  const [previewView, setPreviewView] = useState<"home" | "shop">("home");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [messageKind, setMessageKind] = useState<"success" | "error">("error");
@@ -927,30 +924,12 @@ export function WebsiteSetup({
                       )}
                     </div>
                     {template ? (
-                      <div
-                        className={`website-inline-preview appearance-live-preview header-${headerLayout(previewSubscription)} preview-device-${device}`}
-                        style={storefrontStyle(previewSubscription)}
-                        tabIndex={0}
-                        role="region"
-                        aria-label="Scrollable website preview"
-                      >
-                        <div className="preview-header shop-header">
-                          <StorefrontHeader
-                            subscription={previewSubscription}
-                            location={selectedLocation}
-                            preview
-                            onPreviewNavigate={setPreviewView}
-                          />
-                        </div>
-                        <WebsiteTemplateHero
-                          subscription={previewSubscription}
-                          location={selectedLocation}
-                          products={eligibleProducts}
-                          preview
-                          previewView={previewView}
-                          onPreviewNavigate={setPreviewView}
-                        />
-                      </div>
+                      <WebsitePreview
+                        subscription={previewSubscription}
+                        location={selectedLocation}
+                        products={eligibleProducts}
+                        device={device}
+                      />
                     ) : (
                       <p>Choose a template to preview your website.</p>
                     )}

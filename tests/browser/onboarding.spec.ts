@@ -1,6 +1,17 @@
 import { expect, test } from "@playwright/test";
 test.use({ actionTimeout: 10000 });
 import { onboardingGateway } from "../helpers/onboarding-gateway";
+function templatePresentation(element: Element) {
+  const style = getComputedStyle(element);
+  return {
+    columns: style.gridTemplateColumns.split(" ").length,
+    headingSize: getComputedStyle(element.querySelector("h2")!).fontSize,
+    padding: style.paddingInlineStart,
+    mediaHeight: getComputedStyle(
+      element.querySelector(".website-template-media")!,
+    ).minHeight,
+  };
+}
 for (const changedPrice of [false, true])
   test(`signup → confirmation → ${changedPrice ? "changed price review" : "direct completion"} → workspace`, async ({
     page,
@@ -406,92 +417,133 @@ for (const changedPrice of [false, true])
         const preview = page.getByRole("region", {
           name: "Your website preview",
         });
-        await expect(preview.getByText("Preview — not live")).toBeVisible();
+        const frame = preview.frameLocator(
+          'iframe[title="Private website preview"]',
+        );
+        await expect(frame.getByText("Preview — not live")).toBeVisible();
         await expect(
-          preview.getByRole("heading", { name: "Products", exact: true }),
+          frame.getByRole("heading", { name: "Products", exact: true }),
         ).toBeVisible();
         await expect(
-          preview.getByRole("navigation", { name: "Navigation preview" }),
+          frame.getByRole("navigation", { name: "Navigation preview" }),
         ).toBeVisible();
-        for (const device of ["Mobile", "Tablet", "Desktop"]) {
-          await preview
-            .getByRole("button", { name: device, exact: true })
-            .click();
-          await expect(
-            preview.getByRole("button", { name: device, exact: true }),
-          ).toHaveAttribute("aria-pressed", "true");
-        }
-        await page.screenshot({
-          path: `test-results/website-review-${test.info().project.name}.png`,
-          fullPage: true,
-        });
-        const previewRegion = page.getByRole("region", {
-          name: "Scrollable website preview",
-        });
-        const originalViewport = page.viewportSize() ?? {
-          width: 1280,
-          height: 720,
-        };
-        for (const viewport of [
-          originalViewport,
-          { width: 768, height: 1000 },
-        ]) {
-          await page.setViewportSize(viewport);
-          await page.evaluate(
-            () =>
-              new Promise<void>((resolve) => {
-                requestAnimationFrame(() =>
-                  requestAnimationFrame(() => resolve()),
-                );
-              }),
-          );
-          // Header overflow links are recomputed by ResizeObserver after resize.
-          await expect
-            .poll(
-              () =>
-                previewRegion.evaluate(
-                  (element) => element.scrollWidth - element.clientWidth,
-                ),
-              { message: `Preview overflow at ${viewport.width}px` },
-            )
-            .toBeLessThanOrEqual(0);
-          expect(
-            await page
-              .locator(".website-onboarding")
-              .evaluate(
-                (element) => element.scrollWidth <= element.clientWidth,
-              ),
-          ).toBe(true);
-          for (const selector of [
-            ".website-step-content",
-            ".website-step-body",
-            ".website-review-preview",
-            ".website-step-actions button",
-          ]) {
+        const originalViewport = page.viewportSize()!;
+        for (const hostWidth of [1280, 768, 390, 320]) {
+          await page.setViewportSize({ width: hostWidth, height: 900 });
+          for (const [device, width] of [
+            ["Desktop", 1120],
+            ["Tablet", 768],
+            ["Mobile", 390],
+          ] as const) {
+            const control = preview.getByRole("button", {
+              name: device,
+              exact: true,
+            });
+            await control.focus();
+            await page.keyboard.press("Enter");
+            await expect(control).toHaveAttribute("aria-pressed", "true");
+            await expect
+              .poll(() => frame.locator("body").evaluate(() => innerWidth))
+              .toBe(width);
+            await expect
+              .poll(() =>
+                frame
+                  .locator("body")
+                  .evaluate(
+                    () =>
+                      document.documentElement.scrollWidth -
+                      document.documentElement.clientWidth,
+                  ),
+              )
+              .toBeLessThanOrEqual(1);
+            const iframe = preview.locator("iframe");
+            await expect
+              .poll(() =>
+                iframe.evaluate((element) => {
+                  const box = element.getBoundingClientRect();
+                  const panel = element.parentElement!.getBoundingClientRect();
+                  return (
+                    Math.abs(
+                      box.width / element.clientWidth -
+                        box.height / element.clientHeight,
+                    ) < 0.001 && box.right <= panel.right + 1
+                  );
+                }),
+              )
+              .toBe(true);
             expect(
-              await page.locator(selector).evaluateAll((elements) =>
-                elements.every((element) => {
-                  const box = element.getBoundingClientRect();
-                  return box.left >= 0 && box.right <= window.innerWidth;
-                }),
-              ),
+              await page
+                .locator(".website-onboarding")
+                .evaluate(
+                  (element) => element.scrollWidth <= element.clientWidth,
+                ),
             ).toBe(true);
+            for (const selector of [
+              ".website-step-content",
+              ".website-step-body",
+              ".website-review-preview",
+              ".website-step-actions button",
+            ]) {
+              expect(
+                await page.locator(selector).evaluateAll((elements) =>
+                  elements.every((element) => {
+                    const box = element.getBoundingClientRect();
+                    return box.left >= 0 && box.right <= innerWidth;
+                  }),
+                ),
+              ).toBe(true);
+            }
           }
-          expect(
-            await previewRegion
-              .locator(".website-template-action")
-              .evaluateAll((elements) =>
-                elements.every((element) => {
-                  const box = element.getBoundingClientRect();
-                  const frame = element
-                    .closest(".website-inline-preview")!
-                    .getBoundingClientRect();
-                  return box.left >= frame.left && box.right <= frame.right;
-                }),
-              ),
-          ).toBe(true);
+          await preview
+            .getByRole("button", { name: "Desktop", exact: true })
+            .click();
+          await page.screenshot({
+            path: `test-results/website-preview-${test.info().project.name}-${hostWidth}.png`,
+            fullPage: true,
+          });
         }
+        // The only preview scroll container is its document; the footer remains reachable.
         await page.setViewportSize(originalViewport);
+        await preview
+          .getByRole("button", { name: "Mobile", exact: true })
+          .click();
+        await expect
+          .poll(() => frame.locator("body").evaluate(() => innerWidth))
+          .toBe(390);
+        await preview
+          .locator(".website-preview-viewport")
+          .scrollIntoViewIfNeeded();
+        await frame
+          .getByRole("region", { name: "Scrollable website preview" })
+          .focus();
+        await page.keyboard.press("Control+End");
+        await expect
+          .poll(() => frame.locator("body").evaluate(() => scrollY))
+          .toBeGreaterThan(0);
+        await expect(
+          frame.locator(".website-template-footer"),
+        ).toBeInViewport();
+        await frame
+          .getByRole("button", { name: "Home", exact: true })
+          .first()
+          .focus();
+        await page.keyboard.press("Tab");
+        await expect(
+          frame.getByRole("button", { name: "Shop", exact: true }).first(),
+        ).toBeFocused();
+        await page.setViewportSize(originalViewport);
+        await preview
+          .getByRole("button", { name: "Desktop", exact: true })
+          .click();
+        await expect
+          .poll(() => frame.locator("body").evaluate(() => innerWidth))
+          .toBe(1120);
+        const desktopPresentation = await frame
+          .locator(".website-template-hero")
+          .evaluate(templatePresentation);
+        await expect(
+          frame.getByRole("button", { name: /Add to cart|checkout/i }),
+        ).toHaveCount(0);
         await page.getByRole("button", { name: "Save draft" }).click();
         await expect(page.getByRole("status")).toContainText("Draft saved");
         await expect(
@@ -537,6 +589,23 @@ for (const changedPrice of [false, true])
           publication.website_template_launched_at,
         );
         await expect(page.getByRole("status")).toContainText(publishedTime);
+        const publicPage = await page.context().newPage();
+        await publicPage.setViewportSize({ width: 1120, height: 900 });
+        await publicPage.goto(
+          (await page
+            .getByRole("status")
+            .getByRole("link", { name: "Open website", exact: true })
+            .getAttribute("href")) as string,
+        );
+        await expect(
+          publicPage.locator(".website-template-hero"),
+        ).toBeVisible();
+        expect(
+          await publicPage
+            .locator(".website-template-hero")
+            .evaluate(templatePresentation),
+        ).toEqual(desktopPresentation);
+        await publicPage.close();
         await expect(
           page
             .getByRole("status")
@@ -1129,6 +1198,11 @@ for (const changedPrice of [false, true])
       const appearance = page.getByRole("region", {
         name: changedPrice ? "Storefront appearance" : "Website appearance",
       });
+      const appearanceContent = changedPrice
+        ? appearance.locator(".appearance-live-preview")
+        : appearance
+            .frameLocator('iframe[title="Private website preview"]')
+            .locator(".website-preview-document");
       if (test.info().project.name === "mobile")
         await appearance
           .getByRole("button", { name: "Open storefront preview", exact: true })
@@ -1199,12 +1273,12 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Tile spacing", { exact: true })
         .selectOption("compact");
-      await expect(appearance.locator(".appearance-live-preview")).toHaveCSS(
+      await expect(appearanceContent).toHaveCSS(
         "font-family",
         "Georgia, serif",
       );
 
-      await expect(appearance.locator(".store-preview")).toContainText(
+      await expect(appearanceContent).toContainText(
         "A fresh introduction for our customers.",
       );
       await appearance
@@ -1232,7 +1306,7 @@ for (const changedPrice of [false, true])
       await appearance
         .getByLabel("Tile spacing", { exact: true })
         .selectOption("compact");
-      await expect(appearance.locator(".appearance-live-preview")).toHaveCSS(
+      await expect(appearanceContent).toHaveCSS(
         "font-family",
         "Georgia, serif",
       );
@@ -1388,9 +1462,7 @@ for (const changedPrice of [false, true])
         await appearance
           .getByRole("radio", { name: "Search-focused", exact: true })
           .check();
-        await expect(
-          appearance.locator(".appearance-live-preview"),
-        ).toHaveClass(/header-search/);
+        await expect(appearanceContent).toHaveClass(/header-search/);
       }
       await page.screenshot({
         path: `test-results/header-settings-${changedPrice ? "legacy" : "active"}-${test.info().project.name}.png`,
@@ -1406,7 +1478,7 @@ for (const changedPrice of [false, true])
         .getByLabel("Header photo", { exact: true })
         .setInputFiles(png);
       await expect(
-        appearance.locator(".shop-centered-identity img"),
+        appearanceContent.locator(".shop-centered-identity img"),
       ).toBeVisible();
       await appearance
         .getByRole("button", { name: "Save branding", exact: true })
