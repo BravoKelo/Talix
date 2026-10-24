@@ -516,7 +516,8 @@ for (const changedPrice of [false, true])
         await frame
           .getByRole("region", { name: "Scrollable website preview" })
           .focus();
-        await page.keyboard.press("Control+End");
+        await preview.locator(".website-preview-viewport").hover();
+        await page.mouse.wheel(0, 2000);
         await expect
           .poll(() => frame.locator("body").evaluate(() => scrollY))
           .toBeGreaterThan(0);
