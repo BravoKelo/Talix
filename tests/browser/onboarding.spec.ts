@@ -517,11 +517,30 @@ for (const changedPrice of [false, true])
           .getByRole("region", { name: "Scrollable website preview" })
           .focus();
         await preview.locator(".website-preview-viewport").hover();
-        await page.mouse.wheel(0, 2000);
+        // Engines cap or smooth a large wheel delta differently. Exercise
+        // ordinary repeated scrolling until the bottom content is reached.
+        for (let attempt = 0; attempt < 8; attempt++) {
+          await page.mouse.wheel(0, 600);
+          await page.waitForTimeout(150);
+          if (
+            await frame
+              .locator(".website-template-footer")
+              .evaluate(
+                (element) =>
+                  element.getBoundingClientRect().bottom <= innerHeight,
+              )
+          )
+            break;
+        }
         await expect
           .poll(() => frame.locator("body").evaluate(() => scrollY))
           .toBeGreaterThan(0);
-        await preview.locator(".website-preview-viewport").scrollIntoViewIfNeeded();
+        await preview
+          .locator(".website-preview-viewport")
+          .scrollIntoViewIfNeeded();
+        await page.screenshot({
+          path: `test-results/footer-${test.info().project.name}.png`,
+        });
         await expect(
           frame.locator(".website-template-footer"),
         ).toBeInViewport();
