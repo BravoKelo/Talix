@@ -1,5 +1,11 @@
 # Talix Architecture
 
+## Checkout attempt recovery — issue #51
+
+The storefront captures one request UUID and copied location/customer/line/simulation payload in component memory before calling the unchanged `checkout_simulated` RPC. A synchronous ref guard prevents overlapping submissions; pending/unknown state retains the record and locks conflicting edits/dismissal. Retries replay the record rather than reconstructing it from disabled or edited form fields. A validated UUID token opens the existing private tracking route; missing/malformed confirmation retains unknown state.
+
+Only HTTP 400 plus the exact existing SQLSTATE P0001 validation messages from after the existing-order lookup and before writes releases the draft. A reused-key payload conflict, generic gateway/transport failure or unrecognized response stays unresolved. The SQL function's existing atomic transaction, advisory locking, replay-before-availability checks, authoritative pricing and snapshots remain unchanged; no migration or new RPC is introduced. [CHECKOUT-RECOVERY-REVIEW.md](CHECKOUT-RECOVERY-REVIEW.md) owns verification and error-contract detail. [#94](https://github.com/BravoKelo/Talix/issues/94) tracks recovery after reload/tab closure; no browser persistence or secret/token storage is added.
+
 ## Development owner mode transition — issue #83
 
 The owner approved one additional owner-only atomic operation for explicit storefront-only publication, then separately authorized development execution. `20261022032702_storefront_only_publication.sql` is applied unchanged to development as `20261022035957_storefront_only_publication`. [WEBSITE-MODES-REVIEW.md](WEBSITE-MODES-REVIEW.md) owns the operation's lock/review/retry/grant contract and actual verification. No table/column, public catalog projection or existing save/launch contract changes. Issue #84's homepage/Shop presentation reuses the existing canonical route, catalog and commerce state, with metadata reflecting homepage content; it creates no commerce or routing architecture. Production execution and PR merge remain separately gated.
