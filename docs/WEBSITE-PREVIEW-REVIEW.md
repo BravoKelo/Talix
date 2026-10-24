@@ -35,7 +35,9 @@ claim.
 Deployment blocker: automatic approval review rejected creating branch-scoped
 copies of the unchanged existing development preview variables, classifying it
 as a persistent infrastructure change outside the sprint's restrictions. No
-variable was created. A verified development preview and deployed comparison
+variable was created. The owner explicitly chose to keep preview configuration
+blocked on October 23, 2026 Pacific. Do not retry or work around that hold without
+new authorization. A verified development preview and deployed comparison
 against the published website remain required before visual acceptance. Do not
 label this PR ready until that evidence is recorded. No production, migration,
 schema, security configuration, merge or branch deletion is authorized.
