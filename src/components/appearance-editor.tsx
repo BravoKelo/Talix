@@ -6,13 +6,14 @@ import { WebsitePreview } from "./website-preview";
 import { websiteProductsForLocation } from "@/lib/website";
 import { ImagePicker } from "./image-picker";
 import { useImageDraft } from "@/lib/image-draft";
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import {
   headerLayouts,
   headerLayout,
   designFor,
   storefrontStyle,
   contrastRatio,
+  defaultDesign,
   type StorefrontDesign,
 } from "@/lib/storefront-design";
 import { HeaderLinkEditor } from "./header-link-editor";
@@ -82,6 +83,10 @@ export function AppearanceEditor({
   const [saved, setSaved] = useState<Branding>(original);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const productTextId = useId();
+  const productTextInput = useRef<HTMLInputElement>(null);
+  const textContrast = contrastRatio(draft.storefront_text, "#ffffff");
+  const readableText = textContrast >= 4.5;
   const dirty =
     photo.dirty ||
     hero.dirty ||
@@ -163,11 +168,12 @@ export function AppearanceEditor({
               );
               return;
             }
-            if (contrastRatio(draft.storefront_text, "#ffffff") < 4.5) {
+            if (!readableText) {
               setTab("style");
               setMessage(
                 "Choose a darker product text color so customers can read it on the light background.",
               );
+              requestAnimationFrame(() => productTextInput.current?.focus());
               return;
             }
             setBusy(true);
@@ -521,18 +527,74 @@ export function AppearanceEditor({
                     ["storefront_text", "Product text"],
                     ["storefront_button", "Buttons"],
                   ] as const
-                ).map(([key, label]) => (
-                  <label key={key}>
-                    {label}
-                    <input
-                      type="color"
-                      value={draft[key]}
-                      onChange={(e) =>
-                        setDraft({ ...draft, [key]: e.target.value })
-                      }
-                    />
-                  </label>
-                ))}
+                ).map(([key, label]) =>
+                  key === "storefront_text" ? (
+                    <div key={key} className="stack">
+                      <label htmlFor={productTextId}>{label}</label>
+                      <input
+                        id={productTextId}
+                        ref={productTextInput}
+                        type="color"
+                        value={draft.storefront_text}
+                        aria-invalid={!readableText}
+                        aria-describedby={`${productTextId}-guidance`}
+                        onChange={(e) =>
+                          setDraft({
+                            ...draft,
+                            storefront_text: e.target.value,
+                          })
+                        }
+                      />
+                      <p
+                        id={`${productTextId}-guidance`}
+                        aria-live="polite"
+                        aria-atomic="true"
+                        className={!readableText ? "notice" : "muted"}
+                      >
+                        Contrast on the white product background:{" "}
+                        {textContrast.toFixed(2)}:1. Product text needs at least
+                        4.5:1.
+                        {!readableText &&
+                          " Choose a darker color before saving."}
+                      </p>
+                      {contrastRatio(saved.storefront_text, "#ffffff") <
+                        4.5 && (
+                        <p className="notice">
+                          Your saved Product text color needs correction. It has
+                          not been changed. Choose a readable color and save
+                          your changes.
+                        </p>
+                      )}
+                      {!readableText && (
+                        <button
+                          type="button"
+                          className="secondary"
+                          onClick={() => {
+                            setDraft({
+                              ...draft,
+                              storefront_text: defaultDesign.storefront_text,
+                            });
+                            setMessage("");
+                            productTextInput.current?.focus();
+                          }}
+                        >
+                          Use readable default
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <label key={key}>
+                      {label}
+                      <input
+                        type="color"
+                        value={draft[key]}
+                        onChange={(e) =>
+                          setDraft({ ...draft, [key]: e.target.value })
+                        }
+                      />
+                    </label>
+                  ),
+                )}
                 <label>
                   Font family
                   <select
