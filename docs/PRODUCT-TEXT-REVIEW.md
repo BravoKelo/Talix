@@ -33,5 +33,7 @@ from another tab. Confirm the error returns focus to Product text. Choose the
 readable default or a valid dark brand color, verify the draft, Save, reopen and
 check preservation. Cancel must discard unsaved correction. Existing invalid
 settings must show guidance without changing before Save. Check phone, tablet
-and desktop widths and keyboard operation. Development-preview configuration
-approval is still pending; this is not yet ready for visual acceptance.
+and desktop widths and keyboard operation. The owner explicitly chose to keep
+new development-preview configuration blocked on October 23, 2026 Pacific;
+do not retry or work around that hold. This remains a draft with deployed
+verification and visual acceptance incomplete.

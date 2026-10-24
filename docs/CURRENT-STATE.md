@@ -7,7 +7,7 @@ contrast guidance, invalid-state/focus recovery and an explicit draft correction
 to the existing 4.5:1 Save guard. Legacy invalid values are identified without
 changing storage or published settings. [PRODUCT-TEXT-REVIEW.md](PRODUCT-TEXT-REVIEW.md)
 owns its compatibility, validation scope and manual review. #97/PR own actual
-results and exact-head evidence; development preview approval remains pending.
+results and exact-head evidence; the owner explicitly kept preview configuration blocked.
 No database rule, migration, bulk repair, merge or production change.
 
 ## Sprint #91 preview correction prepared — October 23, 2026 Pacific
