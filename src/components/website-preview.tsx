@@ -9,7 +9,7 @@ import { WebsiteTemplateHero } from "./website-template-hero";
 
 const widths = { mobile: 390, tablet: 768, desktop: 1120 };
 const previewDocument =
-  '<!doctype html><html lang="en" style="overscroll-behavior:contain"><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body></body></html>';
+  '<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width, initial-scale=1"></head><body></body></html>';
 
 // A separate viewport keeps media queries and vw units faithful to the selected
 // device. The frame contains only these private React components, never a public
