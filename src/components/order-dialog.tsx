@@ -102,7 +102,7 @@ export function TaskDialog({
       }}
     >
       <div className="dialog-toolbar">
-        <strong ref={focusTitle} tabIndex={-1}>
+        <strong ref={focusTitle} tabIndex={focusKey === undefined ? undefined : -1}>
           {title}
         </strong>
         <button
