@@ -11,6 +11,15 @@ export function OrderTracking({ token }: { token: string }) {
   const [busy, setBusy] = useState(false);
   const [failedLogo, setFailedLogo] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState<string | null>(null);
+  const fulfillmentActive =
+    order?.status !== "cancelled" && order?.payment_status !== "declined";
+  const currentStatus = !order
+    ? ""
+    : order.status === "cancelled"
+      ? "Order cancelled."
+      : order.payment_status === "declined"
+        ? "Payment declined — fulfillment has not started."
+        : `Current status: ${order.status.replaceAll("_", " ")}.`;
   async function load() {
     const { data, error } = await browserClient().rpc("track_order", {
       p_token: token,
@@ -106,7 +115,6 @@ export function OrderTracking({ token }: { token: string }) {
       {!order ? (
         <>
           <h1>Your order</h1>
-          <p role="status">{message || "Loading…"}</p>
         </>
       ) : (
         <>
@@ -123,10 +131,26 @@ export function OrderTracking({ token }: { token: string }) {
             <span className="badge">
               Simulated payment · {order.payment_status.replaceAll("_", " ")}
             </span>
-            <div className="status-steps">
+            <div
+              className="status-steps"
+              role="list"
+              aria-label="Fulfillment progress"
+            >
               {["received", "in_progress", "ready", "completed"].map((s) => (
-                <span key={s} className={order.status === s ? "current" : ""}>
+                <span
+                  key={s}
+                  role="listitem"
+                  aria-current={
+                    fulfillmentActive && order.status === s ? "step" : undefined
+                  }
+                  className={
+                    fulfillmentActive && order.status === s ? "current" : ""
+                  }
+                >
                   {s.replaceAll("_", " ")}
+                  {fulfillmentActive && order.status === s && (
+                    <small className="current-step-label">Current</small>
+                  )}
                 </span>
               ))}
             </div>
@@ -167,9 +191,16 @@ export function OrderTracking({ token }: { token: string }) {
               seconds. Order emails are not enabled in this release.
             </p>
           </div>
-          <p role="status">{message}</p>
         </>
       )}
+      <p
+        className="tracking-status"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {message || currentStatus || "Loading…"}
+      </p>
     </main>
   );
 }
