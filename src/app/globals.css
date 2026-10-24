@@ -362,6 +362,7 @@ textarea:focus {
 }
 .status-steps .current-step-label {
   display: block;
+  color: inherit;
   font-size: 0.75rem;
   font-weight: 700;
 }

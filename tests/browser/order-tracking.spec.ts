@@ -36,6 +36,11 @@ for (const width of [1280, 768, 390]) {
     await expect(progress.locator('[aria-current="step"]')).toContainText(
       "Current",
     );
+    // The global small-text style must not dim this label on the blue pill.
+    await expect(progress.locator(".current-step-label")).toHaveCSS(
+      "color",
+      "rgb(255, 255, 255)",
+    );
     await status.evaluate((element) => {
       const changes: string[] = [];
       Object.assign(window, { trackingStatusChanges: changes });
