@@ -521,6 +521,7 @@ for (const changedPrice of [false, true])
         await expect
           .poll(() => frame.locator("body").evaluate(() => scrollY))
           .toBeGreaterThan(0);
+        await preview.locator(".website-preview-viewport").scrollIntoViewIfNeeded();
         await expect(
           frame.locator(".website-template-footer"),
         ).toBeInViewport();
