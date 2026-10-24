@@ -1,5 +1,15 @@
 # Talix current state
 
+## Sprint #91 navigation focus prepared — October 23, 2026 Pacific
+
+The focused #64 branch corrects reproduced Menu → About/Contact focus loss with
+explicit view focus, preserved original-opener restoration and a named navigation
+fallback. [NAVIGATION-FOCUS-REVIEW.md](NAVIGATION-FOCUS-REVIEW.md) owns its narrow
+shared-dialog contract, regression scope and review checklist. #97/PR own actual
+results and exact-head evidence. The owner explicitly kept preview configuration
+blocked; no deployed verification or visual acceptance is claimed. No merge,
+production, schema or data change.
+
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 
 Header PR #93 is merged as `edf233467e87ba165e51dc7e6b7ce21b857db491`; #81 is closed. The owner **did not approve #49's proposed extras editor/cart changes**; extras are intended as configurable inventory item selections through future Inventory & BOM. #49 remains open and deferred, not resolved.
