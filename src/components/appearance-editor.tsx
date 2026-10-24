@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { PageTabs } from "./page-tabs";
 import { StorefrontHeader } from "./storefront-header";
-import { WebsiteTemplateHero } from "./website-template-hero";
+import { WebsitePreview } from "./website-preview";
 import { websiteProductsForLocation } from "@/lib/website";
 import { ImagePicker } from "./image-picker";
 import { useImageDraft } from "@/lib/image-draft";
@@ -45,8 +45,9 @@ export function AppearanceEditor({
 }) {
   const [tab, setTab] = useState("branding");
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [device, setDevice] = useState("desktop");
-  const [previewView, setPreviewView] = useState<"home" | "shop">("home");
+  const [device, setDevice] = useState<"desktop" | "tablet" | "mobile">(
+    "desktop",
+  );
   const expanded = "default_location_id" in subscription;
   const original = {
     ...designFor(subscription),
@@ -655,6 +656,16 @@ export function AppearanceEditor({
             >
               Desktop
             </button>
+            {websiteAppearance && (
+              <button
+                type="button"
+                className="secondary"
+                aria-pressed={device === "tablet"}
+                onClick={() => setDevice("tablet")}
+              >
+                Tablet
+              </button>
+            )}
             <button
               type="button"
               className="secondary"
@@ -664,76 +675,73 @@ export function AppearanceEditor({
               Mobile
             </button>
           </div>
-          <div
-            className={`appearance-live-preview${websiteAppearance && subscription.website_template ? " website-inline-preview" : ""} header-${headerLayout(draft)} preview-device-${device}`}
-            style={storefrontStyle(draft)}
-          >
-            <div className="preview-header shop-header">
-              <StorefrontHeader
-                preview
-                onPreviewNavigate={setPreviewView}
-                location={
-                  locations.find(
-                    (l) => l.id === draft.default_location_id && l.published,
-                  ) ??
-                  locations
-                    .filter((l) => l.published)
-                    .toSorted(
-                      (a, b) =>
-                        a.name.localeCompare(b.name) ||
-                        a.id.localeCompare(b.id),
-                    )[0]
-                }
-                subscription={{
-                  ...draft,
-                  header_mode:
-                    "header_mode" in subscription
-                      ? draft.header_mode
-                      : undefined,
-                  logo_url: image.preview,
-                  header_photo_url: photo.preview,
-                }}
-                search={
-                  headerLayout(draft) === "search" ? (
-                    <span className="shop-header-search preview-search">
-                      Search products
+          {websiteAppearance && subscription.website_template ? (
+            <WebsitePreview
+              subscription={previewSubscription}
+              location={previewLocation}
+              products={websiteProductsForLocation(
+                products,
+                previewLocation?.id,
+              )}
+              device={device}
+            />
+          ) : (
+            <div
+              className={`appearance-live-preview header-${headerLayout(draft)} preview-device-${device}`}
+              style={storefrontStyle(draft)}
+            >
+              <div className="preview-header shop-header">
+                <StorefrontHeader
+                  preview
+                  location={
+                    locations.find(
+                      (l) => l.id === draft.default_location_id && l.published,
+                    ) ??
+                    locations
+                      .filter((l) => l.published)
+                      .toSorted(
+                        (a, b) =>
+                          a.name.localeCompare(b.name) ||
+                          a.id.localeCompare(b.id),
+                      )[0]
+                  }
+                  subscription={{
+                    ...draft,
+                    header_mode:
+                      "header_mode" in subscription
+                        ? draft.header_mode
+                        : undefined,
+                    logo_url: image.preview,
+                    header_photo_url: photo.preview,
+                  }}
+                  search={
+                    headerLayout(draft) === "search" ? (
+                      <span className="shop-header-search preview-search">
+                        Search products
+                      </span>
+                    ) : undefined
+                  }
+                >
+                  <div className="shop-header-actions" aria-hidden="true">
+                    <span className="shop-icon">
+                      <Image
+                        src="/storefront/user.svg"
+                        width={24}
+                        height={24}
+                        alt=""
+                      />
                     </span>
-                  ) : undefined
-                }
-              >
-                <div className="shop-header-actions" aria-hidden="true">
-                  <span className="shop-icon">
-                    <Image
-                      src="/storefront/user.svg"
-                      width={24}
-                      height={24}
-                      alt=""
-                    />
-                  </span>
-                  <span className="shop-icon">
-                    <Image
-                      src="/storefront/cart.svg"
-                      width={24}
-                      height={24}
-                      alt=""
-                    />
-                  </span>
-                </div>
-              </StorefrontHeader>
-            </div>
-            {websiteAppearance && subscription.website_template ? (
-              <WebsiteTemplateHero
-                subscription={previewSubscription}
-                location={previewLocation}
-                products={websiteProductsForLocation(
-                  products,
-                  previewLocation?.id,
-                )}
-                preview
-                previewView={previewView}
-                onPreviewNavigate={setPreviewView}
-              />
-            ) : (
+                    <span className="shop-icon">
+                      <Image
+                        src="/storefront/cart.svg"
+                        width={24}
+                        height={24}
+                        alt=""
+                      />
+                    </span>
+                  </div>
+                </StorefrontHeader>
+              </div>
               <div className="preview-catalog">
                 <details>
                   <summary>Business information</summary>
@@ -757,8 +765,8 @@ export function AppearanceEditor({
                   ))}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
           <p className="preview-note">
             {websiteAppearance
               ? "Private website preview · Ordering is disabled."
