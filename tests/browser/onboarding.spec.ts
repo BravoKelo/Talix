@@ -517,7 +517,8 @@ for (const changedPrice of [false, true])
             preview.locator("iframe").evaluate((element) => {
               const available = element.parentElement!.clientWidth;
               return Math.abs(
-                element.getBoundingClientRect().width - Math.min(390, available),
+                element.getBoundingClientRect().width -
+                  Math.min(390, available),
               );
             }),
           )
@@ -529,6 +530,26 @@ for (const changedPrice of [false, true])
           .getByRole("region", { name: "Scrollable website preview" })
           .focus();
         await preview.locator(".website-preview-viewport").hover();
+        await frame.locator("body").evaluate(() => {
+          const probe = { wheels: [] as unknown[] };
+          Object.assign(window, { previewWheelProbe: probe });
+          window.addEventListener(
+            "wheel",
+            (event) => {
+              const target = event.target as Element;
+              queueMicrotask(() =>
+                probe.wheels.push({
+                  delta: event.deltaY,
+                  prevented: event.defaultPrevented,
+                  target: target.tagName,
+                  x: event.clientX,
+                  y: event.clientY,
+                }),
+              );
+            },
+            { passive: true },
+          );
+        });
         const scrollGeometry = await frame.locator("body").evaluate(() => ({
           viewport: innerHeight,
           content: document.documentElement.scrollHeight,
@@ -549,6 +570,64 @@ for (const changedPrice of [false, true])
           )
             break;
         }
+        if (needsScroll)
+          if ((await frame.locator("body").evaluate(() => scrollY)) === 0) {
+            const geometry = await preview
+              .locator("iframe")
+              .evaluate((element) => {
+                const rect = element.getBoundingClientRect();
+                const x = rect.x + rect.width / 2;
+                const y = rect.y + rect.height / 2;
+                return {
+                  x,
+                  y,
+                  hit: document.elementFromPoint(x, y)?.outerHTML.slice(0, 180),
+                  parentScroll: scrollY,
+                };
+              });
+            const snapshot = () =>
+              frame.locator("body").evaluate(() => ({
+                top: scrollY,
+                body: document.body.scrollTop,
+                html: document.documentElement.scrollTop,
+                probe: (window as unknown as { previewWheelProbe: unknown })
+                  .previewWheelProbe,
+              }));
+            console.info(
+              "PREVIEW_WHEEL_DIAGNOSTIC",
+              JSON.stringify({ geometry, state: await snapshot() }),
+            );
+            // Diagnostic ablations retain the original failure below.
+            await frame.locator("body").evaluate(() => window.scrollTo(0, 200));
+            console.info(
+              "PREVIEW_PROGRAMMATIC",
+              JSON.stringify(await snapshot()),
+            );
+            await frame.locator("body").evaluate(() => {
+              window.scrollTo(0, 0);
+              document.documentElement.style.overscrollBehavior = "auto";
+            });
+            await page.mouse.move(geometry.x, geometry.y);
+            await page.mouse.wheel(0, 600);
+            await page.waitForTimeout(300);
+            console.info(
+              "PREVIEW_OVERSCROLL_AUTO",
+              JSON.stringify(await snapshot()),
+            );
+            await frame.locator("body").evaluate(() => window.scrollTo(0, 0));
+            await preview
+              .locator("iframe")
+              .evaluate((element) => (element.style.transform = "none"));
+            await page.mouse.wheel(0, 600);
+            await page.waitForTimeout(300);
+            console.info(
+              "PREVIEW_NO_TRANSFORM",
+              JSON.stringify(await snapshot()),
+            );
+            throw new Error(
+              `Native preview wheel failed before diagnostics: ${JSON.stringify(scrollGeometry)}`,
+            );
+          }
         if (needsScroll)
           await expect
             .poll(() => frame.locator("body").evaluate(() => scrollY), {
