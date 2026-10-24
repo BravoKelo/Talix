@@ -14,6 +14,11 @@ import {
 } from "@/components/website-template-hero";
 import { money, type Catalog, type CartLine, type Product } from "@/lib/types";
 import { websiteProductsForLocation } from "@/lib/website";
+import {
+  checkoutDraftRejection,
+  checkoutResultToken,
+  type CheckoutAttempt,
+} from "@/lib/checkout-attempt";
 type Line = CartLine & { name: string; unit: number; optionNames: string[] };
 function defaultCatalogLocation(catalog: Catalog) {
   const published = [...catalog.locations].sort(
@@ -289,8 +294,13 @@ export function Storefront({
   );
   const [cart, setCart] = useState<Line[]>([]);
   const [message, setMessage] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [requestId, setRequestId] = useState<string | null>(null);
+  const [checkoutPhase, setCheckoutPhase] = useState<
+    "draft" | "submitting" | "unknown" | "confirmed"
+  >("draft");
+  const attempt = useRef<CheckoutAttempt | null>(null);
+  const submitting = useRef(false);
+  const busy = checkoutPhase === "submitting";
+  const checkoutLocked = checkoutPhase !== "draft";
   useEffect(() => {
     if (initialCatalog) return;
     let alive = true;
@@ -310,7 +320,8 @@ export function Storefront({
           setCategory("");
           setQuery("");
           setActiveProduct(null);
-          setRequestId(null);
+          attempt.current = null;
+          setCheckoutPhase("draft");
           setLocation(defaultCatalogLocation(next));
         }
       } catch (e) {
@@ -326,9 +337,9 @@ export function Storefront({
     };
   }, [initialCatalog, slug]);
   function add(p: Product, ids: string[]) {
+    if (attempt.current) return;
     setMessage("");
     setCartNotice(`${p.name} added to your cart.`);
-    setRequestId(null);
     const key = [...ids].sort().join(",");
     setCart((old) => {
       const index = old.findIndex(
@@ -355,38 +366,60 @@ export function Storefront({
   }
   async function checkout(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!cart.length || !location) return;
-    setBusy(true);
-    setMessage("");
-    const form = new FormData(e.currentTarget);
-    const key = requestId ?? crypto.randomUUID();
-    setRequestId(key);
-    try {
-      const { data, error } = await browserClient().rpc("checkout_simulated", {
+    if (submitting.current || checkoutPhase === "confirmed") return;
+    if (!attempt.current) {
+      if (!cart.length || !location) return;
+      const form = new FormData(e.currentTarget);
+      attempt.current = {
+        p_request: crypto.randomUUID(),
         p_location: location,
-        p_request: key,
         p_customer: {
-          name: form.get("name"),
-          email: form.get("email"),
-          phone: form.get("phone"),
+          name: String(form.get("name") ?? ""),
+          email: String(form.get("email") ?? ""),
+          phone: String(form.get("phone") ?? ""),
         },
         p_lines: cart.map(({ product_id, option_ids, quantity }) => ({
           product_id,
-          option_ids,
+          option_ids: [...option_ids],
           quantity,
         })),
-        p_outcome: form.get("outcome"),
-      });
-      if (error) throw error;
-      router.push(`/orders/${data.token}`);
-    } catch (e) {
+        p_outcome: String(form.get("outcome") ?? ""),
+      };
+    }
+    // The ref guard takes effect before React renders disabled controls. Every
+    // retry sends the captured record, never a newly edited form/cart payload.
+    submitting.current = true;
+    setCheckoutPhase("submitting");
+    setMessage("");
+    try {
+      const { data, error, status } = await browserClient().rpc(
+        "checkout_simulated",
+        attempt.current,
+      );
+      if (error) {
+        const rejection = checkoutDraftRejection(error, status);
+        if (rejection) {
+          attempt.current = null;
+          setCheckoutPhase("draft");
+          setMessage(
+            `${rejection}. No order was placed. Review your details or cart before trying again.`,
+          );
+          return;
+        }
+        throw error;
+      }
+      const token = checkoutResultToken(data);
+      if (!token) throw new Error("Missing order confirmation");
+      setCheckoutPhase("confirmed");
+      setMessage("Your order is confirmed. Opening your order…");
+      router.push(`/orders/${token}`);
+    } catch {
+      setCheckoutPhase("unknown");
       setMessage(
-        e instanceof Error
-          ? e.message
-          : "Unable to place order. Retry with the same details.",
+        "We couldn’t confirm whether your order was placed. Retry this order using the same details. Keep this tab open; reloading or closing it loses this recovery step.",
       );
     } finally {
-      setBusy(false);
+      submitting.current = false;
     }
   }
   if (!catalog)
@@ -516,15 +549,16 @@ export function Storefront({
             <span className="sr-only">Choose a location</span>
             <select
               aria-label="Choose a location"
+              disabled={checkoutLocked}
               value={location}
               onChange={(e) => {
+                if (attempt.current) return;
                 setLocation(e.target.value);
                 setCart([]);
                 setCategory("");
                 setQuery("");
                 setActiveProduct(null);
                 setCartNotice("");
-                setRequestId(null);
                 setMessage("");
               }}
             >
@@ -667,10 +701,11 @@ export function Storefront({
         <TaskDialog
           title={checkoutOpen ? "Checkout" : `Your cart (${itemCount})`}
           close={() => {
+            if (attempt.current) return;
             setCartOpen(false);
             setCheckoutOpen(false);
           }}
-          busy={busy}
+          busy={checkoutLocked}
           className="shop-cart-dialog"
           backdropClose
         >
@@ -682,8 +717,10 @@ export function Storefront({
               <button
                 type="button"
                 className="secondary"
-                disabled={busy}
-                onClick={() => setCheckoutOpen(false)}
+                disabled={checkoutLocked}
+                onClick={() => {
+                  if (!attempt.current) setCheckoutOpen(false);
+                }}
               >
                 Back to cart
               </button>
@@ -700,12 +737,13 @@ export function Storefront({
               <form
                 className="stack"
                 onSubmit={checkout}
-                onChange={() => setRequestId(null)}
+                aria-describedby="checkout-status"
               >
                 <label>
                   Your name
                   <input
                     name="name"
+                    disabled={checkoutLocked}
                     required
                     maxLength={100}
                     autoComplete="name"
@@ -715,6 +753,7 @@ export function Storefront({
                   Email
                   <input
                     name="email"
+                    disabled={checkoutLocked}
                     type="email"
                     required
                     maxLength={254}
@@ -725,6 +764,7 @@ export function Storefront({
                   Phone
                   <input
                     name="phone"
+                    disabled={checkoutLocked}
                     type="tel"
                     required
                     minLength={7}
@@ -737,31 +777,43 @@ export function Storefront({
                   <p>No card information is collected and no money moves.</p>
                   <label>
                     Test outcome
-                    <select name="outcome">
+                    <select name="outcome" disabled={checkoutLocked}>
                       <option value="approved">Approve payment</option>
                       <option value="declined">Decline payment</option>
                     </select>
                   </label>
                 </div>
-                <button disabled={busy || !cart.length}>
+                <button
+                  disabled={
+                    busy || checkoutPhase === "confirmed" || !cart.length
+                  }
+                >
                   {busy
                     ? "Placing order…"
-                    : "Place order with simulated payment"}
+                    : checkoutPhase === "unknown"
+                      ? "Retry this order"
+                      : checkoutPhase === "confirmed"
+                        ? "Opening your order…"
+                        : "Place order with simulated payment"}
                 </button>
                 <button
                   type="button"
                   className="secondary"
-                  disabled={busy}
+                  disabled={checkoutLocked}
                   onClick={(e) => {
+                    if (attempt.current) return;
                     e.currentTarget.form?.reset();
-                    setRequestId(null);
                     setMessage("");
                     setCheckoutOpen(false);
                   }}
                 >
                   Cancel checkout
                 </button>
-                <p role="status">{message}</p>
+                <p id="checkout-status" role="status" aria-atomic="true">
+                  {busy
+                    ? "Checking your order. Please keep this tab open."
+                    : message}
+                </p>
               </form>
             </div>
           ) : (
@@ -782,12 +834,12 @@ export function Storefront({
                       (p) => p.id === l.product_id,
                     );
                     const change = (quantity: number) => {
+                      if (attempt.current) return;
                       setCart((old) =>
                         old.map((line, j) =>
                           j === i ? { ...line, quantity } : line,
                         ),
                       );
-                      setRequestId(null);
                       setMessage("");
                     };
                     return (
@@ -838,8 +890,8 @@ export function Storefront({
                               className="secondary"
                               aria-label={`Remove ${l.name}`}
                               onClick={() => {
+                                if (attempt.current) return;
                                 setCart((old) => old.filter((_, j) => j !== i));
-                                setRequestId(null);
                                 setMessage("");
                                 setCartNotice(
                                   `${l.name} removed from your cart.`,

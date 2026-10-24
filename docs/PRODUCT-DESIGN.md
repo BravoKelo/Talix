@@ -1,5 +1,13 @@
 # Talix Product Design
 
+## Approved open-tab checkout recovery — October 23, 2026 Pacific
+
+The owner approved [#51](https://github.com/BravoKelo/Talix/issues/51): capture one checkout attempt with fixed details before sending. During submission or an unknown outcome, keep the checkout review visible, lock customer/cart/location/simulation changes and dismissal, and announce the current state. Say that the order could not be confirmed; offer **Retry this order** with identical details. Do not offer a fresh attempt or imply confirmed failure while the outcome is unknown. A definitive validation rejection proving no order committed permits correction. Confirmed success opens the existing private order result; Return to storefront can begin a separate intentional order.
+
+This scope retains component-memory state only. Reloading or leaving/closing the tab can lose recovery; [#94](https://github.com/BravoKelo/Talix/issues/94) owns the separately reviewed persistence/privacy/recovery design. Payments stay simulated. Implementation/validation and merge acceptance remain separate from this design approval.
+
+The proposed standalone extras-row editor/cart compatibility change in #49 was **not approved**. Extras are intended to become configurable inventory item selections when the Inventory & BOM product is built. #49 retains the unresolved defect and future product decision; no inventory/BOM implementation is authorized here.
+
 ## Approved follow-up — explicit storefront-only publication and homepage goals
 
 Owner approved #83/#84 after review, with implementation following merged PR #90. For an already-launched Talix website, Decide Later → Save to continue saves the pending choice and opens Go Live; it does not hide the website. Go Live explicitly reviews storefront-only mode and requires Publish storefront-only mode. Only an authoritative committed result shows “Your existing website has been hidden, Talix is now in storefront only mode” and Open storefront. Preserve business/catalog/branding, address and saved draft. Never-launched subscribers retain the one-step Save for later path. This supersedes the prior permanent-preservation outcome for an explicitly published deferred transition; saving alone still preserves the site. The owner separately approved and activated the database operation in development; production activation remains unapproved.

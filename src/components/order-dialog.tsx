@@ -49,6 +49,9 @@ export function TaskDialog({
         }
       }}
       aria-label={title}
+      // Repeated native close requests can become non-cancelable; opt out of
+      // them while busy rather than relying only on the cancel handler.
+      closedby={busy ? "none" : undefined}
       onCancel={(e) => {
         e.preventDefault();
         if (!busy) close();

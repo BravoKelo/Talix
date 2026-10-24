@@ -476,7 +476,7 @@ test("cart popup quantities, close/focus, empty state and checkout payload", asy
     submitted = route.request().postDataJSON();
     await route.fulfill({
       status: 400,
-      json: { message: "Verification decline" },
+      json: { code: "P0001", message: "Product unavailable" },
     });
   });
   await page.goto("/shop/example");
@@ -522,7 +522,7 @@ test("cart popup quantities, close/focus, empty state and checkout payload", asy
   await cart
     .getByRole("button", { name: "Place order with simulated payment" })
     .click();
-  await expect(cart.getByRole("status")).toContainText("Unable to place order");
+  await expect(cart.getByRole("status")).toContainText("No order was placed");
   expect(submitted?.p_lines).toEqual([
     { product_id: "shared", option_ids: [], quantity: 1 },
   ]);

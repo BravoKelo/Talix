@@ -1,5 +1,11 @@
 # Talix current state
 
+## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
+
+Header PR #93 is merged as `edf233467e87ba165e51dc7e6b7ce21b857db491`; #81 is closed. The owner **did not approve #49's proposed extras editor/cart changes**; extras are intended as configurable inventory item selections through future Inventory & BOM. #49 remains open and deferred, not resolved.
+
+The owner approved #51's bounded open-tab recovery and requested separate [#94](https://github.com/BravoKelo/Talix/issues/94) for recovery after reload/tab closure. Focused branch `fix/51-checkout-attempt-recovery` retains an immutable in-memory attempt through uncertain responses, locks conflicting edits/dismissal, safely replays retries and permits correction only for definitive pre-write SQL validation rejections. Existing server contracts, private tracking and simulated payments remain. [CHECKOUT-RECOVERY-REVIEW.md](CHECKOUT-RECOVERY-REVIEW.md) records validation design and limits; #51/#92/PR own final exact-head CI and deployed evidence. Implementation is not acceptance. No new merge, production release, schema/security/infrastructure change or browser persistence is authorized. This supersedes earlier wording that #49/#51 both await a decision.
+
 ## Sprint #90 header integration — October 22, 2026 Pacific
 
 Sprint [#92](https://github.com/BravoKelo/Talix/issues/92) authorizes #81 first, then bounded #49/#51 work subject to their protected compatibility/recovery decisions. Recovery confirmed clean main `1b581d86833ed0d1dc625f4b35f9d15661f1e205` includes merged #90/#91; Sprint #89 work is not repeated. The focused header branch corrects a reproduced scroll-anchoring collapse/expansion loop without changing catalog or checkout contracts. [HEADER-SCROLL-REVIEW.md](HEADER-SCROLL-REVIEW.md) records cause, correction, test scope and manual review. #92/PR own exact final commits, CI and preview evidence. Implementation does not establish deployed verification or owner acceptance; no merge, production release, migration or infrastructure/security change is authorized.

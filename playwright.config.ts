@@ -31,14 +31,13 @@ export default defineConfig({
     },
     {
       name: "firefox-critical",
-      testMatch: /(?:onboarding|storefront)\.spec\.ts/,
+      testMatch: /(?:onboarding|storefront|checkout)\.spec\.ts/,
       use: { browserName: "firefox" },
     },
     {
       name: "webkit-critical",
-      testMatch: /(?:onboarding|storefront)\.spec\.ts/,
+      testMatch: /(?:onboarding|storefront|checkout)\.spec\.ts/,
       use: { browserName: "webkit" },
     },
   ],
 });
-
