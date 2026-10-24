@@ -521,6 +521,7 @@ for (const changedPrice of [false, true])
         await expect
           .poll(() => frame.locator("body").evaluate(() => scrollY))
           .toBeGreaterThan(0);
+        await preview.locator(".website-preview-viewport").scrollIntoViewIfNeeded();
         await expect(
           frame.locator(".website-template-footer"),
         ).toBeInViewport();
@@ -590,6 +591,22 @@ for (const changedPrice of [false, true])
           publication.website_template_launched_at,
         );
         await expect(page.getByRole("status")).toContainText(publishedTime);
+
+        await expect(
+          page
+            .getByRole("status")
+            .getByRole("link", { name: "Open website", exact: true }),
+        ).toHaveAttribute("href", /\/shop\//);
+        await expect(
+          page
+            .getByRole("status")
+            .getByRole("link", { name: "Open website", exact: true }),
+        ).toHaveCSS("background-color", "rgb(232, 185, 79)");
+        await expect(
+          page
+            .getByRole("link", { name: "Open website ↗", exact: true })
+            .first(),
+        ).toBeVisible();
         const publicPage = await page.context().newPage();
         await publicPage.setViewportSize({ width: 1120, height: 900 });
         await publicPage.goto(
@@ -607,21 +624,6 @@ for (const changedPrice of [false, true])
             .evaluate(templatePresentation),
         ).toEqual(desktopPresentation);
         await publicPage.close();
-        await expect(
-          page
-            .getByRole("status")
-            .getByRole("link", { name: "Open website", exact: true }),
-        ).toHaveAttribute("href", /\/shop\//);
-        await expect(
-          page
-            .getByRole("status")
-            .getByRole("link", { name: "Open website", exact: true }),
-        ).toHaveCSS("background-color", "rgb(232, 185, 79)");
-        await expect(
-          page
-            .getByRole("link", { name: "Open website ↗", exact: true })
-            .first(),
-        ).toBeVisible();
         await page
           .getByRole("button", { name: "Website setup", exact: false })
           .click();
