@@ -1,5 +1,14 @@
 # Talix current state
 
+## Sprint #91 fulfillment accessibility prepared — October 23, 2026 Pacific
+
+The focused #66 branch preserves tracking and payment contracts while adding
+visible Current text, current-step semantics and a stable polite status region.
+[FULFILLMENT-STATUS-REVIEW.md](FULFILLMENT-STATUS-REVIEW.md) records reproduction,
+regression scope, owner review and evidence limits. #97/PR own exact-head
+results. The owner explicitly kept new preview configuration blocked; deployed
+verification remains incomplete. No merge, production, data or schema change.
+
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 
 Header PR #93 is merged as `edf233467e87ba165e51dc7e6b7ce21b857db491`; #81 is closed. The owner **did not approve #49's proposed extras editor/cart changes**; extras are intended as configurable inventory item selections through future Inventory & BOM. #49 remains open and deferred, not resolved.
