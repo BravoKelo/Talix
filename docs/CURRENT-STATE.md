@@ -1,5 +1,11 @@
 # Talix current state
 
+## General Preview configuration corrected — October 24, 2026 Pacific
+
+The owner explicitly approved the two existing development Supabase connection variables for general Vercel Preview without branch restrictions, superseding the earlier hold for those two variables only. They are now configured; all 24 pre-existing environment entries are unchanged, including Development and branch overrides. Production remains unconfigured. Email flags, deployment protection, application/build guards, workflows and production settings were preserved. Read-only catalog checks confirm all 14 public tables still enforce RLS and the 31 public/storage policies and table ACL/RLS fingerprints are unchanged. No migration or production deployment occurred.
+
+Fresh [Sprint #91 / #96 Preview](https://talix-htlajg00t-bravokelo.vercel.app) is READY at `43a96395bdf338df7f87406d23deab23b1c355d8`: compilation, TypeScript and deployment completed with no missing-variable error. Protected `/signup` and its ten script assets returned HTTP 200; the served browser configuration matches the approved development URL/publishable key and contains only that Supabase project hostname. Existing npm warnings remain non-blocking. No signup submission or Sprint #91 customer journey was tested by this configuration correction. [Issue #97](https://github.com/BravoKelo/Talix/issues/97) owns exact operational evidence; [SETUP.md](SETUP.md#general-preview-configuration) owns the configuration and future verification procedure. Sprint #91 preview testing can resume; other branch previews need fresh builds to inherit the defaults. Feature acceptance and merge approval remain separate.
+
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 
 Header PR #93 is merged as `edf233467e87ba165e51dc7e6b7ce21b857db491`; #81 is closed. The owner **did not approve #49's proposed extras editor/cart changes**; extras are intended as configurable inventory item selections through future Inventory & BOM. #49 remains open and deferred, not resolved.

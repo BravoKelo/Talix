@@ -9,6 +9,21 @@
 5. Business owners enter `/signup`, choose their sample plan and extras, review once, then Continue on the pending email-confirmation page to open the workspace. Their first location starts unpublished; add products and publish it in Settings. There is no public employee signup or email invitation implementation in this slice. Create employee Auth accounts explicitly, then authorized managers assign subscription and separate location roles in Users.
 6. Review Supabase authentication redirects/site URL for the actual deployment and run the acceptance workflow below.
 
+## General Preview configuration
+
+On October 24, 2026, the owner approved `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` for the Talix Vercel project's **general Preview environment**, without a Git branch restriction. Reuse the existing Development values only after verifying that both belong to the documented Talix development project above and that the key is its enabled publishable key. This supersedes the earlier configuration hold for these two variables only; [Sprint #91 execution issue #97](https://github.com/BravoKelo/Talix/issues/97) records approval and deployment evidence. Do not generate credentials or use service-role, secret, administrative or production credentials.
+
+General Preview values cover new feature branches. Existing branch-specific Preview overrides take precedence and must remain intact. Production and Development values, deployment protection and production deployment settings remain unchanged; Preview approval does not authorize production deployment. `TALIX_EMAIL_CONFIRMATION_PENDING` retains its existing branch-specific configuration and behavior; it is not a general Preview default. A successful build does not prove the signup/email journey.
+
+For each future Preview verification:
+
+1. Confirm the `talix` project/team, intended feature branch and exact commit. Check the two variables apply to Preview without a branch restriction, and inspect any branch overrides for the same development-only connection. Never copy full values into logs or review records.
+2. Create a fresh non-production Preview build after changing public build-time values; older deployments retain their original build configuration. For the Vercel REST create-deployment API, omit `target` for Preview (`target: "preview"` is rejected); returned `target: null` identifies Preview. See [Vercel's API reference](https://vercel.com/docs/rest-api/deployments/create-a-new-deployment).
+3. Review the final build state and logs. Preserve the missing-configuration build guard and Next.js configuration; do not bypass the guard or repeatedly redeploy an unchanged failure. Diagnose and report unrelated errors separately.
+4. Access the protected Preview through authorized Vercel authentication. Verify the served application uses only the documented development Supabase connection, then run the scoped customer journey. Record exact deployment URL, commit, build result and evidence limits in the active issue/PR. READY alone is not end-to-end verification.
+
+No production deployment, migration, database policy, workflow permission or application change is authorized by this configuration correction. Earlier branch-only configuration statements under Controlled baseline integration describe that historical baseline; this later general Preview decision supplies development defaults for Preview only.
+
 ## Acceptance workflow
 
 - Owner signs in, creates a subscription with multiple locations, configures subscription branding and local operating details.
