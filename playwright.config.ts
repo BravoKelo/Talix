@@ -3,7 +3,6 @@ export default defineConfig({
   testDir: "tests/browser",
   fullyParallel: false,
   workers: 1,
-  maxFailures: process.env.CI ? 1 : 0,
   use: {
     baseURL: "http://127.0.0.1:3100",
     trace: "retain-on-failure",
@@ -25,11 +24,6 @@ export default defineConfig({
     },
   },
   projects: [
-    {
-      name: "webkit-critical",
-      testMatch: /(?:onboarding|storefront|checkout)\.spec\.ts/,
-      use: { browserName: "webkit" },
-    },
     { name: "desktop", use: { browserName: "chromium" } },
     {
       name: "mobile",
@@ -39,6 +33,11 @@ export default defineConfig({
       name: "firefox-critical",
       testMatch: /(?:onboarding|storefront|checkout)\.spec\.ts/,
       use: { browserName: "firefox" },
+    },
+    {
+      name: "webkit-critical",
+      testMatch: /(?:onboarding|storefront|checkout)\.spec\.ts/,
+      use: { browserName: "webkit" },
     },
   ],
 });

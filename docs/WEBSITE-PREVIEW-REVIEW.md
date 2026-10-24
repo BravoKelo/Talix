@@ -32,6 +32,18 @@ appearance changes. Screenshots are local test artifacts. #97 and the PR own
 final exact-head CI and executed results; this document is not a passing-check
 claim.
 
+The Linux WebKit follow-up reproduced an overflowing 769px frame with native
+wheel scrolling stuck at zero. A diagnostic run retained the original failure,
+confirmed programmatic scrolling, then observed native wheel scrolling after
+changing root overscroll behavior. The correction removes the frame document's
+`overscroll-behavior: contain`; it retains ordinary browser-owned scrolling,
+uniform scaling, the static sandbox and the existing React portal. It adds no
+wheel interception, synthetic scrolling, browser-specific branch or dependency.
+The regression still requires native movement when content overflows and always
+checks footer reachability. Temporary event/style probes and WebKit-first
+fail-fast ordering are removed before final validation. #97/PR own the resulting
+exact-head full-suite evidence; a local pass alone does not resolve Linux CI.
+
 Deployment blocker: automatic approval review rejected creating branch-scoped
 copies of the unchanged existing development preview variables, classifying it
 as a persistent infrastructure change outside the sprint's restrictions. No
