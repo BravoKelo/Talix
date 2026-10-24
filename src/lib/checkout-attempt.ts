@@ -8,9 +8,10 @@ export type CheckoutAttempt = {
   p_outcome: string;
 };
 
-// These exact P0001 errors come from checkout_simulated after its existing-order
-// lookup and before any write. A generic HTTP/network error (or a reused key
-// with different details) does not prove there is no committed order.
+// These exact P0001 errors precede writes. Invalid simulation cannot commit on
+// any replay of the same immutable payload; the other validations follow the
+// existing-order lookup. Generic HTTP/network errors and key conflicts cannot
+// prove there is no committed order.
 const draftRejections = new Set([
   "Invalid simulated payment",
   "Location unavailable",
