@@ -1,10 +1,54 @@
 # Talix current state
 
-## General Preview configuration corrected — October 24, 2026 Pacific
+## General Preview configuration documentation accepted — October 24, 2026 Pacific
 
-The owner explicitly approved the two existing development Supabase connection variables for general Vercel Preview without branch restrictions, superseding the earlier hold for those two variables only. They are now configured; all 24 pre-existing environment entries are unchanged, including Development and branch overrides. Production remains unconfigured. Email flags, deployment protection, application/build guards, workflows and production settings were preserved. Read-only catalog checks confirm all 14 public tables still enforce RLS and the 31 public/storage policies and table ACL/RLS fingerprints are unchanged. No migration or production deployment occurred.
+The owner approved PR #102 for integration. [SETUP.md](SETUP.md#general-preview-configuration)
+owns the approved two-variable general Preview development connection and future
+verification procedure. The October 24 operational correction preserved all 24
+prior environment entries, branch overrides, email behavior, production separation,
+deployment protection and build guards. Its read-only checks retained RLS on all
+14 public tables and unchanged fingerprints for the 31 public/storage policies.
+Those are recorded operational results, not checks repeated by this prose merge.
 
-Fresh [Sprint #91 / #96 Preview](https://talix-htlajg00t-bravokelo.vercel.app) is READY at `43a96395bdf338df7f87406d23deab23b1c355d8`: compilation, TypeScript and deployment completed with no missing-variable error. Protected `/signup` and its ten script assets returned HTTP 200; the served browser configuration matches the approved development URL/publishable key and contains only that Supabase project hostname. Existing npm warnings remain non-blocking. No signup submission or Sprint #91 customer journey was tested by this configuration correction. [Issue #97](https://github.com/BravoKelo/Talix/issues/97) owns exact operational evidence; [SETUP.md](SETUP.md#general-preview-configuration) owns the configuration and future verification procedure. Sprint #91 preview testing can resume; other branch previews need fresh builds to inherit the defaults. Feature acceptance and merge approval remain separate.
+The matching #96 Preview at `43a96395bdf338df7f87406d23deab23b1c355d8` reached READY
+and protected HTTP/script checks succeeded; they did not establish an authenticated
+customer journey. #97 owns exact operational evidence and the later Sprint #91-only
+runner waiver. No service configuration, data, migration or production operation
+is part of merging this documentation.
+
+## Sprint #91 accepted implementation and integration — October 24, 2026 Pacific
+
+This tree brings together the four owner-accepted corrections: #96 uses a genuine,
+uniformly scaled private desktop/tablet/mobile viewport in Go Live and Website
+Appearance; #62 adds measured contrast guidance and explicit draft recovery;
+#64 preserves navigation-dialog focus and restores it safely; #66 exposes the
+current fulfillment step with visible text, semantics and quiet polling updates.
+The existing publication, catalog, checkout, authorization and data contracts remain.
+
+The owner visually accepted all four, then explicitly waived runner testing for
+**Sprint #91 only**, finalized the review package and authorized proceeding with
+merge commits. Hosted runner/remaining agent-run deployed customer journeys were
+not completed or passed. #105 / draft PR #106 remain incomplete and outside this
+integration; the owner rejected its existing-operator-browser-session dependency.
+The waiver creates no precedent for future sprints. Physical-device and actual
+screen-reader certification retain the existing supported-environment deferrals.
+
+Tracking [#97](https://github.com/BravoKelo/Talix/issues/97) owns final PR heads,
+exact CI results, preview identities, acceptance provenance and actual merge SHAs.
+PRs #98/#99 have merged; #100/#101 supply the remaining integration. No new
+application behavior was added in resolving their documentation conflicts. The
+final integrated candidate must pass Core checks; do not infer a passing result
+from this preparation record. #97 records the subsequent merge/check outcome.
+
+The earlier Preview configuration hold was superseded by the separately approved
+general Preview development connection correction, documented in PR #102. #103's
+audit is in separate PR #104. Neither supporting document authorizes new security,
+service or CI infrastructure. Main automatic Vercel deployment remains disabled;
+no production deployment, database migration, access link, credential change or
+branch deletion is part of this integration. #49 and #94 remain outside the sprint.
+
+The issue-specific review notes retain implementation contracts and historical
+reproduction evidence; their status sections are reconciled with these decisions.
 
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 
