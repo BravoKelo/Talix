@@ -9,6 +9,27 @@ shared-dialog contract, regression scope and review checklist. #97/PR own actual
 results and exact-head evidence. The owner explicitly kept preview configuration
 blocked; no deployed verification or visual acceptance is claimed. No merge,
 production, schema or data change.
+## Sprint #91 product-text feedback prepared — October 23, 2026 Pacific
+
+The focused #62 branch builds on #96 / PR #98 and adds measured field-level
+contrast guidance, invalid-state/focus recovery and an explicit draft correction
+to the existing 4.5:1 Save guard. Legacy invalid values are identified without
+changing storage or published settings. [PRODUCT-TEXT-REVIEW.md](PRODUCT-TEXT-REVIEW.md)
+owns its compatibility, validation scope and manual review. #97/PR own actual
+results and exact-head evidence; the owner explicitly kept preview configuration blocked.
+No database rule, migration, bulk repair, merge or production change.
+
+## Sprint #91 preview correction prepared — October 23, 2026 Pacific
+
+Sprint [#97](https://github.com/BravoKelo/Talix/issues/97) authorizes #96, #62,
+#64 and #66 in that order. Recovery confirmed main `4bb93bb` includes Sprint
+#90's PR #95; #49 and #94 remain outside this sprint. The focused #96 branch
+reproduces Desktop rendering at 329px in a 1280px workspace and introduces a
+shared, proportionally scaled true viewport for Go Live and Website Appearance.
+[WEBSITE-PREVIEW-REVIEW.md](WEBSITE-PREVIEW-REVIEW.md) records its design,
+regression scope and the development-preview approval blocker. Implementation
+is not completed validation or owner acceptance; #97/PR own exact-head evidence.
+No merge, production or database change is authorized.
 
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 

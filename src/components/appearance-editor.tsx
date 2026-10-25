@@ -2,17 +2,18 @@
 import Image from "next/image";
 import { PageTabs } from "./page-tabs";
 import { StorefrontHeader } from "./storefront-header";
-import { WebsiteTemplateHero } from "./website-template-hero";
+import { WebsitePreview } from "./website-preview";
 import { websiteProductsForLocation } from "@/lib/website";
 import { ImagePicker } from "./image-picker";
 import { useImageDraft } from "@/lib/image-draft";
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import {
   headerLayouts,
   headerLayout,
   designFor,
   storefrontStyle,
   contrastRatio,
+  defaultDesign,
   type StorefrontDesign,
 } from "@/lib/storefront-design";
 import { HeaderLinkEditor } from "./header-link-editor";
@@ -45,8 +46,9 @@ export function AppearanceEditor({
 }) {
   const [tab, setTab] = useState("branding");
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [device, setDevice] = useState("desktop");
-  const [previewView, setPreviewView] = useState<"home" | "shop">("home");
+  const [device, setDevice] = useState<"desktop" | "tablet" | "mobile">(
+    "desktop",
+  );
   const expanded = "default_location_id" in subscription;
   const original = {
     ...designFor(subscription),
@@ -81,6 +83,10 @@ export function AppearanceEditor({
   const [saved, setSaved] = useState<Branding>(original);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const productTextId = useId();
+  const productTextInput = useRef<HTMLInputElement>(null);
+  const textContrast = contrastRatio(draft.storefront_text, "#ffffff");
+  const readableText = textContrast >= 4.5;
   const dirty =
     photo.dirty ||
     hero.dirty ||
@@ -162,11 +168,12 @@ export function AppearanceEditor({
               );
               return;
             }
-            if (contrastRatio(draft.storefront_text, "#ffffff") < 4.5) {
+            if (!readableText) {
               setTab("style");
               setMessage(
                 "Choose a darker product text color so customers can read it on the light background.",
               );
+              requestAnimationFrame(() => productTextInput.current?.focus());
               return;
             }
             setBusy(true);
@@ -520,18 +527,74 @@ export function AppearanceEditor({
                     ["storefront_text", "Product text"],
                     ["storefront_button", "Buttons"],
                   ] as const
-                ).map(([key, label]) => (
-                  <label key={key}>
-                    {label}
-                    <input
-                      type="color"
-                      value={draft[key]}
-                      onChange={(e) =>
-                        setDraft({ ...draft, [key]: e.target.value })
-                      }
-                    />
-                  </label>
-                ))}
+                ).map(([key, label]) =>
+                  key === "storefront_text" ? (
+                    <div key={key} className="stack">
+                      <label htmlFor={productTextId}>{label}</label>
+                      <input
+                        id={productTextId}
+                        ref={productTextInput}
+                        type="color"
+                        value={draft.storefront_text}
+                        aria-invalid={!readableText}
+                        aria-describedby={`${productTextId}-guidance`}
+                        onChange={(e) =>
+                          setDraft({
+                            ...draft,
+                            storefront_text: e.target.value,
+                          })
+                        }
+                      />
+                      <p
+                        id={`${productTextId}-guidance`}
+                        aria-live="polite"
+                        aria-atomic="true"
+                        className={!readableText ? "notice" : "muted"}
+                      >
+                        Contrast on the white product background:{" "}
+                        {textContrast.toFixed(2)}:1. Product text needs at least
+                        4.5:1.
+                        {!readableText &&
+                          " Choose a darker color before saving."}
+                      </p>
+                      {contrastRatio(saved.storefront_text, "#ffffff") <
+                        4.5 && (
+                        <p className="notice">
+                          Your saved Product text color needs correction. It has
+                          not been changed. Choose a readable color and save
+                          your changes.
+                        </p>
+                      )}
+                      {!readableText && (
+                        <button
+                          type="button"
+                          className="secondary"
+                          onClick={() => {
+                            setDraft({
+                              ...draft,
+                              storefront_text: defaultDesign.storefront_text,
+                            });
+                            setMessage("");
+                            productTextInput.current?.focus();
+                          }}
+                        >
+                          Use readable default
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <label key={key}>
+                      {label}
+                      <input
+                        type="color"
+                        value={draft[key]}
+                        onChange={(e) =>
+                          setDraft({ ...draft, [key]: e.target.value })
+                        }
+                      />
+                    </label>
+                  ),
+                )}
                 <label>
                   Font family
                   <select
@@ -655,6 +718,16 @@ export function AppearanceEditor({
             >
               Desktop
             </button>
+            {websiteAppearance && (
+              <button
+                type="button"
+                className="secondary"
+                aria-pressed={device === "tablet"}
+                onClick={() => setDevice("tablet")}
+              >
+                Tablet
+              </button>
+            )}
             <button
               type="button"
               className="secondary"
@@ -664,76 +737,73 @@ export function AppearanceEditor({
               Mobile
             </button>
           </div>
-          <div
-            className={`appearance-live-preview${websiteAppearance && subscription.website_template ? " website-inline-preview" : ""} header-${headerLayout(draft)} preview-device-${device}`}
-            style={storefrontStyle(draft)}
-          >
-            <div className="preview-header shop-header">
-              <StorefrontHeader
-                preview
-                onPreviewNavigate={setPreviewView}
-                location={
-                  locations.find(
-                    (l) => l.id === draft.default_location_id && l.published,
-                  ) ??
-                  locations
-                    .filter((l) => l.published)
-                    .toSorted(
-                      (a, b) =>
-                        a.name.localeCompare(b.name) ||
-                        a.id.localeCompare(b.id),
-                    )[0]
-                }
-                subscription={{
-                  ...draft,
-                  header_mode:
-                    "header_mode" in subscription
-                      ? draft.header_mode
-                      : undefined,
-                  logo_url: image.preview,
-                  header_photo_url: photo.preview,
-                }}
-                search={
-                  headerLayout(draft) === "search" ? (
-                    <span className="shop-header-search preview-search">
-                      Search products
+          {websiteAppearance && subscription.website_template ? (
+            <WebsitePreview
+              subscription={previewSubscription}
+              location={previewLocation}
+              products={websiteProductsForLocation(
+                products,
+                previewLocation?.id,
+              )}
+              device={device}
+            />
+          ) : (
+            <div
+              className={`appearance-live-preview header-${headerLayout(draft)} preview-device-${device}`}
+              style={storefrontStyle(draft)}
+            >
+              <div className="preview-header shop-header">
+                <StorefrontHeader
+                  preview
+                  location={
+                    locations.find(
+                      (l) => l.id === draft.default_location_id && l.published,
+                    ) ??
+                    locations
+                      .filter((l) => l.published)
+                      .toSorted(
+                        (a, b) =>
+                          a.name.localeCompare(b.name) ||
+                          a.id.localeCompare(b.id),
+                      )[0]
+                  }
+                  subscription={{
+                    ...draft,
+                    header_mode:
+                      "header_mode" in subscription
+                        ? draft.header_mode
+                        : undefined,
+                    logo_url: image.preview,
+                    header_photo_url: photo.preview,
+                  }}
+                  search={
+                    headerLayout(draft) === "search" ? (
+                      <span className="shop-header-search preview-search">
+                        Search products
+                      </span>
+                    ) : undefined
+                  }
+                >
+                  <div className="shop-header-actions" aria-hidden="true">
+                    <span className="shop-icon">
+                      <Image
+                        src="/storefront/user.svg"
+                        width={24}
+                        height={24}
+                        alt=""
+                      />
                     </span>
-                  ) : undefined
-                }
-              >
-                <div className="shop-header-actions" aria-hidden="true">
-                  <span className="shop-icon">
-                    <Image
-                      src="/storefront/user.svg"
-                      width={24}
-                      height={24}
-                      alt=""
-                    />
-                  </span>
-                  <span className="shop-icon">
-                    <Image
-                      src="/storefront/cart.svg"
-                      width={24}
-                      height={24}
-                      alt=""
-                    />
-                  </span>
-                </div>
-              </StorefrontHeader>
-            </div>
-            {websiteAppearance && subscription.website_template ? (
-              <WebsiteTemplateHero
-                subscription={previewSubscription}
-                location={previewLocation}
-                products={websiteProductsForLocation(
-                  products,
-                  previewLocation?.id,
-                )}
-                preview
-                previewView={previewView}
-                onPreviewNavigate={setPreviewView}
-              />
-            ) : (
+                    <span className="shop-icon">
+                      <Image
+                        src="/storefront/cart.svg"
+                        width={24}
+                        height={24}
+                        alt=""
+                      />
+                    </span>
+                  </div>
+                </StorefrontHeader>
+              </div>
               <div className="preview-catalog">
                 <details>
                   <summary>Business information</summary>
@@ -757,8 +827,8 @@ export function AppearanceEditor({
                   ))}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
           <p className="preview-note">
             {websiteAppearance
               ? "Private website preview · Ordering is disabled."
