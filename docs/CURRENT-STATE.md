@@ -1,5 +1,21 @@
 # Talix current state
 
+## General Preview configuration documentation accepted — October 24, 2026 Pacific
+
+The owner approved PR #102 for integration. [SETUP.md](SETUP.md#general-preview-configuration)
+owns the approved two-variable general Preview development connection and future
+verification procedure. The October 24 operational correction preserved all 24
+prior environment entries, branch overrides, email behavior, production separation,
+deployment protection and build guards. Its read-only checks retained RLS on all
+14 public tables and unchanged fingerprints for the 31 public/storage policies.
+Those are recorded operational results, not checks repeated by this prose merge.
+
+The matching #96 Preview at `43a96395bdf338df7f87406d23deab23b1c355d8` reached READY
+and protected HTTP/script checks succeeded; they did not establish an authenticated
+customer journey. #97 owns exact operational evidence and the later Sprint #91-only
+runner waiver. No service configuration, data, migration or production operation
+is part of merging this documentation.
+
 ## Sprint #91 accepted implementation and integration — October 24, 2026 Pacific
 
 This tree brings together the four owner-accepted corrections: #96 uses a genuine,
