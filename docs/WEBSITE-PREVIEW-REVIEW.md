@@ -1,5 +1,16 @@
 # Go Live viewport correction — #96
 
+## Accepted review status — October 24, 2026 Pacific
+
+The owner visually accepted this correction and authorized Sprint #91 integration.
+The prior configuration hold is historical: general Preview development connection
+configuration was separately approved and corrected (PR #102). The owner explicitly
+waived hosted runner testing for Sprint #91 only; it is not a passing journey claim
+or a precedent for later sprints. #105 / draft PR #106 remain incomplete and excluded.
+[#97](https://github.com/BravoKelo/Talix/issues/97) owns current exact-head CI,
+preview/acceptance evidence and actual merge outcomes. Main automatic deployment
+remains disabled; production and database/security settings are unchanged.
+
 Sprint #91 / #97 authorizes this bounded correction. Recovered main was
 `4bb93bbcc75e20b4ed2db4eb7d424a0b2c18e666`, with Sprint #90 merged.
 
@@ -44,15 +55,7 @@ checks footer reachability. Temporary event/style probes and WebKit-first
 fail-fast ordering are removed before final validation. #97/PR own the resulting
 exact-head full-suite evidence; a local pass alone does not resolve Linux CI.
 
-Deployment blocker: automatic approval review rejected creating branch-scoped
-copies of the unchanged existing development preview variables, classifying it
-as a persistent infrastructure change outside the sprint's restrictions. No
-variable was created. The owner explicitly chose to keep preview configuration
-blocked on October 23, 2026 Pacific. Do not retry or work around that hold without
-new authorization. A verified development preview and deployed comparison
-against the published website remain required before visual acceptance. Do not
-label this PR ready until that evidence is recorded. No production, migration,
-schema, security configuration, merge or branch deletion is authorized.
+Historical configuration hold: the October 23 hold was later superseded as recorded above. The original reproduction and implementation evidence remain valid; #97 owns current review and integration status.
 
 ## Owner review
 

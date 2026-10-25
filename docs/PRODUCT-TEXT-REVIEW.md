@@ -1,5 +1,16 @@
 # Product text contrast — #62 / Sprint #91
 
+## Accepted review status — October 24, 2026 Pacific
+
+The owner visually accepted this correction and authorized Sprint #91 integration.
+The prior configuration hold is historical: general Preview development connection
+configuration was separately approved and corrected (PR #102). The owner explicitly
+waived hosted runner testing for Sprint #91 only; it is not a passing journey claim
+or a precedent for later sprints. #105 / draft PR #106 remain incomplete and excluded.
+[#97](https://github.com/BravoKelo/Talix/issues/97) owns current exact-head CI,
+preview/acceptance evidence and actual merge outcomes. Main automatic deployment
+remains disabled; production and database/security settings are unchanged.
+
 The isolated actual storefront reproduced a white product name and price on a
 white card (1:1 contrast); its fixed description remained rgb(102,113,137).
 Nothing was saved to a service. Current main already has a 4.5:1 Save guard;
@@ -33,7 +44,4 @@ from another tab. Confirm the error returns focus to Product text. Choose the
 readable default or a valid dark brand color, verify the draft, Save, reopen and
 check preservation. Cancel must discard unsaved correction. Existing invalid
 settings must show guidance without changing before Save. Check phone, tablet
-and desktop widths and keyboard operation. The owner explicitly chose to keep
-new development-preview configuration blocked on October 23, 2026 Pacific;
-do not retry or work around that hold. This remains a draft with deployed
-verification and visual acceptance incomplete.
+and desktop widths and keyboard operation. The earlier configuration and visual-review holds are superseded by the accepted review status above.

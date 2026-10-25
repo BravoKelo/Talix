@@ -1,35 +1,38 @@
 # Talix current state
 
-## Sprint #91 navigation focus prepared — October 23, 2026 Pacific
+## Sprint #91 accepted implementation and integration — October 24, 2026 Pacific
 
-The focused #64 branch corrects reproduced Menu → About/Contact focus loss with
-explicit view focus, preserved original-opener restoration and a named navigation
-fallback. [NAVIGATION-FOCUS-REVIEW.md](NAVIGATION-FOCUS-REVIEW.md) owns its narrow
-shared-dialog contract, regression scope and review checklist. #97/PR own actual
-results and exact-head evidence. The owner explicitly kept preview configuration
-blocked; no deployed verification or visual acceptance is claimed. No merge,
-production, schema or data change.
-## Sprint #91 product-text feedback prepared — October 23, 2026 Pacific
+This tree brings together the four owner-accepted corrections: #96 uses a genuine,
+uniformly scaled private desktop/tablet/mobile viewport in Go Live and Website
+Appearance; #62 adds measured contrast guidance and explicit draft recovery;
+#64 preserves navigation-dialog focus and restores it safely; #66 exposes the
+current fulfillment step with visible text, semantics and quiet polling updates.
+The existing publication, catalog, checkout, authorization and data contracts remain.
 
-The focused #62 branch builds on #96 / PR #98 and adds measured field-level
-contrast guidance, invalid-state/focus recovery and an explicit draft correction
-to the existing 4.5:1 Save guard. Legacy invalid values are identified without
-changing storage or published settings. [PRODUCT-TEXT-REVIEW.md](PRODUCT-TEXT-REVIEW.md)
-owns its compatibility, validation scope and manual review. #97/PR own actual
-results and exact-head evidence; the owner explicitly kept preview configuration blocked.
-No database rule, migration, bulk repair, merge or production change.
+The owner visually accepted all four, then explicitly waived runner testing for
+**Sprint #91 only**, finalized the review package and authorized proceeding with
+merge commits. Hosted runner/remaining agent-run deployed customer journeys were
+not completed or passed. #105 / draft PR #106 remain incomplete and outside this
+integration; the owner rejected its existing-operator-browser-session dependency.
+The waiver creates no precedent for future sprints. Physical-device and actual
+screen-reader certification retain the existing supported-environment deferrals.
 
-## Sprint #91 preview correction prepared — October 23, 2026 Pacific
+Tracking [#97](https://github.com/BravoKelo/Talix/issues/97) owns final PR heads,
+exact CI results, preview identities, acceptance provenance and actual merge SHAs.
+PRs #98/#99 have merged; #100/#101 supply the remaining integration. No new
+application behavior was added in resolving their documentation conflicts. The
+final integrated candidate must pass Core checks; do not infer a passing result
+from this preparation record. #97 records the subsequent merge/check outcome.
 
-Sprint [#97](https://github.com/BravoKelo/Talix/issues/97) authorizes #96, #62,
-#64 and #66 in that order. Recovery confirmed main `4bb93bb` includes Sprint
-#90's PR #95; #49 and #94 remain outside this sprint. The focused #96 branch
-reproduces Desktop rendering at 329px in a 1280px workspace and introduces a
-shared, proportionally scaled true viewport for Go Live and Website Appearance.
-[WEBSITE-PREVIEW-REVIEW.md](WEBSITE-PREVIEW-REVIEW.md) records its design,
-regression scope and the development-preview approval blocker. Implementation
-is not completed validation or owner acceptance; #97/PR own exact-head evidence.
-No merge, production or database change is authorized.
+The earlier Preview configuration hold was superseded by the separately approved
+general Preview development connection correction, documented in PR #102. #103's
+audit is in separate PR #104. Neither supporting document authorizes new security,
+service or CI infrastructure. Main automatic Vercel deployment remains disabled;
+no production deployment, database migration, access link, credential change or
+branch deletion is part of this integration. #49 and #94 remain outside the sprint.
+
+The issue-specific review notes retain implementation contracts and historical
+reproduction evidence; their status sections are reconciled with these decisions.
 
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 

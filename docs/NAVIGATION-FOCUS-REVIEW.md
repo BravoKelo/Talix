@@ -1,5 +1,16 @@
 # Navigation dialog focus — #64 / Sprint #91
 
+## Accepted review status — October 24, 2026 Pacific
+
+The owner visually accepted this correction and authorized Sprint #91 integration.
+The prior configuration hold is historical: general Preview development connection
+configuration was separately approved and corrected (PR #102). The owner explicitly
+waived hosted runner testing for Sprint #91 only; it is not a passing journey claim
+or a precedent for later sprints. #105 / draft PR #106 remain incomplete and excluded.
+[#97](https://github.com/BravoKelo/Talix/issues/97) owns current exact-head CI,
+preview/acceptance evidence and actual merge outcomes. Main automatic deployment
+remains disabled; production and database/security settings are unchanged.
+
 The actual mobile storefront reproduced Menu → About with `activeElement=BODY`,
 outside the still-open dialog. Changing the view removed the focused menu action
 but did not remount the native TaskDialog or rerun its initial-focus effect.
@@ -23,10 +34,7 @@ plus existing cart and standard-navigation behavior in all configured engines.
 The PR/#97 own executed results and exact-head CI. Actual screen-reader and
 physical-device evidence remains deferred under SUPPORTED-ENVIRONMENTS.md.
 
-The owner explicitly chose to keep new Vercel preview configuration blocked on
-October 23, 2026 Pacific, after automatic approval review rejected copying the
-existing development settings. No configuration was changed. This is a draft;
-deployed verification and visual acceptance remain incomplete.
+The earlier configuration and visual-review holds are superseded by the accepted review status above.
 
 Review later in an approved development preview: open the mobile menu or desktop
 More menu with the keyboard, choose About and Contact, tab in both directions,
