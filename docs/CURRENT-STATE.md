@@ -1,5 +1,9 @@
 # Talix current state
 
+## Browser-validation audit prepared — October 24, 2026 Pacific
+
+The owner directed completing diagnostic/design [issue #103](https://github.com/BravoKelo/Talix/issues/103) before finalizing Sprint #91. [BROWSER-VALIDATION-AUDIT.md](BROWSER-VALIDATION-AUDIT.md) records the evidence: primary PR browser testing already runs locally with isolated fixtures independently of Vercel; missing CI artifact upload, unversioned hosted smoke procedures and runtime headroom are the bounded gaps. All four Sprint #91 final heads have successful Core checks and READY previews after the separately approved connection correction in PR #102. Hosted browser access remains distinct from authenticated connector HTTP success. The audit proposes small follow-ups for owner review; no workflow/code, credential, database, service or production change is authorized by #103. Final Sprint #91 deployed journey evidence and owner acceptance remain pending in #97; merge awaits separate owner approval.
+
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 
 Header PR #93 is merged as `edf233467e87ba165e51dc7e6b7ce21b857db491`; #81 is closed. The owner **did not approve #49's proposed extras editor/cart changes**; extras are intended as configurable inventory item selections through future Inventory & BOM. #49 remains open and deferred, not resolved.
