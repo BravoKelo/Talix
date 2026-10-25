@@ -43,6 +43,7 @@ export function StorefrontNavigation({
     });
   const container = useRef<HTMLDivElement>(null);
   const measure = useRef<HTMLDivElement>(null);
+  const navigation = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(0);
   const [dialog, setDialog] = useState<"menu" | "about" | "contact" | null>(
     null,
@@ -112,7 +113,10 @@ export function StorefrontNavigation({
         key={index}
         {...common}
         type="button"
-        onClick={() => setDialog(item.action!)}
+        onClick={(event) => {
+          event.currentTarget.focus();
+          setDialog(item.action!);
+        }}
       >
         {item.label}
       </button>
@@ -124,6 +128,8 @@ export function StorefrontNavigation({
         {items.map((item, i) => control(item, i, true))}
       </div>
       <nav
+        ref={navigation}
+        tabIndex={-1}
         aria-label={preview ? "Navigation preview" : "Business navigation"}
         className="shop-navigation-links"
       >
@@ -158,6 +164,8 @@ export function StorefrontNavigation({
           close={() => setDialog(null)}
           className="shop-information-dialog"
           backdropClose
+          focusKey={dialog}
+          fallbackFocusRef={navigation}
         >
           {dialog === "menu" ? (
             <nav aria-label="Menu links" className="shop-menu-links">

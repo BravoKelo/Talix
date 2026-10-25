@@ -120,7 +120,10 @@ test("location → catalog → decline → retry → fulfillment → refund", as
     await db.query("select public.advance_order($1,'in_progress')", [order]);
     await db.query("select public.advance_order($1,'ready')", [order]);
     await page.reload();
-    await expect(page.locator(".current")).toHaveText("ready");
+    const currentStep = page.getByRole("listitem").filter({ hasText: /^ready/ });
+    await expect(currentStep).toHaveAttribute("aria-current", "step");
+    await expect(currentStep).toHaveText(/^ready\s*Current$/);
+    await expect(page.getByRole("status")).toHaveText("Current status: ready.");
     await db.query("select public.refund_simulated($1,$2,1200,'Full return')", [
       order,
       crypto.randomUUID(),

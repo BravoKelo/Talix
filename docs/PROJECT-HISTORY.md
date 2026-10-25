@@ -1,5 +1,17 @@
 # Talix Project History
 
+## Sprint #91 acceptance and integration authorization — October 24, 2026 Pacific
+
+The owner accepted #96, #62, #64 and #66, waived hosted runner testing for this
+sprint only, and authorized proceeding after the finalized review. The earlier
+#96 failed screenshot was traced to a separate #105 build lacking the correction;
+acceptance followed the corrected #98 preview. All original candidate Core runs
+passed. Merge integration preserves ancestry and resolves current-state prose;
+#97 owns final exact-head CI, remaining merge results and completion status.
+No hosted-runner pass, production deployment, new migration or infrastructure
+change is implied. #105 remains incomplete; requiring an existing operator
+browser session was explicitly rejected. The waiver does not apply to later sprints.
+
 ## Purpose
 
 This document records material project outcomes, durable decisions, major investigations, milestone transitions, and important rejected directions.
