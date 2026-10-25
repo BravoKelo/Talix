@@ -1,5 +1,14 @@
 # Talix current state
 
+## Sprint #91 navigation focus prepared — October 23, 2026 Pacific
+
+The focused #64 branch corrects reproduced Menu → About/Contact focus loss with
+explicit view focus, preserved original-opener restoration and a named navigation
+fallback. [NAVIGATION-FOCUS-REVIEW.md](NAVIGATION-FOCUS-REVIEW.md) owns its narrow
+shared-dialog contract, regression scope and review checklist. #97/PR own actual
+results and exact-head evidence. The owner explicitly kept preview configuration
+blocked; no deployed verification or visual acceptance is claimed. No merge,
+production, schema or data change.
 ## Sprint #91 product-text feedback prepared — October 23, 2026 Pacific
 
 The focused #62 branch builds on #96 / PR #98 and adds measured field-level
