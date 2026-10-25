@@ -1,5 +1,17 @@
 # Talix current state
 
+## Browser-validation audit accepted — October 24, 2026 Pacific
+
+The owner approved PRs #102 and #104 for merge. [BROWSER-VALIDATION-AUDIT.md](BROWSER-VALIDATION-AUDIT.md)
+records the #103 diagnostic/design deliverable: the primary local-fixture Core
+browser path already operates independently of Vercel; hosted service journeys
+remain separate evidence. The report preserves its assessed baseline and records
+the subsequent Sprint #91 completion, explicit one-sprint runner waiver and
+exclusion of CI artifact storage. No runner, workflow or service implementation
+is authorized by acceptance of the report. #103 owns final integration/closure;
+#105 and draft PR #106 remain incomplete, with the operator-session dependency
+rejected by the owner. No production deployment or new infrastructure is included.
+
 ## General Preview configuration documentation accepted — October 24, 2026 Pacific
 
 The owner approved PR #102 for integration. [SETUP.md](SETUP.md#general-preview-configuration)
@@ -35,10 +47,11 @@ screen-reader certification retain the existing supported-environment deferrals.
 
 Tracking [#97](https://github.com/BravoKelo/Talix/issues/97) owns final PR heads,
 exact CI results, preview identities, acceptance provenance and actual merge SHAs.
-PRs #98/#99 have merged; #100/#101 supply the remaining integration. No new
-application behavior was added in resolving their documentation conflicts. The
-final integrated candidate must pass Core checks; do not infer a passing result
-from this preparation record. #97 records the subsequent merge/check outcome.
+All four correction PRs (#98-#101) are merged; final Sprint #91 main is
+`855ab7b2c6c49d4685a14bfe9d5be0665e09829a`. Its content matched the complete
+integrated candidate, which passed Core run 40159350634: 94 unit/SQL tests and
+128 browser cases, lint, types and build. #97 is closed and records actual merge
+SHAs, owner acceptance and verification limits.
 
 The earlier Preview configuration hold was superseded by the separately approved
 general Preview development connection correction, documented in PR #102. #103's
