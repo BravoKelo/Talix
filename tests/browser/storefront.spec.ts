@@ -837,6 +837,73 @@ test("bundled demo images load from the current preview origin", async ({
   }
 });
 
+for (const width of [1280, 768, 390]) {
+  test(`navigation view focus and removed-trigger recovery at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await mockCatalog(page, {
+      ...catalog,
+      subscription: {
+        ...catalog.subscription,
+        header_mode: "custom",
+        header_layout: "left",
+        header_links: [
+          ...Array.from({ length: 6 }, (_, i) => ({
+            label: `Community collection ${i + 1}`,
+            destination: "home",
+            url: "",
+          })),
+          { label: "About", destination: "about", url: "" },
+          { label: "Contact", destination: "contact", url: "" },
+        ],
+      },
+    });
+    await page.goto("/shop/example");
+    const menu = page.getByRole("button", {
+      name: /Open navigation menu|More navigation links/,
+    });
+    for (const view of ["About", "Contact"]) {
+      await menu.focus();
+      await page.keyboard.press("Enter");
+      await page
+        .getByRole("dialog", { name: "Menu", exact: true })
+        .getByRole("button", { name: view, exact: true })
+        .focus();
+      await page.keyboard.press("Enter");
+      const dialog = page.getByRole("dialog", { name: view, exact: true });
+      await expect(dialog.locator(".dialog-toolbar strong")).toBeFocused();
+      await expect(dialog).toContainText(
+        view === "About" ? catalog.subscription.description : "North Street",
+      );
+      for (const key of ["Tab", "Tab", "Shift+Tab", "Shift+Tab"]) {
+        await page.keyboard.press(key);
+        expect(
+          await dialog.evaluate((el) =>
+            el.contains(el.ownerDocument.activeElement),
+          ),
+        ).toBe(true);
+      }
+      await page.keyboard.press("Escape");
+      await expect(menu).toBeFocused();
+    }
+    await menu.focus();
+    await page.keyboard.press("Enter");
+    await page
+      .getByRole("dialog", { name: "Menu", exact: true })
+      .getByRole("button", { name: "About", exact: true })
+      .click();
+    await menu.evaluate((el) => el.remove());
+    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("navigation", {
+        name: "Business navigation",
+        exact: true,
+      }),
+    ).toBeFocused();
+  });
+}
+
 test("standard navigation uses saved content, follows the selected location and preserves the cart", async ({
   page,
 }) => {
@@ -877,6 +944,16 @@ test("standard navigation uses saved content, follows the selected location and 
     page.getByRole("dialog", { name: "About", exact: true }),
   ).toContainText(catalog.subscription.description);
   await page.keyboard.press("Escape");
+  const aboutOpener = page
+    .getByRole("navigation", { name: "Business navigation", exact: true })
+    .getByRole("button", { name: "About", exact: true });
+  await expect(
+    (await aboutOpener.count())
+      ? aboutOpener
+      : page.getByRole("button", {
+          name: /Open navigation menu|More navigation links/,
+        }),
+  ).toBeFocused();
   await navigate("Contact");
   await expect(
     page.getByRole("dialog", { name: "Contact", exact: true }),
@@ -900,7 +977,9 @@ test("standard navigation uses saved content, follows the selected location and 
   // geometry before this navigation journey's automatic click.
   await expect
     .poll(() =>
-      page.locator(".shop-nav").evaluate((el) => el.getBoundingClientRect().height),
+      page
+        .locator(".shop-nav")
+        .evaluate((el) => el.getBoundingClientRect().height),
     )
     .toBeLessThanOrEqual(56.1);
   const menu = page.getByRole("button", {

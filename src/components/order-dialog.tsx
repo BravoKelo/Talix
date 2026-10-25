@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
 export function TaskDialog({
   children,
@@ -9,6 +9,8 @@ export function TaskDialog({
   busy = false,
   className = "",
   backdropClose = false,
+  focusKey,
+  fallbackFocusRef,
 }: {
   children: React.ReactNode;
   close: () => void;
@@ -17,21 +19,38 @@ export function TaskDialog({
   busy?: boolean;
   className?: string;
   backdropClose?: boolean;
+  focusKey?: string;
+  fallbackFocusRef?: RefObject<HTMLElement | null>;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const focusTitle = useRef<HTMLElement>(null);
   useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
     const element = dialog.current;
+    const ownerDocument = element?.ownerDocument;
+    const previous = ownerDocument?.activeElement as HTMLElement | null;
+    const fallback = fallbackFocusRef?.current;
     element?.showModal();
     return () => {
       element?.close();
-      if (previous?.isConnected) previous.focus();
-      else
-        document
-          .querySelector<HTMLElement>("[data-primary-list-action]")
-          ?.focus();
+      const target = [
+        previous,
+        fallback,
+        ownerDocument?.querySelector<HTMLElement>("[data-primary-list-action]"),
+      ].find(
+        (candidate) =>
+          candidate?.isConnected &&
+          candidate.getClientRects().length > 0 &&
+          !candidate.matches(":disabled") &&
+          !candidate.closest("[inert]"),
+      );
+      target?.focus();
     };
-  }, []);
+  }, [fallbackFocusRef]);
+  useEffect(() => {
+    // Changing a view can remove the focused action without remounting the
+    // native dialog. Preserve the original opener while naming the new view.
+    if (focusKey !== undefined) focusTitle.current?.focus();
+  }, [focusKey]);
   return (
     <dialog
       ref={dialog}
@@ -49,6 +68,31 @@ export function TaskDialog({
         }
       }}
       aria-label={title}
+      onKeyDown={(event) => {
+        if (focusKey === undefined || event.key !== "Tab") return;
+        const controls = Array.from(
+          event.currentTarget.querySelectorAll<HTMLElement>(
+            "button, a[href], input, select, textarea, [tabindex]",
+          ),
+        ).filter(
+          (element) =>
+            element.tabIndex >= 0 &&
+            !element.matches(":disabled") &&
+            element.getClientRects().length > 0,
+        );
+        const active = event.currentTarget.ownerDocument.activeElement;
+        const first = controls[0],
+          last = controls.at(-1);
+        if (
+          !first ||
+          (event.shiftKey &&
+            (active === first || !controls.includes(active as HTMLElement))) ||
+          (!event.shiftKey && active === last)
+        ) {
+          event.preventDefault();
+          (event.shiftKey ? last : first)?.focus();
+        }
+      }}
       // Repeated native close requests can become non-cancelable; opt out of
       // them while busy rather than relying only on the cancel handler.
       closedby={busy ? "none" : undefined}
@@ -58,7 +102,9 @@ export function TaskDialog({
       }}
     >
       <div className="dialog-toolbar">
-        <strong>{title}</strong>
+        <strong ref={focusTitle} tabIndex={focusKey === undefined ? undefined : -1}>
+          {title}
+        </strong>
         <button
           type="button"
           className="secondary"

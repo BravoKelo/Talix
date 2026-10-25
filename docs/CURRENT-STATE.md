@@ -1,13 +1,38 @@
 # Talix current state
 
-## Sprint #91 fulfillment accessibility prepared — October 23, 2026 Pacific
+## Sprint #91 accepted implementation and integration — October 24, 2026 Pacific
 
-The focused #66 branch preserves tracking and payment contracts while adding
-visible Current text, current-step semantics and a stable polite status region.
-[FULFILLMENT-STATUS-REVIEW.md](FULFILLMENT-STATUS-REVIEW.md) records reproduction,
-regression scope, owner review and evidence limits. #97/PR own exact-head
-results. The owner explicitly kept new preview configuration blocked; deployed
-verification remains incomplete. No merge, production, data or schema change.
+This tree brings together the four owner-accepted corrections: #96 uses a genuine,
+uniformly scaled private desktop/tablet/mobile viewport in Go Live and Website
+Appearance; #62 adds measured contrast guidance and explicit draft recovery;
+#64 preserves navigation-dialog focus and restores it safely; #66 exposes the
+current fulfillment step with visible text, semantics and quiet polling updates.
+The existing publication, catalog, checkout, authorization and data contracts remain.
+
+The owner visually accepted all four, then explicitly waived runner testing for
+**Sprint #91 only**, finalized the review package and authorized proceeding with
+merge commits. Hosted runner/remaining agent-run deployed customer journeys were
+not completed or passed. #105 / draft PR #106 remain incomplete and outside this
+integration; the owner rejected its existing-operator-browser-session dependency.
+The waiver creates no precedent for future sprints. Physical-device and actual
+screen-reader certification retain the existing supported-environment deferrals.
+
+Tracking [#97](https://github.com/BravoKelo/Talix/issues/97) owns final PR heads,
+exact CI results, preview identities, acceptance provenance and actual merge SHAs.
+PRs #98/#99 have merged; #100/#101 supply the remaining integration. No new
+application behavior was added in resolving their documentation conflicts. The
+final integrated candidate must pass Core checks; do not infer a passing result
+from this preparation record. #97 records the subsequent merge/check outcome.
+
+The earlier Preview configuration hold was superseded by the separately approved
+general Preview development connection correction, documented in PR #102. #103's
+audit is in separate PR #104. Neither supporting document authorizes new security,
+service or CI infrastructure. Main automatic Vercel deployment remains disabled;
+no production deployment, database migration, access link, credential change or
+branch deletion is part of this integration. #49 and #94 remain outside the sprint.
+
+The issue-specific review notes retain implementation contracts and historical
+reproduction evidence; their status sections are reconciled with these decisions.
 
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 

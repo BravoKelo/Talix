@@ -283,6 +283,7 @@ export async function onboardingGateway(skipMigrations: string[] = []) {
         "payment_events",
       ];
       const functions: Record<string, string[]> = {
+        public_catalog: ["p_slug"],
         advance_order: ["p_order", "p_status"],
         refund_simulated: ["p_order", "p_request", "p_amount", "p_reason"],
         subscription_change_state: ["p_subscription"],

@@ -2961,6 +2961,34 @@ body:has(.figma-store) {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.website-preview-document .shop-centered-identity h3 {
+  color: inherit;
+  font-size: 26px;
+  line-height: 1.25;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+.website-preview-viewport {
+  position: relative;
+  width: 100%;
+  height: 680px;
+  margin-inline: auto;
+  overflow: clip;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+}
+.website-preview-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: none;
+  border: 0;
+  transform-origin: top left;
+}
 .shop-centered-identity img {
   max-width: 100%;
   width: 300px;

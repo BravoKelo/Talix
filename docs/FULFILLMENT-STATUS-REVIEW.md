@@ -1,5 +1,16 @@
 # Fulfillment status accessibility — #66 / Sprint #91
 
+## Accepted review status — October 24, 2026 Pacific
+
+The owner visually accepted this correction and authorized Sprint #91 integration.
+The prior configuration hold is historical: general Preview development connection
+configuration was separately approved and corrected (PR #102). The owner explicitly
+waived hosted runner testing for Sprint #91 only; it is not a passing journey claim
+or a precedent for later sprints. #105 / draft PR #106 remain incomplete and excluded.
+[#97](https://github.com/BravoKelo/Talix/issues/97) owns current exact-head CI,
+preview/acceptance evidence and actual merge outcomes. Main automatic deployment
+remains disabled; production and database/security settings are unchanged.
+
 The isolated actual tracking page reproduced a highlighted ready step with
 `aria-current=null` and an empty status region. The correction preserves the
 progress pills and adds visible Current text, list semantics and
@@ -24,11 +35,7 @@ These are isolated browser/DOM checks, not live-service or actual screen-reader
 certification. Physical-device and real assistive-technology evidence remains
 deferred under SUPPORTED-ENVIRONMENTS.md.
 
-The PR and #97 own exact-head CI and actual results. The owner explicitly chose
-to keep new Vercel preview configuration blocked on October 23, 2026 Pacific,
-after automatic approval review rejected copying development settings. No
-configuration change or workaround is authorized. This PR remains a draft with
-deployed verification and visual acceptance incomplete. Production is unchanged.
+The PR and #97 own exact-head CI and actual results. The earlier configuration and visual-review holds are superseded by the accepted review status above.
 
 Review later in an approved development preview: read the initial status, watch
 a meaningful update, and confirm Current follows the correct step with no
