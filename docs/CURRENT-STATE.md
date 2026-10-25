@@ -1,5 +1,9 @@
 # Talix current state
 
+## Repeatable hosted smoke procedure prepared — #105 / October 24, 2026 Pacific
+
+The owner directed using [#105](https://github.com/BravoKelo/Talix/issues/105) to establish a versioned trusted-operator hosted smoke procedure and explicitly prohibited access links and CI artifact storage/upload. `npm run smoke:preview` and [HOSTED-PREVIEW-SMOKE.md](HOSTED-PREVIEW-SMOKE.md) now pin exact READY Preview/PR/service identity, separate deployment access from application Auth and fixture-owner checks, and define minimal owner/customer flows plus exact cleanup/retention reporting. They use existing approved browser sessions only, copy/inject no credentials and persist no screenshots/traces/videos/reports. Core CI, protection, services, schema and production are unchanged. A real #98 preflight passed metadata checks and stopped at Vercel protection before fixture creation or app Auth; no live journey pass is claimed. The absence of an available authorized operator session remains the precise boundary, not another deployment/configuration failure. Runner validation and exact PR revision belong in #105; Sprint #91 remains unaccepted in #97 and merge awaits owner review.
+
 ## Sprint #90 checkout decision and implementation — October 23, 2026 Pacific
 
 Header PR #93 is merged as `edf233467e87ba165e51dc7e6b7ce21b857db491`; #81 is closed. The owner **did not approve #49's proposed extras editor/cart changes**; extras are intended as configurable inventory item selections through future Inventory & BOM. #49 remains open and deferred, not resolved.
